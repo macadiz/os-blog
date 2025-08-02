@@ -1,0 +1,250 @@
+<header class="bg-white shadow-sm border-b border-gray-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo/Brand -->
+      <div class="flex items-center">
+        <a [routerLink]="['/blog']" class="flex items-center">
+          <span class="material-symbols-outlined text-blue-600 text-3xl mr-2"
+            >article</span
+          >
+          <span class="text-xl font-bold text-gray-900">
+            {{ blogSettings?.blogTitle || "Open Blog" }}
+          </span>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-8">
+        <a
+          [routerLink]="['/blog']"
+          routerLinkActive="text-blue-600 border-blue-600"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
+        >
+          Blog
+        </a>
+
+        <!-- Admin/Author Links (only show if authenticated) -->
+        <ng-container *ngIf="currentUser$ | async as user">
+          <a
+            [routerLink]="['/admin']"
+            routerLinkActive="text-blue-600 border-blue-600"
+            class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
+          >
+            {{ user.role === "ADMIN" ? "Admin Dashboard" : "Author Dashboard" }}
+          </a>
+
+          <a
+            [routerLink]="['/admin/posts']"
+            routerLinkActive="text-blue-600 border-blue-600"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
+          >
+            My Posts
+          </a>
+
+          <a
+            [routerLink]="['/admin/posts/new']"
+            routerLinkActive="text-blue-600 border-blue-600"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
+          >
+            New Post
+          </a>
+        </ng-container>
+      </nav>
+
+      <!-- User Menu -->
+      <div class="flex items-center space-x-4">
+        <ng-container *ngIf="currentUser$ | async as user; else loginLink">
+          <!-- User Dropdown -->
+          <div class="relative" [class.show]="showUserMenu">
+            <button
+              (click)="toggleUserMenu()"
+              class="flex items-center text-sm rounded-full bg-gray-100 hover:bg-gray-200 transition-colors p-2"
+            >
+              <span class="material-symbols-outlined text-gray-600"
+                >person</span
+              >
+              <span class="ml-2 text-gray-700 font-medium">
+                {{
+                  user.firstName && user.lastName
+                    ? user.firstName + " " + user.lastName
+                    : user.username
+                }}
+              </span>
+              <span class="material-symbols-outlined ml-2 text-gray-400"
+                >expand_more</span
+              >
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div
+              *ngIf="showUserMenu"
+              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50"
+            >
+              <div class="py-1">
+                <div
+                  class="px-4 py-2 text-sm text-gray-500 border-b border-gray-100"
+                >
+                  {{ user.role === "ADMIN" ? "Administrator" : "Author" }}
+                </div>
+                <a
+                  [routerLink]="['/admin']"
+                  (click)="closeUserMenu()"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <svg
+                    class="inline w-4 h-4 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
+                    ></path>
+                  </svg>
+                  Dashboard
+                </a>
+                <a
+                  [routerLink]="['/admin/posts']"
+                  (click)="closeUserMenu()"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <svg
+                    class="inline w-4 h-4 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </svg>
+                  My Posts
+                </a>
+                <a
+                  [routerLink]="['/admin/posts/new']"
+                  (click)="closeUserMenu()"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <svg
+                    class="inline w-4 h-4 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </svg>
+                  New Post
+                </a>
+                <div class="border-t border-gray-100 mt-1 pt-1">
+                  <button
+                    (click)="logout()"
+                    class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <svg
+                      class="inline w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Login Link (show when not authenticated) -->
+        <ng-template #loginLink>
+          <a
+            [routerLink]="['/login']"
+            class="inline-flex items-center px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors"
+          >
+            <span class="material-symbols-outlined mr-2 text-lg">login</span>
+            Login
+          </a>
+        </ng-template>
+
+        <!-- Mobile menu button -->
+        <button
+          (click)="toggleMobileMenu()"
+          class="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+        >
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div
+      *ngIf="showMobileMenu"
+      class="md:hidden border-t border-gray-200 pt-4 pb-3"
+    >
+      <div class="space-y-1">
+        <a
+          [routerLink]="['/blog']"
+          (click)="closeMobileMenu()"
+          routerLinkActive="bg-blue-50 text-blue-600"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+        >
+          Blog
+        </a>
+
+        <ng-container *ngIf="currentUser$ | async as user">
+          <a
+            [routerLink]="['/admin']"
+            (click)="closeMobileMenu()"
+            routerLinkActive="bg-blue-50 text-blue-600"
+            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+          >
+            {{ user.role === "ADMIN" ? "Admin Dashboard" : "Author Dashboard" }}
+          </a>
+          <a
+            [routerLink]="['/admin/posts']"
+            (click)="closeMobileMenu()"
+            routerLinkActive="bg-blue-50 text-blue-600"
+            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+          >
+            My Posts
+          </a>
+          <a
+            [routerLink]="['/admin/posts/new']"
+            (click)="closeMobileMenu()"
+            routerLinkActive="bg-blue-50 text-blue-600"
+            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+          >
+            New Post
+          </a>
+          <button
+            (click)="logout()"
+            class="block w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+          >
+            Logout
+          </button>
+        </ng-container>
+
+        <ng-container *ngIf="!(currentUser$ | async)">
+          <a
+            [routerLink]="['/login']"
+            (click)="closeMobileMenu()"
+            class="block px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+          >
+            Login
+          </a>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</header>

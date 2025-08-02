@@ -1,0 +1,5 @@
+.router-link-active {
+  background-color: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border-left-color: #3b82f6 !important;
+}

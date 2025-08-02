@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+    ADMIN
+    AUTHOR
+}
+
+model User {
+    id        String   @id @default(cuid())
+    email     String   @unique
+    username  String   @unique
+    password  String // hashed
+    firstName String?  @map("first_name")
+    lastName  String?  @map("last_name")
+    role      UserRole @default(ADMIN)
+    isActive  Boolean  @default(true) @map("is_active")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    posts      Post[]
+    categories Category[]
+
+    @@map("users")
+}
+
+model Category {
+    id          String   @id @default(cuid())
+    name        String   @unique
+    slug        String   @unique
+    description String?
+    color       String? // for UI theming
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    posts       Post[]
+    createdBy   User   @relation(fields: [createdById], references: [id])
+    createdById String @map("created_by_id")
+
+    @@map("categories")
+}
+
+model Post {
+    id            String    @id @default(cuid())
+    title         String
+    slug          String    @unique
+    content       String // Rich text content
+    excerpt       String? // Short description
+    featuredImage String?   @map("featured_image") // Image URL
+    published     Boolean   @default(false)
+    publishedAt   DateTime? @map("published_at")
+    createdAt     DateTime  @default(now()) @map("created_at")
+    updatedAt     DateTime  @updatedAt @map("updated_at")
+
+    // SEO fields
+    metaTitle       String? @map("meta_title")
+    metaDescription String? @map("meta_description")
+
+    // Relations
+    author     User      @relation(fields: [authorId], references: [id])
+    authorId   String    @map("author_id")
+    category   Category? @relation(fields: [categoryId], references: [id])
+    categoryId String?   @map("category_id")
+    postTags   PostTag[] // Many PostTag records
+
+    @@map("posts")
+}
+
+model PostTag {
+    id     String @id @default(cuid())
+    postId String @map("post_id")
+    tagId  String @map("tag_id")
+
+    // Relations
+    post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+    tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+    // Prevent duplicate post-tag combinations
+    @@unique([postId, tagId])
+    @@map("post_tags")
+}
+
+model Tag {
+    id        String   @id @default(cuid())
+    name      String   @unique
+    slug      String   @unique
+    createdAt DateTime @default(now()) @map("created_at")
+
+    // Relations
+    postTags PostTag[] // Many PostTag records
+
+    @@map("tags")
+}
+
+model BlogSettings {
+    id              String   @id @default("default")
+    blogTitle       String   @default("My Blog") @map("blog_title")
+    blogDescription String   @default("A modern blogging platform") @map("blog_description")
+    logoUrl         String?  @map("logo_url")
+    faviconUrl      String?  @map("favicon_url")
+    theme           String   @default("default")
+    emailSettings   Json?    @map("email_settings") // SMTP configuration
+    socialLinks     Json?    @map("social_links") // Social media links
+    seoSettings     Json?    @map("seo_settings") // SEO configuration
+    createdAt       DateTime @default(now()) @map("created_at")
+    updatedAt       DateTime @updatedAt @map("updated_at")
+
+    @@map("blog_settings")
+}

@@ -1,0 +1,238 @@
+<div class="space-y-6">
+  <!-- Welcome Section -->
+  <div class="bg-white shadow rounded-lg p-6">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <div
+          class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white"
+        >
+          <span class="material-symbols-outlined text-2xl">dashboard</span>
+        </div>
+      </div>
+      <div class="ml-5 w-0 flex-1">
+        <dl>
+          <dt class="text-sm font-medium text-gray-500 truncate">
+            Welcome back,
+            {{
+              (currentUser$ | async)?.firstName ||
+                (currentUser$ | async)?.username
+            }}!
+          </dt>
+          <dd class="text-lg font-medium text-gray-900">
+            {{
+              (currentUser$ | async)?.role === "ADMIN"
+                ? "Administrator"
+                : "Author"
+            }}
+            Dashboard
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- Posts Stat -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span
+              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
+              >article</span
+            >
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                {{
+                  (currentUser$ | async)?.role === "ADMIN"
+                    ? "Total Posts"
+                    : "Your Posts"
+                }}
+              </dt>
+              <dd class="text-lg font-medium text-gray-900">
+                {{ postsCount || 0 }}
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-5 py-3">
+        <div class="text-sm">
+          <a
+            [routerLink]="['/admin/posts']"
+            class="font-medium text-blue-700 hover:text-blue-900"
+          >
+            View all posts
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Stat (Admin Only) -->
+    <div
+      class="bg-white overflow-hidden shadow rounded-lg"
+      *ngIf="(currentUser$ | async)?.role === 'ADMIN'"
+    >
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span
+              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
+              >group</span
+            >
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                Total Users
+              </dt>
+              <dd class="text-lg font-medium text-gray-900">
+                {{ usersCount || 0 }}
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-5 py-3">
+        <div class="text-sm">
+          <a
+            [routerLink]="['/admin/users']"
+            class="font-medium text-blue-700 hover:text-blue-900"
+          >
+            Manage users
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories Stat (Admin Only) -->
+    <div
+      class="bg-white overflow-hidden shadow rounded-lg"
+      *ngIf="(currentUser$ | async)?.role === 'ADMIN'"
+    >
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span
+              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
+              >category</span
+            >
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                Categories
+              </dt>
+              <dd class="text-lg font-medium text-gray-900">
+                {{ categoriesCount || 0 }}
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-5 py-3">
+        <div class="text-sm">
+          <a
+            [routerLink]="['/admin/categories']"
+            class="font-medium text-blue-700 hover:text-blue-900"
+          >
+            Manage categories
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">Quick Actions</h3>
+      <div class="mt-5">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <a
+            [routerLink]="['/admin/posts/new']"
+            class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            <span
+              class="material-symbols-outlined mx-auto h-12 w-12 text-gray-400 text-5xl"
+              >add_circle</span
+            >
+            <span class="mt-2 block text-sm font-medium text-gray-900">
+              Create New Post
+            </span>
+          </a>
+
+          <a
+            [routerLink]="['/blog']"
+            class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            <span
+              class="material-symbols-outlined mx-auto h-12 w-12 text-gray-400 text-5xl"
+              >public</span
+            >
+            <span class="mt-2 block text-sm font-medium text-gray-900">
+              View Public Blog
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">
+        Recent Activity
+      </h3>
+      <div class="mt-5">
+        <div class="flow-root">
+          <ul class="-mb-8">
+            <li>
+              <div class="relative pb-8">
+                <span
+                  class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
+                  aria-hidden="true"
+                ></span>
+                <div class="relative flex items-start space-x-3">
+                  <div>
+                    <div class="relative px-1">
+                      <div
+                        class="h-8 w-8 bg-blue-500 rounded-full ring-8 ring-white flex items-center justify-center"
+                      >
+                        <span
+                          class="material-symbols-outlined h-4 w-4 text-white text-sm"
+                          >event</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div>
+                      <div class="text-sm">
+                        <p class="font-medium text-gray-900">
+                          {{
+                            (currentUser$ | async)?.role === "ADMIN"
+                              ? "Admin panel"
+                              : "Author dashboard"
+                          }}
+                          accessed
+                        </p>
+                      </div>
+                      <p class="mt-0.5 text-sm text-gray-500">
+                        Welcome to your content management area
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

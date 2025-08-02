@@ -1,0 +1,819 @@
+openapi: 3.0.3
+info:
+  title: Open Blog API
+  description: |
+    A comprehensive REST API for a blog platform built with NestJS and Prisma.
+
+    ## Features
+    - User authentication with JWT tokens
+    - Blog post management (CRUD operations)
+    - Categories and tags support
+    - Initial setup workflow
+    - Admin dashboard capabilities
+
+    ## Authentication
+    Most admin endpoints require JWT authentication. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+  version: 1.0.0
+  contact:
+    name: Open Blog API Support
+    email: support@openblog.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://your-production-domain.com/api
+    description: Production server
+
+paths:
+  /:
+    get:
+      summary: Health check endpoint
+      description: Simple endpoint to check if the API is running
+      tags:
+        - Health
+      responses:
+        '200':
+          description: API is running successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 'Hello World!'
+
+  /auth/login:
+    post:
+      summary: User login
+      description: Authenticate a user and receive a JWT token
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+            example:
+              username: 'admin'
+              password: 'password123'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /posts/published:
+    get:
+      summary: Get published posts
+      description: Retrieve all published blog posts (public endpoint)
+      tags:
+        - Posts (Public)
+      responses:
+        '200':
+          description: List of published posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BlogPost'
+
+  /posts/slug/{slug}:
+    get:
+      summary: Get post by slug
+      description: Retrieve a specific post by its slug (public endpoint)
+      tags:
+        - Posts (Public)
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: The post slug
+          schema:
+            type: string
+            example: 'my-first-blog-post'
+      responses:
+        '200':
+          description: Post found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPost'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/posts:
+    get:
+      summary: Get all posts (admin)
+      description: Retrieve all posts including drafts (admin only)
+      tags:
+        - Posts (Admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of all posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BlogPost'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create a new post
+      description: Create a new blog post (admin only)
+      tags:
+        - Posts (Admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostDto'
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPost'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/posts/{id}:
+    get:
+      summary: Get post by ID
+      description: Retrieve a specific post by its ID (admin only)
+      tags:
+        - Posts (Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The post ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Post found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPost'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      summary: Update a post
+      description: Update an existing blog post (admin only)
+      tags:
+        - Posts (Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The post ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePostDto'
+      responses:
+        '200':
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPost'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete a post
+      description: Delete a blog post (admin only)
+      tags:
+        - Posts (Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The post ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Post deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Post deleted successfully'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories:
+    get:
+      summary: Get all categories
+      description: Retrieve all available categories
+      tags:
+        - Categories
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+
+  /tags:
+    get:
+      summary: Get all tags
+      description: Retrieve all available tags
+      tags:
+        - Tags
+      responses:
+        '200':
+          description: List of tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+
+  /setup/required:
+    get:
+      summary: Check if setup is required
+      description: Check if the initial blog setup has been completed
+      tags:
+        - Setup
+      responses:
+        '200':
+          description: Setup status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  required:
+                    type: boolean
+                    description: Whether initial setup is required
+                    example: true
+
+  /setup/admin:
+    post:
+      summary: Create initial admin user
+      description: Create the first admin user and set up the blog
+      tags:
+        - Setup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdminDto'
+      responses:
+        '201':
+          description: Admin user created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Admin user created successfully'
+                  admin:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input or setup already completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /setup/blog-settings:
+    get:
+      summary: Get blog settings
+      description: Retrieve the current blog settings
+      tags:
+        - Setup
+      responses:
+        '200':
+          description: Blog settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogSettings'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginDto:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: Username or email
+          example: 'admin'
+        password:
+          type: string
+          description: User password
+          example: 'password123'
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT access token
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+
+    CreatePostDto:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+          description: Post title
+          example: 'My First Blog Post'
+        content:
+          type: string
+          description: Post content (HTML/Markdown)
+          example: '<p>This is the content of my first blog post.</p>'
+        excerpt:
+          type: string
+          description: Short excerpt of the post
+          example: 'A brief summary of the post'
+        featuredImage:
+          type: string
+          description: URL to the featured image
+          example: 'https://example.com/image.jpg'
+        published:
+          type: boolean
+          description: Whether the post is published
+          default: false
+          example: true
+        publishedAt:
+          type: string
+          format: date-time
+          description: When the post was published
+          example: '2025-07-30T15:30:00Z'
+        metaTitle:
+          type: string
+          description: SEO meta title
+          example: 'My First Blog Post - Open Blog'
+        metaDescription:
+          type: string
+          description: SEO meta description
+          example: 'Learn about creating your first blog post'
+        categoryId:
+          type: string
+          format: uuid
+          description: Category ID
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        tagIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Array of tag IDs
+          example:
+            [
+              '123e4567-e89b-12d3-a456-426614174001',
+              '123e4567-e89b-12d3-a456-426614174002',
+            ]
+
+    UpdatePostDto:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Post title
+          example: 'Updated Blog Post Title'
+        content:
+          type: string
+          description: Post content (HTML/Markdown)
+          example: '<p>Updated content of the blog post.</p>'
+        excerpt:
+          type: string
+          description: Short excerpt of the post
+          example: 'Updated brief summary'
+        featuredImage:
+          type: string
+          description: URL to the featured image
+          example: 'https://example.com/updated-image.jpg'
+        published:
+          type: boolean
+          description: Whether the post is published
+          example: true
+        publishedAt:
+          type: string
+          format: date-time
+          description: When the post was published
+          example: '2025-07-30T16:00:00Z'
+        metaTitle:
+          type: string
+          description: SEO meta title
+          example: 'Updated Blog Post - Open Blog'
+        metaDescription:
+          type: string
+          description: SEO meta description
+          example: 'Updated description for SEO'
+        categoryId:
+          type: string
+          format: uuid
+          description: Category ID
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        tagIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Array of tag IDs
+          example: ['123e4567-e89b-12d3-a456-426614174001']
+
+    CreateAdminDto:
+      type: object
+      required:
+        - email
+        - username
+        - password
+        - blogTitle
+      properties:
+        email:
+          type: string
+          format: email
+          description: Admin email address
+          example: 'admin@example.com'
+        username:
+          type: string
+          description: Admin username
+          example: 'admin'
+        password:
+          type: string
+          minLength: 8
+          description: Admin password (minimum 8 characters)
+          example: 'securepassword123'
+        firstName:
+          type: string
+          description: Admin first name
+          example: 'John'
+        lastName:
+          type: string
+          description: Admin last name
+          example: 'Doe'
+        blogTitle:
+          type: string
+          description: The title of the blog
+          example: 'My Awesome Blog'
+        blogDescription:
+          type: string
+          description: Description of the blog
+          example: 'A blog about technology and life'
+
+    BlogPost:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique post identifier
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        title:
+          type: string
+          description: Post title
+          example: 'My First Blog Post'
+        slug:
+          type: string
+          description: URL-friendly post slug
+          example: 'my-first-blog-post'
+        content:
+          type: string
+          description: Post content
+          example: '<p>This is the content of my blog post.</p>'
+        excerpt:
+          type: string
+          nullable: true
+          description: Short excerpt
+          example: 'A brief summary'
+        featuredImage:
+          type: string
+          nullable: true
+          description: Featured image URL
+          example: 'https://example.com/image.jpg'
+        published:
+          type: boolean
+          description: Publication status
+          example: true
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Publication date
+          example: '2025-07-30T15:30:00Z'
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2025-07-30T15:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update date
+          example: '2025-07-30T15:30:00Z'
+        metaTitle:
+          type: string
+          nullable: true
+          description: SEO meta title
+          example: 'My First Blog Post - Open Blog'
+        metaDescription:
+          type: string
+          nullable: true
+          description: SEO meta description
+          example: 'Learn about creating your first blog post'
+        authorId:
+          type: string
+          format: uuid
+          description: Author user ID
+          example: '123e4567-e89b-12d3-a456-426614174001'
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Category ID
+          example: '123e4567-e89b-12d3-a456-426614174002'
+        author:
+          $ref: '#/components/schemas/User'
+        category:
+          allOf:
+            - $ref: '#/components/schemas/Category'
+            - nullable: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique user identifier
+          example: '123e4567-e89b-12d3-a456-426614174001'
+        email:
+          type: string
+          format: email
+          description: User email
+          example: 'admin@example.com'
+        username:
+          type: string
+          description: Username
+          example: 'admin'
+        firstName:
+          type: string
+          nullable: true
+          description: First name
+          example: 'John'
+        lastName:
+          type: string
+          nullable: true
+          description: Last name
+          example: 'Doe'
+        role:
+          type: string
+          enum: [ADMIN, AUTHOR]
+          description: User role
+          example: 'ADMIN'
+        isActive:
+          type: boolean
+          description: Whether user is active
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation date
+          example: '2025-07-30T15:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update date
+          example: '2025-07-30T15:00:00Z'
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique category identifier
+          example: '123e4567-e89b-12d3-a456-426614174002'
+        name:
+          type: string
+          description: Category name
+          example: 'Technology'
+        slug:
+          type: string
+          description: URL-friendly category slug
+          example: 'technology'
+        description:
+          type: string
+          nullable: true
+          description: Category description
+          example: 'Posts about technology and programming'
+        color:
+          type: string
+          nullable: true
+          description: Category color (hex code)
+          example: '#3B82F6'
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2025-07-30T15:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update date
+          example: '2025-07-30T15:00:00Z'
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique tag identifier
+          example: '123e4567-e89b-12d3-a456-426614174003'
+        name:
+          type: string
+          description: Tag name
+          example: 'JavaScript'
+        slug:
+          type: string
+          description: URL-friendly tag slug
+          example: 'javascript'
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2025-07-30T15:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update date
+          example: '2025-07-30T15:00:00Z'
+
+    BlogSettings:
+      type: object
+      properties:
+        blogTitle:
+          type: string
+          description: The title of the blog
+          example: 'My Awesome Blog'
+        blogDescription:
+          type: string
+          nullable: true
+          description: Description of the blog
+          example: 'A blog about technology and life'
+        logoUrl:
+          type: string
+          nullable: true
+          description: URL to the blog logo
+          example: 'https://example.com/logo.png'
+
+    ErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code
+          example: 400
+        message:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Error message(s)
+          example: 'Invalid input data'
+        error:
+          type: string
+          description: Error type
+          example: 'Bad Request'
+
+tags:
+  - name: Health
+    description: API health check endpoints
+  - name: Authentication
+    description: User authentication endpoints
+  - name: Posts (Public)
+    description: Public blog post endpoints
+  - name: Posts (Admin)
+    description: Admin blog post management endpoints
+  - name: Categories
+    description: Category management endpoints
+  - name: Tags
+    description: Tag management endpoints
+  - name: Setup
+    description: Initial blog setup endpoints

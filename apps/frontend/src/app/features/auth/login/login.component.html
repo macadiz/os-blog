@@ -1,0 +1,51 @@
+<div class="min-h-screen flex justify-center items-center bg-gray-100">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="text-center mb-8 text-gray-800">Login to Open Blog</h1>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username" class="form-label">Username or Email</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-input"
+          [class]="
+            loginForm.get('username')?.invalid &&
+            loginForm.get('username')?.touched
+              ? 'form-input border-red-500'
+              : 'form-input'
+          "
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-input"
+          [class]="
+            loginForm.get('password')?.invalid &&
+            loginForm.get('password')?.touched
+              ? 'form-input border-red-500'
+              : 'form-input'
+          "
+        />
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || isLoading"
+        class="w-full py-3 bg-blue-600 text-white border-none rounded text-base cursor-pointer mt-4 disabled:bg-gray-600 disabled:cursor-not-allowed hover:bg-blue-700"
+      >
+        {{ isLoading ? "Signing in..." : "Sign In" }}
+      </button>
+
+      <div *ngIf="errorMessage" class="alert alert-danger mt-4">
+        {{ errorMessage }}
+      </div>
+    </form>
+  </div>
+</div>

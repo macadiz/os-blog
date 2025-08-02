@@ -1,0 +1,32 @@
+{
+  "name": "open-blog-monorepo",
+  "version": "1.0.0",
+  "description": "A modern blogging platform with Angular frontend and NestJS backend",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "install:all": "npm install --workspaces",
+    "build": "npm run build --workspaces --if-present",
+    "dev:backend": "npm run start:dev --workspace=apps/backend",
+    "dev:frontend": "npm run start --workspace=apps/frontend",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "prisma:migrate": "npm run prisma:migrate --workspace=apps/backend",
+    "prisma:generate": "npm run prisma:generate --workspace=apps/backend",
+    "prisma:studio": "npm run prisma:studio --workspace=apps/backend",
+    "compose": "docker compose --env-file ./.env up -d"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["blog", "angular", "nestjs", "prisma", "jwt"],
+  "author": "",
+  "license": "MIT"
+}

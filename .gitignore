@@ -1,0 +1,6 @@
+.env
+node_modules
+apps/backend/.env
+apps/backend/dist
+apps/frontend/.angular
+apps/frontend/node_modules

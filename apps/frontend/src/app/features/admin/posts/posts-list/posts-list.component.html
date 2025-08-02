@@ -1,0 +1,123 @@
+<div class="max-w-7xl mx-auto p-6">
+  <div class="bg-white rounded-lg shadow-md">
+    <!-- Header -->
+    <div class="border-b border-gray-200 px-6 py-4">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Posts</h1>
+        <button
+          [routerLink]="['new']"
+          class="btn btn-primary inline-flex items-center"
+        >
+          <span class="material-symbols-outlined mr-2 text-lg">add</span>
+          Create New Post
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="p-6">
+      <div class="flex justify-center">
+        <div class="spinner"></div>
+        <span class="ml-2">Loading posts...</span>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage" class="p-6">
+      <div class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <!-- Posts List -->
+    <div *ngIf="!isLoading && !errorMessage" class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Title
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Status
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Category
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Created
+            </th>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let post of posts" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">
+                {{ post.title }}
+              </div>
+              <div class="text-sm text-gray-500">{{ post.slug }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                [class]="
+                  post.published
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                "
+              >
+                {{ post.published ? "Published" : "Draft" }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ post.category?.name || "Uncategorized" }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ post.createdAt | date: "medium" }}
+            </td>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+            >
+              <div class="flex justify-end gap-2">
+                <button
+                  [routerLink]="['edit', post.id]"
+                  class="text-blue-600 hover:text-blue-900"
+                >
+                  Edit
+                </button>
+                <button
+                  (click)="onDelete(post.id)"
+                  class="text-red-600 hover:text-red-900 ml-2"
+                >
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div *ngIf="posts.length === 0" class="text-center py-12">
+        <div class="text-gray-500 mb-4">No posts found</div>
+        <button [routerLink]="['new']" class="btn btn-primary">
+          Create Your First Post
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

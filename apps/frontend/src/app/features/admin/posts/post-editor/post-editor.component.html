@@ -1,0 +1,352 @@
+<div class="max-w-4xl mx-auto p-6">
+  <div class="bg-white rounded-lg shadow-md">
+    <!-- Header -->
+    <div class="border-b border-gray-200 px-6 py-4">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">
+          {{ isEditing ? "Edit Post" : "Create New Post" }}
+        </h1>
+        <div class="flex items-center gap-2">
+          <!-- Status indicator -->
+          <div
+            class="flex items-center px-3 py-1 rounded-full text-sm"
+            [class]="
+              postForm.get('published')?.value
+                ? 'bg-green-100 text-green-800'
+                : 'bg-yellow-100 text-yellow-800'
+            "
+          >
+            <div
+              class="w-2 h-2 rounded-full mr-2"
+              [class]="
+                postForm.get('published')?.value
+                  ? 'bg-green-500'
+                  : 'bg-yellow-500'
+              "
+            ></div>
+            {{ postForm.get("published")?.value ? "Published" : "Draft" }}
+          </div>
+          <button
+            type="button"
+            (click)="onCancel()"
+            class="inline-flex items-center px-4 py-2 text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+          >
+            <span class="material-symbols-outlined mr-2 text-lg">close</span>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="postForm" (ngSubmit)="onSubmit()" class="p-6">
+      <!-- Success/Error Messages -->
+      <div *ngIf="successMessage" class="alert alert-success mb-4">
+        {{ successMessage }}
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+        {{ errorMessage }}
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Title -->
+          <div class="form-group">
+            <label for="title" class="form-label">Title *</label>
+            <input
+              type="text"
+              id="title"
+              formControlName="title"
+              class="form-input"
+              [class.border-red-500]="isFieldInvalid('title')"
+              placeholder="Enter post title..."
+            />
+            <div
+              *ngIf="isFieldInvalid('title')"
+              class="text-red-500 text-sm mt-1"
+            >
+              {{ getFieldError("title") }}
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="form-group">
+            <label for="content" class="form-label">Content *</label>
+            <textarea
+              id="content"
+              formControlName="content"
+              rows="20"
+              class="form-input min-h-96"
+              [class.border-red-500]="isFieldInvalid('content')"
+              placeholder="Write your post content here..."
+            ></textarea>
+            <div
+              *ngIf="isFieldInvalid('content')"
+              class="text-red-500 text-sm mt-1"
+            >
+              {{ getFieldError("content") }}
+            </div>
+            <p class="text-sm text-gray-500 mt-1">
+              Supports HTML and Markdown formatting
+            </p>
+          </div>
+
+          <!-- Excerpt -->
+          <div class="form-group">
+            <label for="excerpt" class="form-label">Excerpt</label>
+            <textarea
+              id="excerpt"
+              formControlName="excerpt"
+              rows="3"
+              class="form-input"
+              [class.border-red-500]="isFieldInvalid('excerpt')"
+              placeholder="Brief summary of the post (optional)..."
+            ></textarea>
+            <div
+              *ngIf="isFieldInvalid('excerpt')"
+              class="text-red-500 text-sm mt-1"
+            >
+              {{ getFieldError("excerpt") }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+          <!-- Publish Settings -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-lg font-medium mb-3">Publish Settings</h3>
+
+            <!-- Publish Status -->
+            <div class="form-group mb-4">
+              <label class="form-label mb-2">Status</label>
+              <div
+                class="flex items-center justify-between p-3 bg-white rounded border"
+              >
+                <div class="flex items-center">
+                  <div
+                    class="w-3 h-3 rounded-full mr-2"
+                    [class]="
+                      postForm.get('published')?.value
+                        ? 'bg-green-500'
+                        : 'bg-yellow-500'
+                    "
+                  ></div>
+                  <span
+                    class="font-medium"
+                    [class]="
+                      postForm.get('published')?.value
+                        ? 'text-green-700'
+                        : 'text-yellow-700'
+                    "
+                  >
+                    {{
+                      postForm.get("published")?.value ? "Published" : "Draft"
+                    }}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  (click)="onPublishToggle()"
+                  class="px-3 py-1 text-sm rounded transition-colors"
+                  [class]="
+                    postForm.get('published')?.value
+                      ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                      : 'bg-green-100 text-green-700 hover:bg-green-200'
+                  "
+                >
+                  {{
+                    postForm.get("published")?.value ? "Unpublish" : "Publish"
+                  }}
+                </button>
+              </div>
+              <p class="text-sm text-gray-500 mt-1">
+                {{
+                  postForm.get("published")?.value
+                    ? "This post is visible to readers"
+                    : "This post is saved as draft and not visible to readers"
+                }}
+              </p>
+            </div>
+
+            <!-- Publish Date (only show if published) -->
+            <div *ngIf="postForm.get('published')?.value" class="form-group">
+              <label for="publishedAt" class="form-label">Publish Date</label>
+              <input
+                type="datetime-local"
+                id="publishedAt"
+                formControlName="publishedAt"
+                class="form-input"
+              />
+              <p class="text-sm text-gray-500 mt-1">
+                Leave empty to use current date/time
+              </p>
+            </div>
+          </div>
+          <!-- Featured Image -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-lg font-medium mb-3">Featured Image</h3>
+            <div class="form-group">
+              <label for="featuredImage" class="form-label">Image URL</label>
+              <input
+                type="url"
+                id="featuredImage"
+                formControlName="featuredImage"
+                class="form-input"
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-lg font-medium mb-3">Category</h3>
+            <div class="form-group">
+              <select formControlName="categoryId" class="form-input">
+                <option value="">Select a category</option>
+                <option
+                  *ngFor="let category of categories"
+                  [value]="category.id"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-lg font-medium mb-3">Tags</h3>
+            <div class="space-y-2">
+              <div *ngFor="let tag of tags" class="flex items-center">
+                <input
+                  type="checkbox"
+                  [id]="'tag-' + tag.id"
+                  [checked]="isTagSelected(tag.id)"
+                  (change)="onTagToggle(tag.id)"
+                  class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label [for]="'tag-' + tag.id" class="text-sm text-gray-700">
+                  {{ tag.name }}
+                </label>
+              </div>
+              <div *ngIf="tags.length === 0" class="text-sm text-gray-500">
+                No tags available
+              </div>
+            </div>
+          </div>
+
+          <!-- SEO Settings -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-lg font-medium mb-3">SEO Settings</h3>
+
+            <div class="form-group mb-3">
+              <label for="metaTitle" class="form-label">Meta Title</label>
+              <input
+                type="text"
+                id="metaTitle"
+                formControlName="metaTitle"
+                class="form-input"
+                [class.border-red-500]="isFieldInvalid('metaTitle')"
+                placeholder="SEO title (60 chars max)"
+              />
+              <div
+                *ngIf="isFieldInvalid('metaTitle')"
+                class="text-red-500 text-sm mt-1"
+              >
+                {{ getFieldError("metaTitle") }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="metaDescription" class="form-label"
+                >Meta Description</label
+              >
+              <textarea
+                id="metaDescription"
+                formControlName="metaDescription"
+                rows="3"
+                class="form-input"
+                [class.border-red-500]="isFieldInvalid('metaDescription')"
+                placeholder="SEO description (160 chars max)"
+              ></textarea>
+              <div
+                *ngIf="isFieldInvalid('metaDescription')"
+                class="text-red-500 text-sm mt-1"
+              >
+                {{ getFieldError("metaDescription") }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div
+        class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200"
+      >
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="inline-flex items-center px-6 py-2 text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+          [disabled]="isLoading"
+        >
+          <span class="material-symbols-outlined mr-2 text-lg">cancel</span>
+          Cancel
+        </button>
+
+        <div class="flex gap-3">
+          <!-- Save as Draft -->
+          <button
+            type="button"
+            (click)="onSaveAsDraft()"
+            class="inline-flex items-center px-6 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+            [disabled]="isLoading || postForm.invalid"
+          >
+            <span
+              *ngIf="isLoading && !postForm.get('published')?.value"
+              class="spinner mr-2"
+            ></span>
+            <span
+              *ngIf="!isLoading || postForm.get('published')?.value"
+              class="material-symbols-outlined mr-2 text-lg"
+              >draft</span
+            >
+            {{
+              isLoading && !postForm.get("published")?.value
+                ? "Saving..."
+                : "Save as Draft"
+            }}
+          </button>
+
+          <!-- Publish/Update -->
+          <button
+            type="button"
+            (click)="onPublish()"
+            class="inline-flex items-center px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+            [disabled]="isLoading || postForm.invalid"
+          >
+            <span
+              *ngIf="isLoading && postForm.get('published')?.value"
+              class="spinner mr-2"
+            ></span>
+            <span
+              *ngIf="!isLoading || !postForm.get('published')?.value"
+              class="material-symbols-outlined mr-2 text-lg"
+              >publish</span
+            >
+            {{
+              isLoading && postForm.get("published")?.value
+                ? "Publishing..."
+                : isEditing
+                  ? "Update & Publish"
+                  : "Publish Post"
+            }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

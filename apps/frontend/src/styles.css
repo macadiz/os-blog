@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Form Components */
+@layer components {
+  .form-group {
+    @apply mb-4;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-2;
+  }
+
+  .form-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
+  }
+
+  .alert {
+    @apply p-4 rounded-md mb-4;
+  }
+
+  .alert-success {
+    @apply bg-green-50 text-green-800 border border-green-200;
+  }
+
+  .alert-danger {
+    @apply bg-red-50 text-red-800 border border-red-200;
+  }
+
+  .spinner {
+    @apply inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin;
+  }
+}
+
+/* Custom Tailwind Components */
+@layer components {
+  /* Form Components */
+  .form-group {
+    @apply mb-4;
+  }
+
+  .form-label {
+    @apply block mb-2 text-sm font-medium text-gray-700;
+  }
+
+  .form-input {
+    @apply block w-full px-3 py-2 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-gray-300 rounded transition-colors duration-150 ease-in-out focus:text-gray-700 focus:bg-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200;
+  }
+
+  /* Button Components */
+  .btn {
+    @apply inline-block font-normal text-center align-middle cursor-pointer bg-transparent border border-transparent px-3 py-2 text-base leading-normal rounded no-underline transition-all duration-150 ease-in-out;
+  }
+
+  .btn:hover {
+    @apply no-underline;
+  }
+
+  .btn-primary {
+    @apply text-white bg-blue-600 border-blue-600 hover:bg-blue-700 hover:border-blue-700;
+  }
+
+  .btn-secondary {
+    @apply text-white bg-gray-600 border-gray-600 hover:bg-gray-700 hover:border-gray-700;
+  }
+
+  .btn-danger {
+    @apply text-white bg-red-600 border-red-600 hover:bg-red-700 hover:border-red-700;
+  }
+
+  .btn:disabled {
+    @apply opacity-65 cursor-not-allowed;
+  }
+
+  /* Card Components */
+  .card {
+    @apply relative flex flex-col min-w-0 break-words bg-white border border-gray-200 rounded;
+  }
+
+  .card-body {
+    @apply flex-1 p-5;
+  }
+
+  .card-header {
+    @apply px-5 py-3 mb-0 bg-gray-50 border-b border-gray-200;
+  }
+
+  /* Alert Components */
+  .alert {
+    @apply relative px-5 py-3 mb-4 border rounded;
+  }
+
+  .alert-success {
+    @apply text-green-800 bg-green-100 border-green-200;
+  }
+
+  .alert-danger {
+    @apply text-red-800 bg-red-100 border-red-200;
+  }
+
+  .alert-warning {
+    @apply text-yellow-800 bg-yellow-100 border-yellow-200;
+  }
+
+  .alert-info {
+    @apply text-blue-800 bg-blue-100 border-blue-200;
+  }
+
+  /* Loading Spinner */
+  .spinner {
+    @apply inline-block w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin;
+  }
+}
