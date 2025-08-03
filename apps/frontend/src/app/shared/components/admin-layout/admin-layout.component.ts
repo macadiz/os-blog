@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule, Router, ActivatedRoute } from "@angular/router";
 import { AuthService, User } from "../../../core/services/auth.service";
@@ -15,7 +15,7 @@ import {
   templateUrl: "./admin-layout.component.html",
   styleUrls: ["./admin-layout.component.css"],
 })
-export class AdminLayoutComponent implements OnInit {
+export class AdminLayoutComponent implements OnInit, OnDestroy {
   currentUser$: Observable<User | null>;
 
   // Author menu items (available to both authors and admins)
@@ -73,7 +73,13 @@ export class AdminLayoutComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Any initialization logic
+    // Add admin layout class to body for proper scrolling
+    document.body.classList.add("admin-layout-active");
+  }
+
+  ngOnDestroy() {
+    // Remove admin layout class when component is destroyed
+    document.body.classList.remove("admin-layout-active");
   }
 
   getPageTitle(): string {

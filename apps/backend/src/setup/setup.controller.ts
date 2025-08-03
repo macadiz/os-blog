@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { SetupService } from './setup.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 
@@ -51,5 +52,11 @@ export class SetupController {
     // Get current user ID from request (if authenticated)
     const currentUserId = req?.user?.id;
     return await this.setupService.getBlogSetupStatus(currentUserId);
+  }
+
+  @Get('insights')
+  @UseGuards(JwtAuthGuard)
+  async getBlogInsights() {
+    return await this.setupService.getBlogInsights();
   }
 }

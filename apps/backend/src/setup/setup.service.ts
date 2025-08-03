@@ -167,4 +167,57 @@ export class SetupService {
       };
     }
   }
+
+  async getBlogInsights() {
+    try {
+      // Get counts for dashboard insights
+      const [postsCount, categoriesCount, tagsCount, usersCount] =
+        await Promise.all([
+          this.prisma.post.count(),
+          this.prisma.category.count(),
+          this.prisma.tag.count(),
+          this.prisma.user.count({
+            where: { isActive: true },
+          }),
+        ]);
+
+      // Get published posts count
+      const publishedPostsCount = await this.prisma.post.count({
+        where: { published: true },
+      });
+
+      // Get recent posts (last 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const recentPostsCount = await this.prisma.post.count({
+        where: {
+          createdAt: {
+            gte: sevenDaysAgo,
+          },
+        },
+      });
+
+      return {
+        totalPosts: postsCount,
+        publishedPosts: publishedPostsCount,
+        draftPosts: postsCount - publishedPostsCount,
+        totalCategories: categoriesCount,
+        totalTags: tagsCount,
+        totalUsers: usersCount,
+        recentPosts: recentPostsCount,
+      };
+    } catch (error) {
+      console.error('Error getting blog insights:', error);
+      return {
+        totalPosts: 0,
+        publishedPosts: 0,
+        draftPosts: 0,
+        totalCategories: 0,
+        totalTags: 0,
+        totalUsers: 0,
+        recentPosts: 0,
+      };
+    }
+  }
 }

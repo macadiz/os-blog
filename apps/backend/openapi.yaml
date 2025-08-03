@@ -75,6 +75,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /auth/me:
+    get:
+      summary: Get current user
+      description: Get the current authenticated user's information
+      tags:
+        - Authentication
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /posts/published:
     get:
       summary: Get published posts
@@ -301,7 +323,7 @@ paths:
   /categories:
     get:
       summary: Get all categories
-      description: Retrieve all available categories
+      description: Retrieve all available categories (public endpoint)
       tags:
         - Categories
       responses:
@@ -313,6 +335,171 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Category'
+
+    post:
+      summary: Create a new category
+      description: Create a new category (admin only)
+      tags:
+        - Categories
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryDto'
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories/{id}:
+    get:
+      summary: Get category by ID
+      description: Retrieve a specific category by its ID
+      tags:
+        - Categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The category ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Category found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      summary: Update a category
+      description: Update an existing category (admin only)
+      tags:
+        - Categories
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The category ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryDto'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete a category
+      description: Delete a category (admin only)
+      tags:
+        - Categories
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The category ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Category deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Category deleted successfully'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /tags:
     get:
@@ -394,6 +581,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlogSettings'
+
+  /insights:
+    get:
+      summary: Get blog insights
+      description: Retrieve blog statistics and insights for dashboard (admin only)
+      tags:
+        - Insights
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Blog insights and statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogInsights'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   securitySchemes:
@@ -570,6 +779,46 @@ components:
           type: string
           description: Description of the blog
           example: 'A blog about technology and life'
+
+    CreateCategoryDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: Category name
+          example: 'Technology'
+        description:
+          type: string
+          maxLength: 500
+          description: Category description
+          example: 'Posts about technology and programming'
+        color:
+          type: string
+          maxLength: 7
+          description: Category color (hex code)
+          example: '#3B82F6'
+
+    UpdateCategoryDto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: Category name
+          example: 'Updated Technology'
+        description:
+          type: string
+          maxLength: 500
+          description: Category description
+          example: 'Updated posts about technology and programming'
+        color:
+          type: string
+          maxLength: 7
+          description: Category color (hex code)
+          example: '#10B981'
 
     BlogPost:
       type: object
@@ -782,6 +1031,38 @@ components:
           description: URL to the blog logo
           example: 'https://example.com/logo.png'
 
+    BlogInsights:
+      type: object
+      properties:
+        totalPosts:
+          type: integer
+          description: Total number of posts
+          example: 15
+        publishedPosts:
+          type: integer
+          description: Number of published posts
+          example: 12
+        draftPosts:
+          type: integer
+          description: Number of draft posts
+          example: 3
+        totalCategories:
+          type: integer
+          description: Total number of categories
+          example: 5
+        totalTags:
+          type: integer
+          description: Total number of tags
+          example: 8
+        totalUsers:
+          type: integer
+          description: Total number of active users
+          example: 3
+        recentPosts:
+          type: integer
+          description: Number of posts created in the last 7 days
+          example: 2
+
     ErrorResponse:
       type: object
       properties:
@@ -817,3 +1098,5 @@ tags:
     description: Tag management endpoints
   - name: Setup
     description: Initial blog setup endpoints
+  - name: Insights
+    description: Blog statistics and insights endpoints

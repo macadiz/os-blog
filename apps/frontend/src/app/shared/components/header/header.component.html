@@ -89,69 +89,26 @@
                 >
                   {{ user.role === "ADMIN" ? "Administrator" : "Author" }}
                 </div>
-                <a
-                  [routerLink]="['/admin']"
-                  (click)="closeUserMenu()"
-                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <svg
-                    class="inline w-4 h-4 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+
+                <!-- Use reusable dropdown menu items -->
+                <ng-container *ngFor="let menuItem of dropdownMenuItems">
+                  <div
+                    *ngIf="menuItem.label === 'Logout'"
+                    class="border-t border-gray-100 mt-1 pt-1"
                   >
-                    <path
-                      d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
-                    ></path>
-                  </svg>
-                  Dashboard
-                </a>
-                <a
-                  [routerLink]="['/admin/posts']"
-                  (click)="closeUserMenu()"
-                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <svg
-                    class="inline w-4 h-4 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  My Posts
-                </a>
-                <a
-                  [routerLink]="['/admin/posts/new']"
-                  (click)="closeUserMenu()"
-                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <svg
-                    class="inline w-4 h-4 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  New Post
-                </a>
-                <div class="border-t border-gray-100 mt-1 pt-1">
-                  <button
-                    (click)="logout()"
-                    class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <span class="material-symbols-outlined mr-2 text-lg"
-                      >logout</span
+                    <app-dropdown-menu-item
+                      [item]="menuItem"
+                      (itemClick)="closeUserMenu()"
                     >
-                    Logout
-                  </button>
-                </div>
+                    </app-dropdown-menu-item>
+                  </div>
+                  <app-dropdown-menu-item
+                    *ngIf="menuItem.label !== 'Logout'"
+                    [item]="menuItem"
+                    (itemClick)="closeUserMenu()"
+                  >
+                  </app-dropdown-menu-item>
+                </ng-container>
               </div>
             </div>
           </div>

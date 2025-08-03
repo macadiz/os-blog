@@ -7,6 +7,10 @@ import {
   AuthService,
   User as AuthUser,
 } from "../../../core/services/auth.service";
+import {
+  DropdownMenuItemComponent,
+  DropdownMenuItem,
+} from "../dropdown-menu-item/dropdown-menu-item.component";
 
 interface BlogSettings {
   blogTitle: string;
@@ -16,7 +20,7 @@ interface BlogSettings {
 @Component({
   selector: "app-header",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, DropdownMenuItemComponent],
   templateUrl: "./header.component.html",
   styleUrls: ["./header.component.css"],
 })
@@ -25,6 +29,7 @@ export class HeaderComponent implements OnInit {
   currentUser$: Observable<AuthUser | null>;
   showUserMenu = false;
   showMobileMenu = false;
+  dropdownMenuItems: DropdownMenuItem[] = [];
 
   constructor(
     private apiService: ApiService,
@@ -36,6 +41,7 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {
     this.loadBlogSettings();
+    this.setupDropdownMenuItems();
 
     // Close dropdowns when clicking outside
     document.addEventListener("click", (event) => {
@@ -44,6 +50,36 @@ export class HeaderComponent implements OnInit {
         this.showUserMenu = false;
       }
     });
+  }
+
+  private setupDropdownMenuItems() {
+    this.dropdownMenuItems = [
+      {
+        label: "Dashboard",
+        icon: "dashboard",
+        routerLink: ["/admin"],
+        type: "link",
+      },
+      {
+        label: "My Posts",
+        icon: "article",
+        routerLink: ["/admin/posts"],
+        type: "link",
+      },
+      {
+        label: "New Post",
+        icon: "add",
+        routerLink: ["/admin/posts/new"],
+        type: "link",
+      },
+      {
+        label: "Logout",
+        icon: "logout",
+        variant: "danger",
+        type: "button",
+        action: () => this.logout(),
+      },
+    ];
   }
 
   private loadBlogSettings() {

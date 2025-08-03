@@ -32,7 +32,24 @@
   </div>
 
   <!-- Quick Stats -->
-  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-8">
+    <p class="text-gray-600">Loading dashboard...</p>
+  </div>
+
+  <!-- Error State -->
+  <div
+    *ngIf="errorMessage"
+    class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md mb-6"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <!-- Statistics Cards -->
+  <div
+    class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+    *ngIf="insights && !isLoading"
+  >
     <!-- Posts Stat -->
     <div class="bg-white overflow-hidden shadow rounded-lg">
       <div class="p-5">
@@ -53,7 +70,11 @@
                 }}
               </dt>
               <dd class="text-lg font-medium text-gray-900">
-                {{ postsCount || 0 }}
+                {{ insights.totalPosts }}
+              </dd>
+              <dd class="text-xs text-gray-500">
+                {{ insights.publishedPosts }} published,
+                {{ insights.draftPosts }} drafts
               </dd>
             </dl>
           </div>
@@ -90,7 +111,7 @@
                 Total Users
               </dt>
               <dd class="text-lg font-medium text-gray-900">
-                {{ usersCount || 0 }}
+                {{ insights.totalUsers }}
               </dd>
             </dl>
           </div>
@@ -127,7 +148,7 @@
                 Categories
               </dt>
               <dd class="text-lg font-medium text-gray-900">
-                {{ categoriesCount || 0 }}
+                {{ insights.totalCategories }}
               </dd>
             </dl>
           </div>
@@ -141,6 +162,68 @@
           >
             Manage categories
           </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tags Stat (Admin Only) -->
+    <div
+      class="bg-white overflow-hidden shadow rounded-lg"
+      *ngIf="(currentUser$ | async)?.role === 'ADMIN'"
+    >
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span
+              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
+              >label</span
+            >
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Tags</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                {{ insights.totalTags }}
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-5 py-3">
+        <div class="text-sm">
+          <a
+            [routerLink]="['/admin/tags']"
+            class="font-medium text-blue-700 hover:text-blue-900"
+          >
+            Manage tags
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Posts Activity -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span
+              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
+              >trending_up</span
+            >
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                Recent Activity
+              </dt>
+              <dd class="text-lg font-medium text-gray-900">
+                {{ insights.recentPosts }}
+              </dd>
+              <dd class="text-xs text-gray-500">
+                Posts created in the last 7 days
+              </dd>
+            </dl>
+          </div>
         </div>
       </div>
     </div>

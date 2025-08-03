@@ -64,10 +64,29 @@ export const adminRoutes: Routes = [
       {
         path: "categories",
         canActivate: [roleGuard(["ADMIN"])],
-        loadComponent: () =>
-          import("./admin-dashboard/admin-dashboard.component").then(
-            (m) => m.AdminDashboardComponent
-          ),
+        children: [
+          {
+            path: "",
+            loadComponent: () =>
+              import(
+                "./categories/categories-list/categories-list.component"
+              ).then((m) => m.CategoriesListComponent),
+          },
+          {
+            path: "new",
+            loadComponent: () =>
+              import("./categories/category-form/category-form.component").then(
+                (m) => m.CategoryFormComponent
+              ),
+          },
+          {
+            path: "edit/:id",
+            loadComponent: () =>
+              import("./categories/category-form/category-form.component").then(
+                (m) => m.CategoryFormComponent
+              ),
+          },
+        ],
       },
       {
         path: "tags",

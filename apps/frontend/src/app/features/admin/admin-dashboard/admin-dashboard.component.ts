@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { AuthService, User } from "../../../core/services/auth.service";
+import { ApiService, BlogInsights } from "../../../core/services/api.service";
 import { Observable } from "rxjs";
 
 @Component({
@@ -13,11 +14,14 @@ import { Observable } from "rxjs";
 })
 export class AdminDashboardComponent implements OnInit {
   currentUser$: Observable<User | null>;
-  postsCount = 0;
-  usersCount = 0;
-  categoriesCount = 0;
+  insights: BlogInsights | null = null;
+  isLoading = true;
+  errorMessage = "";
 
-  constructor(private authService: AuthService) {
+  constructor(
+    private authService: AuthService,
+    private apiService: ApiService
+  ) {
     this.currentUser$ = this.authService.currentUser$;
   }
 
@@ -26,11 +30,18 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   private loadDashboardStats() {
-    // TODO: Implement actual API calls to get dashboard statistics
-    // For now, using placeholder values
-    this.postsCount = 12; // Example value
-    this.usersCount = 5; // Example value
-    this.categoriesCount = 8; // Example value
+    this.isLoading = true;
+    this.apiService.getBlogInsights().subscribe({
+      next: (insights: BlogInsights) => {
+        this.insights = insights;
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error("Error loading dashboard insights:", error);
+        this.errorMessage = "Failed to load dashboard statistics.";
+        this.isLoading = false;
+      },
+    });
   }
 
   logout() {

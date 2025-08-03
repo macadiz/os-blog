@@ -26,6 +26,7 @@ This is a modern blogging platform built with:
 - Follow NestJS module structure (controller, service, module)
 - Use JWT guards for protected endpoints
 - Implement proper error handling with HTTP exceptions
+- When creating new endpoints, update the `openapi.yaml` to incldue it into the documentation.
 
 ### Frontend (Angular)
 - Use standalone components (Angular 19 style)

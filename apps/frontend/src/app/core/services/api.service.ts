@@ -49,6 +49,18 @@ export interface CreateAdminDto {
   blogDescription?: string;
 }
 
+export interface CreateCategoryDto {
+  name: string;
+  description?: string;
+  color?: string;
+}
+
+export interface UpdateCategoryDto {
+  name?: string;
+  description?: string;
+  color?: string;
+}
+
 // Response models matching OpenAPI specification
 export interface User {
   id: string;
@@ -118,6 +130,16 @@ export interface BlogSetupStatus {
   currentUserValid: boolean;
 }
 
+export interface BlogInsights {
+  totalPosts: number;
+  publishedPosts: number;
+  draftPosts: number;
+  totalCategories: number;
+  totalTags: number;
+  totalUsers: number;
+  recentPosts: number;
+}
+
 export interface CreateAdminResponse {
   message: string;
   admin: User;
@@ -170,6 +192,10 @@ export class ApiService {
     return this.http.get<BlogSetupStatus>(`${this.baseUrl}/setup/blog-status`);
   }
 
+  getBlogInsights(): Observable<BlogInsights> {
+    return this.http.get<BlogInsights>(`${this.baseUrl}/insights`);
+  }
+
   // Public post endpoints
   getPublishedPosts(): Observable<BlogPost[]> {
     return this.http.get<BlogPost[]>(`${this.baseUrl}/posts/published`);
@@ -205,6 +231,30 @@ export class ApiService {
   // Categories
   getCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${this.baseUrl}/categories`);
+  }
+
+  getCategory(id: string): Observable<Category> {
+    return this.http.get<Category>(`${this.baseUrl}/categories/${id}`);
+  }
+
+  createCategory(category: CreateCategoryDto): Observable<Category> {
+    return this.http.post<Category>(`${this.baseUrl}/categories`, category);
+  }
+
+  updateCategory(
+    id: string,
+    category: UpdateCategoryDto
+  ): Observable<Category> {
+    return this.http.patch<Category>(
+      `${this.baseUrl}/categories/${id}`,
+      category
+    );
+  }
+
+  deleteCategory(id: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.baseUrl}/categories/${id}`
+    );
   }
 
   // Tags
