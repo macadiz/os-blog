@@ -47,186 +47,20 @@
 
   <!-- Statistics Cards -->
   <div
-    class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+    class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr"
     *ngIf="insights && !isLoading"
   >
-    <!-- Posts Stat -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="p-5">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <span
-              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
-              >article</span
-            >
-          </div>
-          <div class="ml-5 w-0 flex-1">
-            <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                {{
-                  (currentUser$ | async)?.role === "ADMIN"
-                    ? "Total Posts"
-                    : "Your Posts"
-                }}
-              </dt>
-              <dd class="text-lg font-medium text-gray-900">
-                {{ insights.totalPosts }}
-              </dd>
-              <dd class="text-xs text-gray-500">
-                {{ insights.publishedPosts }} published,
-                {{ insights.draftPosts }} drafts
-              </dd>
-            </dl>
-          </div>
-        </div>
-      </div>
-      <div class="bg-gray-50 px-5 py-3">
-        <div class="text-sm">
-          <a
-            [routerLink]="['/admin/posts']"
-            class="font-medium text-blue-700 hover:text-blue-900"
-          >
-            View all posts
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Users Stat (Admin Only) -->
-    <div
-      class="bg-white overflow-hidden shadow rounded-lg"
-      *ngIf="(currentUser$ | async)?.role === 'ADMIN'"
-    >
-      <div class="p-5">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <span
-              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
-              >group</span
-            >
-          </div>
-          <div class="ml-5 w-0 flex-1">
-            <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Total Users
-              </dt>
-              <dd class="text-lg font-medium text-gray-900">
-                {{ insights.totalUsers }}
-              </dd>
-            </dl>
-          </div>
-        </div>
-      </div>
-      <div class="bg-gray-50 px-5 py-3">
-        <div class="text-sm">
-          <a
-            [routerLink]="['/admin/users']"
-            class="font-medium text-blue-700 hover:text-blue-900"
-          >
-            Manage users
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Categories Stat (Admin Only) -->
-    <div
-      class="bg-white overflow-hidden shadow rounded-lg"
-      *ngIf="(currentUser$ | async)?.role === 'ADMIN'"
-    >
-      <div class="p-5">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <span
-              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
-              >category</span
-            >
-          </div>
-          <div class="ml-5 w-0 flex-1">
-            <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Categories
-              </dt>
-              <dd class="text-lg font-medium text-gray-900">
-                {{ insights.totalCategories }}
-              </dd>
-            </dl>
-          </div>
-        </div>
-      </div>
-      <div class="bg-gray-50 px-5 py-3">
-        <div class="text-sm">
-          <a
-            [routerLink]="['/admin/categories']"
-            class="font-medium text-blue-700 hover:text-blue-900"
-          >
-            Manage categories
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tags Stat (Admin Only) -->
-    <div
-      class="bg-white overflow-hidden shadow rounded-lg"
-      *ngIf="(currentUser$ | async)?.role === 'ADMIN'"
-    >
-      <div class="p-5">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <span
-              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
-              >label</span
-            >
-          </div>
-          <div class="ml-5 w-0 flex-1">
-            <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">Tags</dt>
-              <dd class="text-lg font-medium text-gray-900">
-                {{ insights.totalTags }}
-              </dd>
-            </dl>
-          </div>
-        </div>
-      </div>
-      <div class="bg-gray-50 px-5 py-3">
-        <div class="text-sm">
-          <a
-            [routerLink]="['/admin/tags']"
-            class="font-medium text-blue-700 hover:text-blue-900"
-          >
-            Manage tags
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Recent Posts Activity -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="p-5">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <span
-              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
-              >trending_up</span
-            >
-          </div>
-          <div class="ml-5 w-0 flex-1">
-            <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">
-                Recent Activity
-              </dt>
-              <dd class="text-lg font-medium text-gray-900">
-                {{ insights.recentPosts }}
-              </dd>
-              <dd class="text-xs text-gray-500">
-                Posts created in the last 7 days
-              </dd>
-            </dl>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ng-container *ngFor="let statCard of statCards">
+      <!-- Show all cards for posts, or only admin cards for admin users -->
+      <app-stat-card
+        *ngIf="
+          !statCard.showOnlyForAdmin || (currentUser$ | async)?.role === 'ADMIN'
+        "
+        [stat]="statCard"
+        class="h-full"
+      >
+      </app-stat-card>
+    </ng-container>
   </div>
 
   <!-- Quick Actions -->

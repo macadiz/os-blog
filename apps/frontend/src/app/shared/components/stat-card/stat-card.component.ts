@@ -1,0 +1,70 @@
+import { Component, Input } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router";
+
+export interface StatCard {
+  title: string;
+  value: number | string;
+  subtitle?: string;
+  icon: string;
+  linkUrl?: string[];
+  linkText?: string;
+  showOnlyForAdmin?: boolean;
+}
+
+@Component({
+  selector: "app-stat-card",
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
+    <div
+      class="bg-white overflow-hidden shadow rounded-lg h-full flex flex-col"
+    >
+      <div class="p-5 flex-1">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <span
+              class="material-symbols-outlined h-6 w-6 text-gray-400 text-xl"
+              >{{ stat.icon }}</span
+            >
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                {{ stat.title }}
+              </dt>
+              <dd class="text-lg font-medium text-gray-900">
+                {{ stat.value }}
+              </dd>
+              <!-- Reserve space for subtitle even if empty -->
+              <dd class="text-xs text-gray-500 min-h-[1rem]">
+                {{ stat.subtitle || "" }}
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <!-- Always render footer section to maintain consistent height -->
+      <div
+        [ngClass]="{
+          'bg-gray-50 px-5 py-3 flex-shrink-0': true,
+          'bg-transparent': !(stat.linkUrl && stat.linkText),
+        }"
+      >
+        <div class="text-sm min-h-[1.25rem]">
+          <a
+            *ngIf="stat.linkUrl && stat.linkText"
+            [routerLink]="stat.linkUrl"
+            class="font-medium text-blue-700 hover:text-blue-900"
+          >
+            {{ stat.linkText }}
+          </a>
+        </div>
+      </div>
+    </div>
+  `,
+  styleUrls: ["./stat-card.component.css"],
+})
+export class StatCardComponent {
+  @Input() stat!: StatCard;
+}
