@@ -4,21 +4,21 @@ import { ApiService } from "../services/api.service";
 import { map, catchError } from "rxjs/operators";
 import { of } from "rxjs";
 
-export const setupGuard: CanActivateFn = (route, state) => {
+export const blogSetupGuard: CanActivateFn = (route, state) => {
   const apiService = inject(ApiService);
   const router = inject(Router);
 
-  return apiService.checkBlogSetup().pipe(
+  return apiService.checkSetupRequired().pipe(
     map((response) => {
-      if (!response.isSetup) {
-        return true; // Allow access to setup page when setup is required
-      } else {
-        router.navigate(["/blog"]);
-        return false; // Redirect to blog if setup is already complete
+      if (response.required) {
+        // Setup is required, redirect to setup
+        router.navigate(["/setup"]);
+        return false;
       }
+      return true; // Blog is set up, allow access
     }),
     catchError(() => {
-      // If API call fails, assume setup is needed
+      // If API call fails, allow access but let the component handle the error
       return of(true);
     })
   );

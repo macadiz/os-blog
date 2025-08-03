@@ -110,6 +110,14 @@ export interface SetupStatusResponse {
   required: boolean;
 }
 
+export interface BlogSetupStatus {
+  isSetup: boolean;
+  hasAdminUsers: boolean;
+  hasSettings: boolean;
+  hasPosts: boolean;
+  currentUserValid: boolean;
+}
+
 export interface CreateAdminResponse {
   message: string;
   admin: User;
@@ -156,6 +164,10 @@ export class ApiService {
 
   getBlogSettings(): Observable<BlogSettings> {
     return this.http.get<BlogSettings>(`${this.baseUrl}/setup/blog-settings`);
+  }
+
+  checkBlogSetup(): Observable<BlogSetupStatus> {
+    return this.http.get<BlogSetupStatus>(`${this.baseUrl}/setup/blog-status`);
   }
 
   // Public post endpoints

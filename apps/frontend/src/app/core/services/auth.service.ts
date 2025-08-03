@@ -4,6 +4,7 @@ import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { catchError, tap } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
+import { STORAGE_KEYS } from "../../shared/constants";
 
 export interface User {
   id: string;
@@ -41,20 +42,17 @@ export class AuthService {
   private checkExistingAuth() {
     const token = this.getToken();
     if (token) {
-      // Since we're using a mock backend, immediately set a mock user when token exists
-      // In a real app, you would make an API call here to validate the token
-      const mockUser: User = {
-        id: "1",
-        email: "admin@example.com",
-        username: "admin",
-        firstName: "Admin",
-        lastName: "User",
-        role: "ADMIN" as const,
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      this.currentUserSubject.next(mockUser);
+      // Validate token and get current user from backend
+      this.getCurrentUser().subscribe({
+        next: (user) => {
+          this.currentUserSubject.next(user);
+        },
+        error: (error) => {
+          console.error("Failed to validate token:", error);
+          // Token is invalid, remove it and logout
+          this.logout();
+        },
+      });
     }
   }
 
@@ -77,17 +75,17 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem("access_token");
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     this.currentUserSubject.next(null);
     this.router.navigate(["/blog"]);
   }
 
   getToken(): string | null {
-    return localStorage.getItem("access_token");
+    return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
   }
 
   private setToken(token: string): void {
-    localStorage.setItem("access_token", token);
+    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
   }
 
   isAuthenticated(): boolean {
@@ -95,25 +93,12 @@ export class AuthService {
   }
 
   getCurrentUser(): Observable<User> {
-    // This would typically be an API endpoint to get current user info
-    // For now, we'll return a mock response based on token existence
     const token = this.getToken();
     if (!token) {
       throw new Error("No authentication token");
     }
 
-    // Mock response - in real app, this would be an API call
-    return of({
-      id: "1",
-      email: "admin@example.com",
-      username: "admin",
-      firstName: "Admin",
-      lastName: "User",
-      role: "ADMIN" as const,
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    return this.http.get<User>(`${this.baseUrl}/auth/me`);
   }
 
   hasRole(role: "ADMIN" | "AUTHOR"): Observable<boolean> {

@@ -94,4 +94,77 @@ export class SetupService {
       where: { id: 'default' },
     });
   }
+
+  async getBlogSetupStatus(currentUserId?: string, hasAuthError = false) {
+    try {
+      // Check if there are active admin users
+      const adminUsers = await this.prisma.user.findMany({
+        where: {
+          role: 'ADMIN',
+          isActive: true,
+        },
+      });
+
+      if (adminUsers.length === 0) {
+        return {
+          isSetup: false,
+          hasAdminUsers: false,
+          hasSettings: false,
+          hasPosts: false,
+          currentUserValid: false,
+        };
+      }
+
+      // Check if blog settings exist
+      const settings = await this.prisma.blogSettings.findFirst();
+      const hasSettings = !!settings;
+
+      // Check if there are any posts
+      const postCount = await this.prisma.post.count();
+      const hasPosts = postCount > 0;
+
+      // Handle authentication status
+      let currentUserValid = true;
+
+      if (hasAuthError) {
+        // Invalid token was provided
+        currentUserValid = false;
+      } else if (currentUserId !== undefined) {
+        // Valid token was provided, check if user still exists
+        const currentUser = await this.prisma.user.findFirst({
+          where: {
+            id: currentUserId,
+            role: { in: ['ADMIN', 'AUTHOR'] },
+            isActive: true,
+          },
+        });
+        currentUserValid = !!currentUser;
+      }
+      // If currentUserId is undefined and no auth error, treat as unauthenticated (valid)
+
+      // Blog is considered "set up" if there are admin users and settings exist
+      // Current user validity only affects setup status when there IS an authenticated user
+      const isSetup =
+        adminUsers.length > 0 &&
+        hasSettings &&
+        (currentUserId === undefined || currentUserValid);
+
+      return {
+        isSetup,
+        hasAdminUsers: adminUsers.length > 0,
+        hasSettings,
+        hasPosts,
+        currentUserValid,
+      };
+    } catch (error) {
+      console.error('Error checking blog setup status:', error);
+      return {
+        isSetup: false,
+        hasAdminUsers: false,
+        hasSettings: false,
+        hasPosts: false,
+        currentUserValid: false,
+      };
+    }
+  }
 }
