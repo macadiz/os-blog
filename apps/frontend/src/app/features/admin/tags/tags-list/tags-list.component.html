@@ -1,0 +1,139 @@
+<div class="max-w-7xl mx-auto p-6">
+  <div class="bg-white rounded-lg shadow-md">
+    <!-- Header -->
+    <div class="border-b border-gray-200 px-6 py-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Tags</h1>
+          <p class="text-gray-600">
+            Manage your blog tags. Tags with 0 posts can be safely deleted.
+          </p>
+        </div>
+        <app-create-button [routerLink]="['/admin/tags/new']" text="New Tag" />
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="flex justify-center py-12">
+        <div
+          class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+        ></div>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (error()) {
+      <div class="rounded-md bg-red-50 p-4 m-6">
+        <div class="text-sm text-red-700">
+          {{ error() }}
+        </div>
+      </div>
+    }
+
+    <!-- Tags List -->
+    @if (!isLoading() && !error()) {
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Name
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Posts
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Created
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            @for (tag of tags(); track tag.id) {
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div>
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ tag.name }}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                      {{ tag.slug }}
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">
+                    @if (tag._count) {
+                      {{ tag._count.postTags }}
+                      {{ tag._count.postTags === 1 ? "post" : "posts" }}
+                    } @else {
+                      0 posts
+                    }
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ formatDate(tag.createdAt) }}
+                </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2"
+                >
+                  <a
+                    [routerLink]="['/admin/tags', tag.id, 'edit']"
+                    class="inline-flex items-center px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                  >
+                    <span class="material-symbols-outlined text-sm mr-1"
+                      >edit</span
+                    >
+                    Edit
+                  </a>
+                  <button
+                    (click)="deleteTag(tag)"
+                    class="inline-flex items-center px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+                  >
+                    <span class="material-symbols-outlined text-sm mr-1"
+                      >delete</span
+                    >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            }
+            @if (tags().length === 0) {
+              <tr>
+                <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                  <div class="flex flex-col items-center">
+                    <span
+                      class="material-symbols-outlined text-4xl mb-4 text-gray-300"
+                      >sell</span
+                    >
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">
+                      No tags yet
+                    </h3>
+                    <p class="text-sm mb-4">
+                      Create your first tag to organize your posts
+                    </p>
+                    <app-create-button
+                      [routerLink]="['/admin/tags/new']"
+                      text="Create Tag"
+                    ></app-create-button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

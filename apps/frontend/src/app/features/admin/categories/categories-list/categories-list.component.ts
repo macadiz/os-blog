@@ -3,11 +3,12 @@ import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { ApiService, Category } from "../../../../core/services/api.service";
 import { Observable } from "rxjs";
+import { CreateButtonComponent } from "../../../../shared/components/create-button/create-button.component";
 
 @Component({
   selector: "app-categories-list",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, CreateButtonComponent],
   templateUrl: "./categories-list.component.html",
   styleUrls: ["./categories-list.component.css"],
 })

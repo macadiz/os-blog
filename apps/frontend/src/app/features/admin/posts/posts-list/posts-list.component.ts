@@ -3,11 +3,12 @@ import { CommonModule } from "@angular/common";
 import { Router, RouterModule } from "@angular/router";
 import { ApiService } from "../../../../core/services/api.service";
 import { AuthService } from "../../../../core/services/auth.service";
+import { CreateButtonComponent } from "../../../../shared/components/create-button/create-button.component";
 
 @Component({
   selector: "app-posts-list",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, CreateButtonComponent],
   templateUrl: "./posts-list.component.html",
   styleUrls: ["./posts-list.component.css"],
 })

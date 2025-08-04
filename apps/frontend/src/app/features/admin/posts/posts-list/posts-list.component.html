@@ -29,13 +29,7 @@
             {{ filterButtonText }}
           </button>
           <!-- Create New Post Button -->
-          <button
-            [routerLink]="['new']"
-            class="btn btn-primary inline-flex items-center"
-          >
-            <span class="material-symbols-outlined mr-2 text-lg">add</span>
-            Create New Post
-          </button>
+          <app-create-button [routerLink]="['new']" text="Create New Post" />
         </div>
       </div>
     </div>
@@ -75,13 +69,10 @@
           }}
         </p>
         <div class="mt-6">
-          <button
+          <app-create-button
             [routerLink]="['new']"
-            class="btn btn-primary inline-flex items-center"
-          >
-            <span class="material-symbols-outlined mr-2 text-lg">add</span>
-            Create New Post
-          </button>
+            text="Create New Post"
+          ></app-create-button>
         </div>
       </div>
     </div>
@@ -181,30 +172,32 @@
               {{ post.createdAt | date: "medium" }}
             </td>
             <td
-              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2"
             >
-              <div class="flex justify-end gap-2">
-                <button
-                  [routerLink]="['edit', post.id]"
-                  class="text-blue-600 hover:text-blue-900"
-                  *ngIf="canEditPost(post)"
+              <a
+                [routerLink]="['edit', post.id]"
+                class="inline-flex items-center px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                *ngIf="canEditPost(post)"
+              >
+                <span class="material-symbols-outlined text-sm mr-1">edit</span>
+                Edit
+              </a>
+              <button
+                (click)="onDelete(post.id)"
+                class="inline-flex items-center px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+                *ngIf="canDeletePost(post)"
+              >
+                <span class="material-symbols-outlined text-sm mr-1"
+                  >delete</span
                 >
-                  Edit
-                </button>
-                <button
-                  (click)="onDelete(post.id)"
-                  class="text-red-600 hover:text-red-900 ml-2"
-                  *ngIf="canDeletePost(post)"
-                >
-                  Delete
-                </button>
-                <span
-                  *ngIf="!canEditPost(post) && !canDeletePost(post)"
-                  class="text-gray-400 text-sm"
-                >
-                  No actions
-                </span>
-              </div>
+                Delete
+              </button>
+              <span
+                *ngIf="!canEditPost(post) && !canDeletePost(post)"
+                class="text-gray-400 text-sm"
+              >
+                No actions
+              </span>
             </td>
           </tr>
         </tbody>

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router, ActivatedRoute, RouterModule } from "@angular/router";
 import {
   TagsService,
   type Tag,
@@ -12,158 +12,8 @@ import {
 @Component({
   selector: "app-tag-form",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  template: `
-    <div class="space-y-6">
-      <!-- Header -->
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">
-          {{ isEdit() ? "Edit Tag" : "Create New Tag" }}
-        </h1>
-        <p class="mt-2 text-sm text-gray-700">
-          {{
-            isEdit()
-              ? "Update the tag information below."
-              : "Fill in the details to create a new tag."
-          }}
-        </p>
-      </div>
-
-      <!-- Loading State -->
-      @if (isLoading()) {
-        <div class="flex justify-center py-12">
-          <div
-            class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
-          ></div>
-        </div>
-      } @else {
-        <!-- Form -->
-        <form [formGroup]="tagForm" (ngSubmit)="onSubmit()" class="space-y-6">
-          <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
-            <div class="md:grid md:grid-cols-3 md:gap-6">
-              <div class="md:col-span-1">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">
-                  Tag Information
-                </h3>
-                <p class="mt-1 text-sm text-gray-500">
-                  Basic information about the tag. The slug will be
-                  automatically generated from the name.
-                </p>
-              </div>
-              <div class="mt-5 md:mt-0 md:col-span-2">
-                <div class="space-y-6">
-                  <!-- Name Field -->
-                  <div>
-                    <label
-                      for="name"
-                      class="block text-sm font-medium text-gray-700"
-                    >
-                      Name <span class="text-red-500">*</span>
-                    </label>
-                    <div class="mt-1">
-                      <input
-                        type="text"
-                        id="name"
-                        formControlName="name"
-                        class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                        [class.border-red-300]="isFieldInvalid('name')"
-                        placeholder="e.g., JavaScript, React, Angular"
-                      />
-                      @if (isFieldInvalid("name")) {
-                        <p class="mt-2 text-sm text-red-600">
-                          @if (tagForm.get("name")?.errors?.["required"]) {
-                            Tag name is required.
-                          }
-                          @if (tagForm.get("name")?.errors?.["maxlength"]) {
-                            Tag name cannot exceed 50 characters.
-                          }
-                        </p>
-                      }
-                    </div>
-                    <p class="mt-2 text-sm text-gray-500">
-                      Choose a descriptive name for your tag. It will be used to
-                      categorize your posts.
-                    </p>
-                  </div>
-
-                  <!-- Preview Slug -->
-                  @if (tagForm.get("name")?.value) {
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">
-                        Generated Slug (Preview)
-                      </label>
-                      <div
-                        class="mt-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-sm text-gray-600"
-                      >
-                        {{
-                          generateSlugPreview(tagForm.get("name")?.value || "")
-                        }}
-                      </div>
-                      <p class="mt-2 text-sm text-gray-500">
-                        This is how your tag will appear in URLs.
-                      </p>
-                    </div>
-                  }
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Error Message -->
-          @if (error()) {
-            <div class="rounded-md bg-red-50 p-4">
-              <div class="text-sm text-red-700">
-                {{ error() }}
-              </div>
-            </div>
-          }
-
-          <!-- Form Actions -->
-          <div class="flex justify-end space-x-3">
-            <button
-              type="button"
-              (click)="onCancel()"
-              class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              [disabled]="isSubmitting() || tagForm.invalid"
-              class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              @if (isSubmitting()) {
-                <span class="inline-flex items-center">
-                  <svg
-                    class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      class="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      stroke-width="4"
-                    ></circle>
-                    <path
-                      class="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  {{ isEdit() ? "Updating..." : "Creating..." }}
-                </span>
-              } @else {
-                {{ isEdit() ? "Update Tag" : "Create Tag" }}
-              }
-            </button>
-          </div>
-        </form>
-      }
-    </div>
-  `,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  templateUrl: "./tag-form.component.html",
 })
 export class TagFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
