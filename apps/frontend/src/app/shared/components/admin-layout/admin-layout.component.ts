@@ -54,7 +54,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     },
     {
       routerLink: ["/admin/tags"],
-      icon: "tag",
+      icon: "sell",
       label: "Tags",
     },
     {
@@ -90,7 +90,12 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     if (url.includes("/posts/edit")) return "Edit Post";
     if (url.includes("/posts")) return "All Posts";
     if (url.includes("/users")) return "Users";
+    if (url.includes("/categories/new")) return "New Category";
+    if (url.includes("/categories") && url.includes("/edit"))
+      return "Edit Category";
     if (url.includes("/categories")) return "Categories";
+    if (url.includes("/tags/new")) return "New Tag";
+    if (url.includes("/tags") && url.includes("/edit")) return "Edit Tag";
     if (url.includes("/tags")) return "Tags";
     if (url.includes("/settings")) return "Settings";
 

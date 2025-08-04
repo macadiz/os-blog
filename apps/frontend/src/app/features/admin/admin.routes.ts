@@ -91,10 +91,8 @@ export const adminRoutes: Routes = [
       {
         path: "tags",
         canActivate: [roleGuard(["ADMIN"])],
-        loadComponent: () =>
-          import("./admin-dashboard/admin-dashboard.component").then(
-            (m) => m.AdminDashboardComponent
-          ),
+        loadChildren: () =>
+          import("./tags/tags.routes").then((m) => m.TAGS_ROUTES),
       },
       {
         path: "settings",
