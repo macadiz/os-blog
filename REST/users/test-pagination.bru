@@ -1,0 +1,40 @@
+meta {
+  name: Test Pagination
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/users
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 2
+  sortBy: createdAt
+  sortOrder: desc
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should respect pagination limits", function() {
+    expect(res.getBody().data.users).to.be.an('array');
+    expect(res.getBody().data.users.length).to.be.at.most(2);
+  });
+  
+  test("should include pagination metadata", function() {
+    expect(res.getBody().data.pagination).to.have.property('page', 1);
+    expect(res.getBody().data.pagination).to.have.property('limit', 2);
+    expect(res.getBody().data.pagination).to.have.property('total');
+    expect(res.getBody().data.pagination).to.have.property('totalPages');
+  });
+}

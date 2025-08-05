@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "name": "Open Blog API",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "presets": {
+    "requestType": "http"
+  }
+}

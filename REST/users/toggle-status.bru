@@ -1,0 +1,27 @@
+meta {
+  name: Toggle User Status (Admin)
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/users/{{testUserId}}/toggle-status
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should return updated user status", function() {
+    expect(res.getBody()).to.have.property('statusCode', 200);
+    expect(res.getBody()).to.have.property('data');
+    expect(res.getBody().data).to.have.property('isActive');
+  });
+}

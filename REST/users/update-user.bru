@@ -1,0 +1,37 @@
+meta {
+  name: Update User (Admin)
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/users/{{testUserId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "firstName": "Updated",
+    "lastName": "TestUser",
+    "role": "ADMIN"
+  }
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should return updated user", function() {
+    expect(res.getBody()).to.have.property('statusCode', 200);
+    expect(res.getBody()).to.have.property('data');
+    expect(res.getBody().data).to.have.property('firstName', 'Updated');
+    expect(res.getBody().data).to.have.property('lastName', 'TestUser');
+    expect(res.getBody().data).to.have.property('role', 'ADMIN');
+  });
+}

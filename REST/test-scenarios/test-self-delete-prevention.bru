@@ -1,0 +1,26 @@
+meta {
+  name: Test Self Delete Prevention
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/users/{{adminUserId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("should return 400 for self-deletion attempt", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+  
+  test("should return error message", function() {
+    expect(res.getBody()).to.have.property('message');
+    expect(res.getBody().message).to.include('delete yourself');
+  });
+}

@@ -1,0 +1,36 @@
+meta {
+  name: Test Invalid User Creation - Duplicate Username
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "email": "newunique@example.com",
+    "username": "maikolasdf",
+    "firstName": "Duplicate",
+    "lastName": "Username",
+    "role": "AUTHOR"
+  }
+}
+
+tests {
+  test("should return 409 for duplicate username", function() {
+    expect(res.getStatus()).to.equal(409);
+  });
+  
+  test("should return conflict message", function() {
+    expect(res.getBody()).to.have.property('message');
+    expect(res.getBody().message).to.include('Username already exists');
+  });
+}

@@ -1,0 +1,35 @@
+meta {
+  name: Test Invalid User Creation - Invalid Email
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "email": "invalid-email",
+    "username": "validusername",
+    "firstName": "Valid",
+    "lastName": "User",
+    "role": "AUTHOR"
+  }
+}
+
+tests {
+  test("should return 400 for invalid email format", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+  
+  test("should return validation error", function() {
+    expect(res.getBody()).to.have.property('message');
+  });
+}

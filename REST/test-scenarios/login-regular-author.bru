@@ -1,0 +1,34 @@
+meta {
+  name: Login as Regular Author
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "regularauthor",
+    "password": "Password123!"
+  }
+}
+
+tests {
+  test("should login as regular author", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('access_token');
+    expect(res.getBody().user).to.have.property('role', 'AUTHOR');
+    expect(res.getBody().user).to.have.property('mustChangePassword', false);
+  });
+}
+
+script:post-response {
+  if (res.getBody().access_token) {
+    bru.setVar("authorToken", res.getBody().access_token);
+    console.log("Author token stored");
+  }
+}

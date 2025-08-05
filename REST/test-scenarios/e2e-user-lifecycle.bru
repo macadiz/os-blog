@@ -1,0 +1,49 @@
+meta {
+  name: E2E User Lifecycle Test
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "email": "lifecycle@example.com",
+    "username": "lifecycleuser",
+    "firstName": "Lifecycle",
+    "lastName": "Test",
+    "role": "AUTHOR"
+  }
+}
+
+tests {
+  test("should create user successfully", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().data).to.have.property('mustChangePassword', true);
+    expect(res.getBody().data).to.have.property('isTemporaryPassword', true);
+    expect(res.getBody().data).to.have.property('isActive', true);
+  });
+  
+  test("should have generated temporary password", function() {
+    expect(res.getBody().data).to.have.property('temporaryPassword');
+    expect(res.getBody().data.temporaryPassword).to.be.a('string');
+    expect(res.getBody().data.temporaryPassword.length).to.be.at.least(8);
+  });
+}
+
+script:post-response {
+  if (res.getBody().data) {
+    bru.setVar("lifecycleUserId", res.getBody().data.id);
+    bru.setVar("lifecycleTempPassword", res.getBody().data.temporaryPassword);
+    console.log("Lifecycle test user created:", res.getBody().data.id);
+    console.log("Temp password:", res.getBody().data.temporaryPassword);
+  }
+}

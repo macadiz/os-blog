@@ -1,0 +1,46 @@
+meta {
+  name: Test User Search Functionality
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/users
+  body: none
+  auth: bearer
+}
+
+params:query {
+  search: test
+  page: 1
+  limit: 10
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should return search results", function() {
+    expect(res.getBody().data).to.have.property('users');
+    expect(res.getBody().data).to.have.property('pagination');
+  });
+  
+  test("should include search term in results", function() {
+    const users = res.getBody().data.users;
+    if (users.length > 0) {
+      // At least one user should contain 'test' in username, email, firstName or lastName
+      const hasSearchTerm = users.some(user => 
+        user.username.toLowerCase().includes('test') ||
+        user.email.toLowerCase().includes('test') ||
+        (user.firstName && user.firstName.toLowerCase().includes('test')) ||
+        (user.lastName && user.lastName.toLowerCase().includes('test'))
+      );
+      expect(hasSearchTerm).to.be.true;
+    }
+  });
+}

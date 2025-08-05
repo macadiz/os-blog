@@ -1,0 +1,40 @@
+meta {
+  name: Login Admin
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "{{adminUsername}}",
+    "password": "{{adminPassword}}"
+  }
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should return access token", function() {
+    expect(res.getBody()).to.have.property('access_token');
+  });
+  
+  test("should return user data", function() {
+    expect(res.getBody()).to.have.property('user');
+    expect(res.getBody().user).to.have.property('role', 'ADMIN');
+  });
+}
+
+script:post-response {
+  if (res.getBody().access_token) {
+    bru.setVar("adminToken", res.getBody().access_token);
+    console.log("Admin token stored");
+  }
+}

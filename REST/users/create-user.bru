@@ -1,0 +1,48 @@
+meta {
+  name: Create New User (Admin)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "email": "testuser@example.com",
+    "username": "testuser",
+    "firstName": "Test",
+    "lastName": "User",
+    "role": "AUTHOR"
+  }
+}
+
+tests {
+  test("should return 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("should return created user", function() {
+    expect(res.getBody()).to.have.property('statusCode', 201);
+    expect(res.getBody()).to.have.property('data');
+    expect(res.getBody().data).to.have.property('id');
+    expect(res.getBody().data).to.have.property('username', 'testuser');
+    expect(res.getBody().data).to.have.property('role', 'AUTHOR');
+    expect(res.getBody().data).to.have.property('mustChangePassword', true);
+    expect(res.getBody().data).to.have.property('isTemporaryPassword', true);
+  });
+}
+
+script:post-response {
+  if (res.getBody().data && res.getBody().data.id) {
+    bru.setVar("testUserId", res.getBody().data.id);
+    console.log("Test user ID stored:", res.getBody().data.id);
+  }
+}

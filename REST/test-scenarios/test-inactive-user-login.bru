@@ -1,0 +1,29 @@
+meta {
+  name: Test Inactive User Login
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "inactiveuser",
+    "password": "password123"
+  }
+}
+
+tests {
+  test("should return 401 for inactive user", function() {
+    expect(res.getStatus()).to.equal(401);
+  });
+  
+  test("should return deactivated account message", function() {
+    expect(res.getBody()).to.have.property('message');
+    expect(res.getBody().message).to.include('deactivated');
+  });
+}

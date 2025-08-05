@@ -1,0 +1,26 @@
+meta {
+  name: Test Posts Access with Temp Password User
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/posts
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tempUserToken}}
+}
+
+tests {
+  test("should return 401 for temp password user", function() {
+    expect(res.getStatus()).to.equal(401);
+  });
+  
+  test("should return password change required message", function() {
+    expect(res.getBody()).to.have.property('message');
+    expect(res.getBody().message).to.include('Password change required');
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Login with Invalid Credentials
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "invaliduser",
+    "password": "wrongpassword"
+  }
+}
+
+tests {
+  test("should return 401 for invalid credentials", function() {
+    expect(res.getStatus()).to.equal(401);
+  });
+  
+  test("should return error message", function() {
+    expect(res.getBody()).to.have.property('message');
+  });
+}

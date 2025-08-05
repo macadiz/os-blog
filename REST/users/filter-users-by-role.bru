@@ -1,0 +1,36 @@
+meta {
+  name: Test User Filtering by Role
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/users
+  body: none
+  auth: bearer
+}
+
+params:query {
+  role: ADMIN
+  page: 1
+  limit: 10
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("should return 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should filter users by role", function() {
+    expect(res.getBody().data.users).to.be.an('array');
+    
+    // Check that all returned users have ADMIN role
+    res.getBody().data.users.forEach(function(user) {
+      expect(user).to.have.property('role', 'ADMIN');
+    });
+  });
+}

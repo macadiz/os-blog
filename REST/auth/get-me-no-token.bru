@@ -1,0 +1,17 @@
+meta {
+  name: Get Current User - No Token
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/auth/me
+  body: none
+  auth: none
+}
+
+tests {
+  test("should return 401 without token", function() {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

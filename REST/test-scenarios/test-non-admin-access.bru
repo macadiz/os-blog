@@ -1,0 +1,25 @@
+meta {
+  name: Test Access Without Admin Role
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/users
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userToken}}
+}
+
+tests {
+  test("should return 403 for non-admin user", function() {
+    expect(res.getStatus()).to.equal(403);
+  });
+  
+  test("should return forbidden message", function() {
+    expect(res.getBody()).to.have.property('message');
+  });
+}

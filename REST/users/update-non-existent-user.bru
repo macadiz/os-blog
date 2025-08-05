@@ -1,0 +1,33 @@
+meta {
+  name: Test Update Non-Existent User
+  type: http
+  seq: 14
+}
+
+patch {
+  url: {{baseUrl}}/users/non-existent-id
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "firstName": "Updated",
+    "lastName": "Name"
+  }
+}
+
+tests {
+  test("should return 404 for non-existent user", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+  
+  test("should return not found message", function() {
+    expect(res.getBody()).to.have.property('message');
+    expect(res.getBody().message).to.include('User not found');
+  });
+}

@@ -1,0 +1,40 @@
+meta {
+  name: Create User with Temp Password for Testing
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "email": "tempuser@example.com",
+    "username": "tempuser",
+    "firstName": "Temp",
+    "lastName": "User",
+    "role": "AUTHOR"
+  }
+}
+
+tests {
+  test("should create user with temporary password", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().data).to.have.property('mustChangePassword', true);
+    expect(res.getBody().data).to.have.property('isTemporaryPassword', true);
+  });
+}
+
+script:post-response {
+  if (res.getBody().data && res.getBody().data.id) {
+    bru.setVar("tempUserId", res.getBody().data.id);
+    console.log("Temp user ID stored:", res.getBody().data.id);
+  }
+}

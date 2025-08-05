@@ -1,0 +1,25 @@
+meta {
+  name: Test Posts Access with Active User
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/posts
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("should return 200 for active admin user", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should return posts data", function() {
+    expect(res.getBody()).to.be.an('array');
+  });
+}

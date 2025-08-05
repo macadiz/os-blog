@@ -1,0 +1,37 @@
+meta {
+  name: Test Login with Temporary Password
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "tempuser",
+    "password": "tempuser"
+  }
+}
+
+script:post-response {
+  if (res.getBody().access_token) {
+    bru.setVar("tempUserToken", res.getBody().access_token);
+    console.log("Temp user token stored");
+  }
+}
+
+tests {
+  test("should allow login with temp password", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('access_token');
+  });
+  
+  test("should return user with mustChangePassword=true", function() {
+    expect(res.getBody().user).to.have.property('mustChangePassword', true);
+    expect(res.getBody().user).to.have.property('isTemporaryPassword', true);
+  });
+}

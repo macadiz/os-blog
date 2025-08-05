@@ -1,0 +1,43 @@
+meta {
+  name: Create Regular Author User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "email": "author@example.com",
+    "username": "regularauthor",
+    "firstName": "Regular",
+    "lastName": "Author",
+    "role": "AUTHOR",
+    "password": "Password123!",
+    "mustChangePassword": false
+  }
+}
+
+tests {
+  test("should create regular author user", function() {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.getBody().data).to.have.property('role', 'AUTHOR');
+    expect(res.getBody().data).to.have.property('mustChangePassword', false);
+    expect(res.getBody().data).to.have.property('isTemporaryPassword', false);
+  });
+}
+
+script:post-response {
+  if (res.getBody().data && res.getBody().data.id) {
+    bru.setVar("regularAuthorId", res.getBody().data.id);
+    console.log("Regular author ID stored:", res.getBody().data.id);
+  }
+}

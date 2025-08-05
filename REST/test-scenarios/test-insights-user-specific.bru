@@ -1,0 +1,37 @@
+meta {
+  name: Test Insights User-Specific Data
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/insights
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.totalPosts: exists
+  res.body.publishedPosts: exists
+  res.body.draftPosts: exists
+  res.body.scope: eq global
+}
+
+tests {
+  test("Admin sees global insights with scope", function() {
+    const data = res.getBody();
+    expect(data.scope).to.equal("global");
+    expect(data.totalPosts).to.be.a("number");
+    expect(data.publishedPosts).to.be.a("number");
+    expect(data.draftPosts).to.be.a("number");
+    expect(data.totalCategories).to.be.a("number");
+    expect(data.totalTags).to.be.a("number");
+    expect(data.totalUsers).to.be.a("number");
+    expect(data.recentPosts).to.be.a("number");
+  });
+}

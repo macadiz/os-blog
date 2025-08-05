@@ -1,0 +1,36 @@
+meta {
+  name: Test Invalid User Creation - Duplicate Email
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "email": "maikolasdf@gmail.com",
+    "username": "duplicateuser",
+    "firstName": "Duplicate",
+    "lastName": "User",
+    "role": "AUTHOR"
+  }
+}
+
+tests {
+  test("should return 409 for duplicate email", function() {
+    expect(res.getStatus()).to.equal(409);
+  });
+  
+  test("should return conflict message", function() {
+    expect(res.getBody()).to.have.property('message');
+    expect(res.getBody().message).to.include('Email already exists');
+  });
+}

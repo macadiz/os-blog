@@ -1,0 +1,29 @@
+meta {
+  name: Setup Admin User ID
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/auth/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("should get admin user info", function() {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property('id');
+  });
+}
+
+script:post-response {
+  if (res.getBody().id) {
+    bru.setVar("adminUserId", res.getBody().id);
+    console.log("Admin user ID stored:", res.getBody().id);
+  }
+}

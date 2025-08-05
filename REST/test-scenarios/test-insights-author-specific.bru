@@ -1,0 +1,40 @@
+meta {
+  name: Test Insights Author-Specific Data
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{host}}/insights
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authorToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body.scope: eq user
+}
+
+tests {
+  test("Author sees user-specific insights with scope", function() {
+    const data = res.getBody();
+    expect(data.scope).to.equal("user");
+    expect(data.totalPosts).to.be.a("number");
+    expect(data.publishedPosts).to.be.a("number");
+    expect(data.draftPosts).to.be.a("number");
+    expect(data.totalCategories).to.be.a("number");
+    expect(data.totalTags).to.be.a("number");
+    expect(data.totalUsers).to.be.a("number");
+    expect(data.recentPosts).to.be.a("number");
+    
+    // Author should have 0 posts initially since they just created
+    expect(data.totalPosts).to.equal(0);
+    expect(data.publishedPosts).to.equal(0);
+    expect(data.draftPosts).to.equal(0);
+    expect(data.recentPosts).to.equal(0);
+  });
+}
