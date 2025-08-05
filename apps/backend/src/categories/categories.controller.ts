@@ -6,24 +6,20 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { RequireActiveUser } from '../auth/decorators/require-active-user.decorator';
 
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @RequireActiveUser(['ADMIN'])
   create(
     @Body(ValidationPipe) createCategoryDto: CreateCategoryDto,
     @CurrentUser() user: any,
@@ -42,8 +38,7 @@ export class CategoriesController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @RequireActiveUser(['ADMIN'])
   update(
     @Param('id') id: string,
     @Body(ValidationPipe) updateCategoryDto: UpdateCategoryDto,
@@ -52,8 +47,7 @@ export class CategoriesController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @RequireActiveUser(['ADMIN'])
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
   }

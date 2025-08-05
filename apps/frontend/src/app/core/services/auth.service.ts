@@ -14,6 +14,11 @@ export interface User {
   lastName?: string;
   role: "ADMIN" | "AUTHOR";
   isActive: boolean;
+  isTemporaryPassword?: boolean;
+  mustChangePassword?: boolean;
+  lastLoginAt?: Date;
+  passwordResetAt?: Date;
+  passwordChangedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -66,6 +71,12 @@ export class AuthService {
         tap((response) => {
           this.setToken(response.access_token);
           this.currentUserSubject.next(response.user);
+
+          // Check if user must change password
+          if (response.user.mustChangePassword) {
+            // Redirect to password change page
+            this.router.navigate(["/change-password"]);
+          }
         }),
         catchError((error) => {
           console.error("Login failed:", error);
@@ -115,5 +126,17 @@ export class AuthService {
         observer.next(user ? roles.includes(user.role) : false);
       });
     });
+  }
+
+  mustChangePassword(): Observable<boolean> {
+    return new Observable((observer) => {
+      this.currentUser$.subscribe((user) => {
+        observer.next(user?.mustChangePassword === true);
+      });
+    });
+  }
+
+  getCurrentUserSync(): User | null {
+    return this.currentUserSubject.value;
   }
 }

@@ -97,6 +97,56 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /user/change-password:
+    patch:
+      summary: Change user password
+      description: Change the current user's password (self-service)
+      tags:
+        - User Self-Service
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordDto'
+            example:
+              currentPassword: 'oldpassword123'
+              newPassword: 'newpassword123'
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 'Password changed successfully'
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: 'Password changed successfully'
+        '400':
+          description: Bad request (invalid current password)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /posts/published:
     get:
       summary: Get published posts
@@ -824,6 +874,410 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /users:
+    get:
+      summary: Get all users
+      description: Retrieve a list of all users with filtering and sorting options (admin only)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search term for email, username, firstName, or lastName
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [ADMIN, AUTHOR]
+          description: Filter by user role
+        - in: query
+          name: isActive
+          schema:
+            type: boolean
+          description: Filter by active status
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [createdAt, email, username, firstName, lastName]
+            default: createdAt
+          description: Field to sort by
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort order
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create a new user
+      description: Create a new user account (admin only)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Email or username already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/stats/overview:
+    get:
+      summary: Get user statistics
+      description: Retrieve user statistics and overview data (admin only)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{id}:
+    get:
+      summary: Get user by ID
+      description: Retrieve a specific user by their ID (admin only)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      summary: Update user
+      description: Update a user's information (admin only)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Bad request - validation error or self-modification attempt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Email or username already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete user
+      description: Delete a user account (admin only)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Bad request - Cannot delete own account or user has associated content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{id}/toggle-status:
+    patch:
+      summary: Toggle user active status
+      description: Activate or deactivate a user account (admin only)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: User status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Bad request - Cannot change own account status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{id}/reset-password:
+    patch:
+      summary: Reset user password
+      description: Reset a user's password and generate a temporary password (admin only)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/me/change-password:
+    patch:
+      summary: Change own password
+      description: Change the current user's password (all authenticated users)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordDto'
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordChangeResponse'
+        '400':
+          description: Bad request - Current password incorrect or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -854,6 +1308,23 @@ components:
           type: string
           description: JWT access token
           example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        user:
+          $ref: '#/components/schemas/User'
+
+    ChangePasswordDto:
+      type: object
+      required:
+        - currentPassword
+        - newPassword
+      properties:
+        currentPassword:
+          type: string
+          description: Current user password
+          example: 'oldpassword123'
+        newPassword:
+          type: string
+          description: New password
+          example: 'newpassword123'
 
     CreatePostDto:
       type: object
@@ -1158,6 +1629,32 @@ components:
           type: boolean
           description: Whether user is active
           example: true
+        isTemporaryPassword:
+          type: boolean
+          description: Whether user has a temporary password that must be changed
+          example: false
+        mustChangePassword:
+          type: boolean
+          description: Whether user must change password on next login
+          example: false
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last login timestamp
+          example: '2025-08-05T15:30:00Z'
+        passwordResetAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last password reset timestamp
+          example: '2025-08-05T14:00:00Z'
+        passwordChangedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last password change timestamp
+          example: '2025-08-05T14:05:00Z'
         createdAt:
           type: string
           format: date-time
@@ -1325,6 +1822,246 @@ components:
           description: Error type
           example: 'Bad Request'
 
+    # User Management Schemas
+    CreateUserDto:
+      type: object
+      required:
+        - email
+        - username
+        - password
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: 'john.doe@example.com'
+        username:
+          type: string
+          minLength: 3
+          description: Unique username
+          example: 'johndoe'
+        password:
+          type: string
+          minLength: 8
+          description: User password
+          example: 'SecureP@ssw0rd'
+        firstName:
+          type: string
+          description: User first name
+          example: 'John'
+        lastName:
+          type: string
+          description: User last name
+          example: 'Doe'
+        role:
+          type: string
+          enum: [ADMIN, AUTHOR]
+          description: User role
+          example: 'AUTHOR'
+        isActive:
+          type: boolean
+          description: Whether the user account is active
+          default: true
+          example: true
+
+    UpdateUserDto:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: 'john.doe@example.com'
+        username:
+          type: string
+          minLength: 3
+          description: Unique username
+          example: 'johndoe'
+        password:
+          type: string
+          minLength: 8
+          description: New password
+          example: 'NewSecureP@ssw0rd'
+        firstName:
+          type: string
+          description: User first name
+          example: 'John'
+        lastName:
+          type: string
+          description: User last name
+          example: 'Doe'
+        role:
+          type: string
+          enum: [ADMIN, AUTHOR]
+          description: User role
+          example: 'AUTHOR'
+        isActive:
+          type: boolean
+          description: Whether the user account is active
+          example: true
+
+    UserResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code
+          example: 200
+        message:
+          type: string
+          description: Response message
+          example: 'User retrieved successfully'
+        data:
+          $ref: '#/components/schemas/User'
+
+    UsersListResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code
+          example: 200
+        message:
+          type: string
+          description: Response message
+          example: 'Users retrieved successfully'
+        data:
+          type: object
+          properties:
+            users:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+            total:
+              type: integer
+              description: Total number of users
+              example: 10
+            meta:
+              type: object
+              properties:
+                search:
+                  type: string
+                  description: Search term used
+                  example: 'john'
+                role:
+                  type: string
+                  enum: [ADMIN, AUTHOR]
+                  description: Role filter used
+                  example: 'AUTHOR'
+                isActive:
+                  type: boolean
+                  description: Active status filter used
+                  example: true
+                sortBy:
+                  type: string
+                  description: Field used for sorting
+                  example: 'createdAt'
+                sortOrder:
+                  type: string
+                  enum: [asc, desc]
+                  description: Sort order used
+                  example: 'desc'
+
+    UserStatsResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code
+          example: 200
+        message:
+          type: string
+          description: Response message
+          example: 'User statistics retrieved successfully'
+        data:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: Total number of users
+              example: 50
+            active:
+              type: integer
+              description: Number of active users
+              example: 45
+            inactive:
+              type: integer
+              description: Number of inactive users
+              example: 5
+            admins:
+              type: integer
+              description: Number of admin users
+              example: 3
+            authors:
+              type: integer
+              description: Number of author users
+              example: 47
+            recent:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+              description: Recently created users
+              maxItems: 5
+
+    PasswordResetResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code
+          example: 200
+        message:
+          type: string
+          description: Response message
+          example: 'Password reset successfully'
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Reset confirmation message
+              example: 'Password reset successfully'
+            temporaryPassword:
+              type: string
+              description: Temporary password generated
+              example: 'temp123abc456'
+            note:
+              type: string
+              description: Important note about temporary password
+              example: 'Please provide this temporary password to the user and ask them to change it immediately.'
+
+    PasswordChangeResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code
+          example: 200
+        message:
+          type: string
+          description: Response message
+          example: 'Password changed successfully'
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Confirmation message
+              example: 'Password changed successfully'
+
+    SuccessResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code
+          example: 200
+        message:
+          type: string
+          description: Success message
+          example: 'Operation completed successfully'
+
 tags:
   - name: Health
     description: API health check endpoints
@@ -1340,5 +2077,7 @@ tags:
     description: Tag management endpoints
   - name: Setup
     description: Initial blog setup endpoints
+  - name: Users
+    description: User management endpoints (admin only)
   - name: Insights
     description: Blog statistics and insights endpoints

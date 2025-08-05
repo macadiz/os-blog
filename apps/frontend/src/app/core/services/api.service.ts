@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
 
 // DTOs matching OpenAPI specification
@@ -11,6 +12,24 @@ export interface LoginDto {
 
 export interface LoginResponse {
   access_token: string;
+  user: User;
+}
+
+// Backend response wrapper
+export interface ApiResponse<T> {
+  statusCode: number;
+  message: string;
+  data: T;
+}
+
+// Users list response structure
+export interface UsersListResponse {
+  users: User[];
+  total: number;
+  meta: {
+    sortBy: string;
+    sortOrder: string;
+  };
 }
 
 export interface CreatePostDto {
@@ -61,6 +80,32 @@ export interface UpdateCategoryDto {
   color?: string;
 }
 
+export interface CreateUserDto {
+  email: string;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  password: string;
+  role: "ADMIN" | "AUTHOR";
+}
+
+export interface UpdateUserDto {
+  email?: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: "ADMIN" | "AUTHOR";
+  isActive?: boolean;
+}
+
+export interface UserQueryDto {
+  search?: string;
+  role?: "ADMIN" | "AUTHOR";
+  isActive?: boolean;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
 // Response models matching OpenAPI specification
 export interface User {
   id: string;
@@ -70,6 +115,11 @@ export interface User {
   lastName?: string;
   role: "ADMIN" | "AUTHOR";
   isActive: boolean;
+  isTemporaryPassword?: boolean;
+  mustChangePassword?: boolean;
+  lastLoginAt?: Date;
+  passwordResetAt?: Date;
+  passwordChangedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -260,5 +310,78 @@ export class ApiService {
   // Tags
   getTags(): Observable<Tag[]> {
     return this.http.get<Tag[]>(`${this.baseUrl}/tags`);
+  }
+
+  // Users
+  getUsers(query?: UserQueryDto): Observable<User[]> {
+    let params = "";
+    if (query) {
+      const queryParams = new URLSearchParams();
+      if (query.search) queryParams.append("search", query.search);
+      if (query.role) queryParams.append("role", query.role);
+      if (query.isActive !== undefined)
+        queryParams.append("isActive", query.isActive.toString());
+      if (query.sortBy) queryParams.append("sortBy", query.sortBy);
+      if (query.sortOrder) queryParams.append("sortOrder", query.sortOrder);
+      params = queryParams.toString() ? `?${queryParams.toString()}` : "";
+    }
+    return this.http
+      .get<ApiResponse<UsersListResponse>>(`${this.baseUrl}/users${params}`)
+      .pipe(map((response) => response.data.users));
+  }
+
+  getUser(id: string): Observable<User> {
+    return this.http
+      .get<ApiResponse<User>>(`${this.baseUrl}/users/${id}`)
+      .pipe(map((response) => response.data));
+  }
+
+  createUser(user: CreateUserDto): Observable<User> {
+    return this.http
+      .post<ApiResponse<User>>(`${this.baseUrl}/users`, user)
+      .pipe(map((response) => response.data));
+  }
+
+  updateUser(id: string, user: UpdateUserDto): Observable<User> {
+    return this.http
+      .patch<ApiResponse<User>>(`${this.baseUrl}/users/${id}`, user)
+      .pipe(map((response) => response.data));
+  }
+
+  deleteUser(id: string): Observable<{ message: string }> {
+    return this.http
+      .delete<ApiResponse<{ message: string }>>(`${this.baseUrl}/users/${id}`)
+      .pipe(map((response) => response.data));
+  }
+
+  toggleUserStatus(id: string): Observable<User> {
+    return this.http
+      .patch<ApiResponse<User>>(`${this.baseUrl}/users/${id}/toggle-status`, {})
+      .pipe(map((response) => response.data));
+  }
+
+  resetUserPassword(
+    id: string
+  ): Observable<{ message: string; temporaryPassword: string; note: string }> {
+    return this.http
+      .patch<
+        ApiResponse<{
+          message: string;
+          temporaryPassword: string;
+          note: string;
+        }>
+      >(`${this.baseUrl}/users/${id}/reset-password`, {})
+      .pipe(map((response) => response.data));
+  }
+
+  changePassword(changePasswordData: {
+    currentPassword: string;
+    newPassword: string;
+  }): Observable<{ message: string }> {
+    return this.http
+      .patch<
+        ApiResponse<{ message: string }>
+      >(`${this.baseUrl}/users/me/change-password`, changePasswordData)
+      .pipe(map((response) => response.data));
   }
 }

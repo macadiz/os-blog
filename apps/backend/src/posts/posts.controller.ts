@@ -6,13 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { RequireActiveUser } from '../auth/decorators/require-active-user.decorator';
 
 @Controller()
 export class PostsController {
@@ -30,31 +29,31 @@ export class PostsController {
   }
 
   // Admin endpoints (protected)
-  @UseGuards(JwtAuthGuard)
+  @RequireActiveUser()
   @Post('admin/posts')
   create(@Body() createPostDto: CreatePostDto, @CurrentUser() user: any) {
     return this.postsService.create(createPostDto, user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @RequireActiveUser()
   @Get('admin/posts')
   findAll() {
     return this.postsService.findAll(true); // Include unpublished posts for admin
   }
 
-  @UseGuards(JwtAuthGuard)
+  @RequireActiveUser()
   @Get('admin/posts/:id')
   findOne(@Param('id') id: string) {
     return this.postsService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @RequireActiveUser()
   @Patch('admin/posts/:id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.update(id, updatePostDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @RequireActiveUser()
   @Delete('admin/posts/:id')
   remove(@Param('id') id: string) {
     return this.postsService.remove(id);

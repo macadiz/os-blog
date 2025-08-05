@@ -1,0 +1,293 @@
+<div class="max-w-7xl mx-auto p-6">
+  <div class="bg-white rounded-lg shadow-md">
+    <!-- Header -->
+    <div class="border-b border-gray-200 px-6 py-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Users</h1>
+          <p class="text-gray-600">Manage user accounts and permissions</p>
+        </div>
+        <app-create-button [routerLink]="['/admin/users/new']" text="New User">
+        </app-create-button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="border-b border-gray-200 px-6 py-4 bg-gray-50">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-medium text-gray-900">Filters</h3>
+        <button
+          (click)="clearFilters()"
+          class="text-sm text-gray-500 hover:text-gray-700"
+        >
+          Clear all
+        </button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
+        <!-- Search -->
+        <div>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+            placeholder="Search users..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Role Filter -->
+        <div>
+          <select
+            [(ngModel)]="selectedRole"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">All Roles</option>
+            <option value="ADMIN">Admin</option>
+            <option value="AUTHOR">Author</option>
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div>
+          <select
+            [(ngModel)]="selectedStatus"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <!-- Sort Order -->
+        <div>
+          <select
+            [(ngModel)]="sortOrder"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="desc">Newest First</option>
+            <option value="asc">Oldest First</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div *ngIf="users$ | async as users; else loading">
+      <div *ngIf="users.length > 0; else noUsers" class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                User
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Role & Status
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Last Login
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Created
+              </th>
+              <th scope="col" class="relative px-6 py-3">
+                <span class="sr-only">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let user of users" class="hover:bg-gray-50">
+              <!-- User Info -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div
+                      class="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center"
+                    >
+                      <span class="text-sm font-medium text-white">
+                        {{
+                          user.firstName?.[0] || user.username[0] | uppercase
+                        }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      {{
+                        user.firstName && user.lastName
+                          ? user.firstName + " " + user.lastName
+                          : user.username
+                      }}
+                    </div>
+                    <div class="text-sm text-gray-500">{{ user.email }}</div>
+                    <div class="text-xs text-gray-400">
+                      {{ "@" + user.username }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Role & Status -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="space-y-1">
+                  <span
+                    [class]="getRoleBadgeClass(user.role)"
+                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                  >
+                    {{ user.role }}
+                  </span>
+                  <br />
+                  <span
+                    [class]="getStatusBadgeClass(user)"
+                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                  >
+                    {{ getStatusText(user) }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Last Login -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div *ngIf="user.lastLoginAt; else neverLoggedIn">
+                  {{ user.lastLoginAt | date: "short" }}
+                </div>
+                <ng-template #neverLoggedIn>
+                  <span class="text-gray-400 italic">Never</span>
+                </ng-template>
+              </td>
+
+              <!-- Created -->
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-500">
+                  {{ user.createdAt | date: "short" }}
+                </div>
+                <div class="text-xs text-gray-400 space-y-1 mt-1">
+                  <div *ngIf="user.passwordResetAt">
+                    Reset: {{ user.passwordResetAt | date: "short" }}
+                  </div>
+                  <div *ngIf="user.passwordChangedAt">
+                    Changed: {{ user.passwordChangedAt | date: "short" }}
+                  </div>
+                </div>
+              </td>
+
+              <!-- Actions -->
+              <td
+                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+              >
+                <div class="flex items-center justify-end space-x-2">
+                  <!-- Edit Button -->
+                  <button
+                    [routerLink]="['/admin/users', user.id, 'edit']"
+                    class="inline-flex items-center p-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    title="Edit user"
+                  >
+                    <span class="material-symbols-outlined text-base"
+                      >edit</span
+                    >
+                  </button>
+
+                  <!-- Toggle Status Button -->
+                  <button
+                    (click)="toggleUserStatus(user)"
+                    [class]="
+                      user.isActive
+                        ? 'text-red-700 bg-red-100 hover:bg-red-200 border-red-300'
+                        : 'text-green-700 bg-green-100 hover:bg-green-200 border-green-300'
+                    "
+                    class="inline-flex items-center p-2 border shadow-sm text-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    [title]="
+                      user.isActive ? 'Deactivate user' : 'Activate user'
+                    "
+                  >
+                    <span
+                      *ngIf="user.isActive"
+                      class="material-symbols-outlined text-base"
+                      >block</span
+                    >
+                    <span
+                      *ngIf="!user.isActive"
+                      class="material-symbols-outlined text-base"
+                      >check_circle</span
+                    >
+                  </button>
+
+                  <!-- Reset Password Button -->
+                  <button
+                    (click)="resetPassword(user)"
+                    class="inline-flex items-center p-2 border border-yellow-300 shadow-sm text-sm leading-4 font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                    title="Reset password"
+                  >
+                    <span class="material-symbols-outlined text-base"
+                      >lock_reset</span
+                    >
+                  </button>
+
+                  <!-- Delete Button -->
+                  <button
+                    (click)="deleteUser(user)"
+                    class="inline-flex items-center p-2 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    title="Delete user"
+                  >
+                    <span class="material-symbols-outlined text-base"
+                      >delete</span
+                    >
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No users found -->
+      <ng-template #noUsers>
+        <div class="px-6 py-12 text-center">
+          <div class="text-gray-500">
+            <span
+              class="material-symbols-outlined mx-auto block text-6xl text-gray-400"
+              >group</span
+            >
+            <h3 class="mt-2 text-sm font-medium text-gray-900">
+              No users found
+            </h3>
+            <p class="mt-1 text-sm text-gray-500">
+              Get started by creating a new user.
+            </p>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Loading state -->
+    <ng-template #loading>
+      <div class="px-6 py-12 text-center">
+        <div class="text-gray-500">
+          <div
+            class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full"
+            role="status"
+          >
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="mt-2 text-sm">Loading users...</p>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+  <!-- End Single Card Container -->
+</div>

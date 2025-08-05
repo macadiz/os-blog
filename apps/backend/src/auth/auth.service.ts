@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 
 interface JwtPayload {
@@ -15,6 +16,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private usersService: UsersService,
   ) {}
 
   async validateUser(emailOrUsername: string, password: string): Promise<any> {
@@ -42,6 +44,9 @@ export class AuthService {
       throw new UnauthorizedException('Account is deactivated');
     }
 
+    // Update last login time
+    await this.usersService.updateLastLogin(user.id);
+
     const payload: JwtPayload = {
       email: user.email,
       sub: user.id,
@@ -58,6 +63,8 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        isTemporaryPassword: user.isTemporaryPassword,
+        mustChangePassword: user.mustChangePassword,
         createdAt: user.createdAt,
       },
     };
@@ -74,6 +81,8 @@ export class AuthService {
         lastName: true,
         role: true,
         isActive: true,
+        isTemporaryPassword: true,
+        mustChangePassword: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -84,5 +93,24 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async findUserByUsername(username: string) {
+    return this.prisma.user.findUnique({
+      where: { username },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isActive: true,
+        isTemporaryPassword: true,
+        mustChangePassword: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 }

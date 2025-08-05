@@ -6,25 +6,21 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { TagsService } from './tags.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { RequireActiveUser } from '../auth/decorators/require-active-user.decorator';
 
 @Controller('tags')
-@UseGuards(JwtAuthGuard)
+@RequireActiveUser()
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
   @Post()
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @RequireActiveUser(['ADMIN'])
   create(@Body() createTagDto: CreateTagDto) {
     return this.tagsService.create(createTagDto);
   }
@@ -45,15 +41,13 @@ export class TagsController {
   }
 
   @Patch(':id')
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @RequireActiveUser(['ADMIN'])
   update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
     return this.tagsService.update(id, updateTagDto);
   }
 
   @Delete(':id')
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @RequireActiveUser(['ADMIN'])
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {
     await this.tagsService.remove(id);

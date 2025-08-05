@@ -1,6 +1,7 @@
 import { Routes } from "@angular/router";
 import { authGuard } from "../../core/guards/auth.guard";
 import { roleGuard } from "../../core/guards/role.guard";
+import { passwordChangeGuard } from "../../core/guards/password-change.guard";
 
 export const adminRoutes: Routes = [
   {
@@ -9,7 +10,11 @@ export const adminRoutes: Routes = [
       import(
         "../../shared/components/admin-layout/admin-layout.component"
       ).then((m) => m.AdminLayoutComponent),
-    canActivate: [authGuard, roleGuard(["ADMIN", "AUTHOR"])],
+    canActivate: [
+      authGuard,
+      roleGuard(["ADMIN", "AUTHOR"]),
+      passwordChangeGuard,
+    ],
     children: [
       {
         path: "",
@@ -52,14 +57,33 @@ export const adminRoutes: Routes = [
           },
         ],
       },
-      // Admin-only routes - for now using dashboard component
+      // Admin-only routes
       {
         path: "users",
         canActivate: [roleGuard(["ADMIN"])],
-        loadComponent: () =>
-          import("./admin-dashboard/admin-dashboard.component").then(
-            (m) => m.AdminDashboardComponent
-          ),
+        children: [
+          {
+            path: "",
+            loadComponent: () =>
+              import("./users/users-list/users-list.component").then(
+                (m) => m.UsersListComponent
+              ),
+          },
+          {
+            path: "new",
+            loadComponent: () =>
+              import("./users/user-form/user-form.component").then(
+                (m) => m.UserFormComponent
+              ),
+          },
+          {
+            path: ":id/edit",
+            loadComponent: () =>
+              import("./users/user-form/user-form.component").then(
+                (m) => m.UserFormComponent
+              ),
+          },
+        ],
       },
       {
         path: "categories",

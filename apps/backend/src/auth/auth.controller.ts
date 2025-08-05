@@ -5,12 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Get,
-  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { RequireAuthentication } from './decorators/require-authentication.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -23,7 +22,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
+  @RequireAuthentication()
   getCurrentUser(@CurrentUser() user: any) {
     return user;
   }
