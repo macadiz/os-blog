@@ -1,11 +1,11 @@
-import { Controller, Patch, Body, UseGuards, HttpStatus } from '@nestjs/common';
+import { Controller, Patch, Body, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { RequireAuthentication } from 'src/auth/decorators/require-authentication.decorator';
 
-@Controller('user')
-@UseGuards(JwtAuthGuard)
+@Controller('users/me')
+@RequireAuthentication()
 export class UserSelfController {
   constructor(private readonly usersService: UsersService) {}
 

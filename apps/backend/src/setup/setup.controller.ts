@@ -9,7 +9,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RequireActiveUser } from '../auth/decorators/require-active-user.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { SetupService } from './setup.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 
@@ -55,8 +56,8 @@ export class SetupController {
   }
 
   @Get('insights')
-  @UseGuards(JwtAuthGuard)
-  async getBlogInsights() {
-    return await this.setupService.getBlogInsights();
+  @RequireActiveUser()
+  async getBlogInsights(@CurrentUser() currentUser: any) {
+    return await this.setupService.getBlogInsights(currentUser);
   }
 }

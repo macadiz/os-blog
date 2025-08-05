@@ -168,14 +168,43 @@ export class SetupService {
     }
   }
 
-  async getBlogInsights() {
+  async getBlogInsights(currentUser?: any) {
     try {
+      // Base queries - these depend on user role
+      let postsWhere = {};
+      let publishedPostsWhere = { published: true };
+      let recentPostsWhere = {};
+
+      // If user is not ADMIN, filter to only their posts
+      if (currentUser && currentUser.role !== 'ADMIN') {
+        const authorFilter = { authorId: currentUser.id };
+        postsWhere = authorFilter;
+        publishedPostsWhere = { ...publishedPostsWhere, ...authorFilter };
+
+        // Recent posts (last 7 days) with author filter
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        recentPostsWhere = {
+          ...authorFilter,
+          createdAt: { gte: sevenDaysAgo },
+        };
+      } else {
+        // Admin sees all posts - set up recent posts filter for all posts
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        recentPostsWhere = {
+          createdAt: { gte: sevenDaysAgo },
+        };
+      }
+
       // Get counts for dashboard insights
       const [postsCount, categoriesCount, tagsCount, usersCount] =
         await Promise.all([
-          this.prisma.post.count(),
+          this.prisma.post.count({ where: postsWhere }),
+          // Categories and tags are always global for now
           this.prisma.category.count(),
           this.prisma.tag.count(),
+          // Users count is always global
           this.prisma.user.count({
             where: { isActive: true },
           }),
@@ -183,19 +212,12 @@ export class SetupService {
 
       // Get published posts count
       const publishedPostsCount = await this.prisma.post.count({
-        where: { published: true },
+        where: publishedPostsWhere,
       });
 
-      // Get recent posts (last 7 days)
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
+      // Get recent posts count
       const recentPostsCount = await this.prisma.post.count({
-        where: {
-          createdAt: {
-            gte: sevenDaysAgo,
-          },
-        },
+        where: recentPostsWhere,
       });
 
       return {
@@ -206,6 +228,8 @@ export class SetupService {
         totalTags: tagsCount,
         totalUsers: usersCount,
         recentPosts: recentPostsCount,
+        // Add context about what data is shown
+        scope: currentUser?.role === 'ADMIN' ? 'global' : 'user',
       };
     } catch (error) {
       console.error('Error getting blog insights:', error);
@@ -217,6 +241,7 @@ export class SetupService {
         totalTags: 0,
         totalUsers: 0,
         recentPosts: 0,
+        scope: 'error',
       };
     }
   }

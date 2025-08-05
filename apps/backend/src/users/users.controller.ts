@@ -16,7 +16,6 @@ import { UserQueryDto } from './dto/user-query.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RequireActiveUser } from '../auth/decorators/require-active-user.decorator';
-import { RequireAuthentication } from '../auth/decorators/require-authentication.decorator';
 
 @Controller('users')
 @RequireActiveUser(['ADMIN'])
@@ -98,13 +97,6 @@ export class UsersController {
       data: await this.usersService.resetPassword(id),
     };
   }
-}
-
-// Separate controller for user self-service endpoints (all authenticated users)
-@Controller('users/me')
-@RequireAuthentication()
-export class UserSelfController {
-  constructor(private readonly usersService: UsersService) {}
 
   @Patch('change-password')
   async changePassword(
