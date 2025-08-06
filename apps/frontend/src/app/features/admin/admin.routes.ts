@@ -122,9 +122,22 @@ export const adminRoutes: Routes = [
         path: "settings",
         canActivate: [roleGuard(["ADMIN"])],
         loadComponent: () =>
-          import("./admin-dashboard/admin-dashboard.component").then(
-            (m) => m.AdminDashboardComponent
+          import("./blog-settings/blog-settings.component").then(
+            (m) => m.BlogSettingsComponent
           ),
+        data: {
+          title: "Blog Settings",
+        },
+      },
+      {
+        path: "profile",
+        loadComponent: () =>
+          import("./user-profile/user-profile.component").then(
+            (m) => m.UserProfileComponent
+          ),
+        data: {
+          title: "My Profile",
+        },
       },
     ],
   },

@@ -1,0 +1,32 @@
+meta {
+  name: Update Profile with Invalid Data
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{base_url}}/users/profile
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{admin_token}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "invalid-email-format",
+    "profilePicture": "not-a-valid-url"
+  }
+}
+
+tests {
+  test("should reject invalid profile data", function() {
+    expect(res.status).to.equal(400);
+  });
+}

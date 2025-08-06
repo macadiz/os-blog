@@ -1,4 +1,8 @@
-<div class="max-w-4xl mx-auto p-8">
+<!-- Show Blog Unavailable component if settings failed to load -->
+<app-blog-unavailable *ngIf="isBlogUnavailable"></app-blog-unavailable>
+
+<!-- Show normal blog content if settings loaded successfully -->
+<div *ngIf="!isBlogUnavailable" class="max-w-4xl mx-auto p-8">
   <header class="text-center mb-12 pb-8 border-b border-gray-200">
     <h1 class="text-4xl text-gray-800 mb-4">
       {{ blogSettings?.blogTitle || "Open Blog" }}
@@ -122,3 +126,4 @@
     </article>
   </main>
 </div>
+<!-- End of conditional blog content -->

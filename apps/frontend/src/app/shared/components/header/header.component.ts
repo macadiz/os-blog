@@ -87,8 +87,8 @@ export class HeaderComponent implements OnInit {
       next: (settings: BlogSettings) => {
         this.blogSettings = settings;
       },
-      error: (error: any) => {
-        console.error("Failed to load blog settings:", error);
+      error: () => {
+        // Silently handle error - header will show default title
       },
     });
   }

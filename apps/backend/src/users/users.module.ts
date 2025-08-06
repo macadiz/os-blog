@@ -4,7 +4,7 @@ import { UsersController } from './users.controller';
 import { UserSelfController } from './user-self.controller';
 
 @Module({
-  controllers: [UsersController, UserSelfController],
+  controllers: [UserSelfController, UsersController],
   providers: [UsersService],
   exports: [UsersService],
 })

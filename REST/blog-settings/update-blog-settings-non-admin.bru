@@ -1,0 +1,32 @@
+meta {
+  name: Update Blog Settings (Non-Admin) - Should Fail
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{base_url}}/setup/blog-settings
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{author_token}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "blogTitle": "Unauthorized Update",
+    "blogDescription": "This should not work"
+  }
+}
+
+tests {
+  test("should reject non-admin access", function() {
+    expect(res.status).to.equal(403);
+  });
+}

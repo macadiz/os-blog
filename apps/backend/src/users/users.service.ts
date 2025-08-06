@@ -438,4 +438,82 @@ export class UsersService {
       },
     });
   }
+
+  async getCurrentProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        profilePicture: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async updateProfile(userId: string, updateProfileDto: any) {
+    // Verify user exists
+    await this.findById(userId);
+
+    // Check for email/username conflicts (excluding current user)
+    if (updateProfileDto.email || updateProfileDto.username) {
+      const conflictUser = await this.prisma.user.findFirst({
+        where: {
+          AND: [
+            { id: { not: userId } },
+            {
+              OR: [
+                ...(updateProfileDto.email
+                  ? [{ email: updateProfileDto.email }]
+                  : []),
+                ...(updateProfileDto.username
+                  ? [{ username: updateProfileDto.username }]
+                  : []),
+              ],
+            },
+          ],
+        },
+      });
+
+      if (conflictUser) {
+        if (conflictUser.email === updateProfileDto.email) {
+          throw new ConflictException('Email already exists');
+        }
+        if (conflictUser.username === updateProfileDto.username) {
+          throw new ConflictException('Username already exists');
+        }
+      }
+    }
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: updateProfileDto,
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        profilePicture: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return user;
+  }
 }

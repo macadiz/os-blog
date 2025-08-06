@@ -9,6 +9,7 @@ export interface User {
   username: string;
   firstName?: string;
   lastName?: string;
+  profilePicture?: string;
   role: UserRole;
   isActive: boolean;
   createdAt: Date;
@@ -83,6 +84,19 @@ export interface BlogSettingsDto {
   blogTitle: string;
   blogDescription?: string;
   logoUrl?: string;
+  faviconUrl?: string;
+  theme?: string;
+  emailSettings?: any;
+  socialLinks?: any;
+  seoSettings?: any;
+}
+
+export interface UpdateProfileDto {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  username?: string;
+  profilePicture?: string;
 }
 
 export interface LoginDto {

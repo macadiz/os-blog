@@ -1,0 +1,41 @@
+meta {
+  name: Test Posts Access for Admin
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/posts
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Admin should see all posts", function() {
+    const posts = res.getBody();
+    expect(posts).to.be.an("array");
+    
+    // Admin can see posts from different authors
+    const authorIds = new Set();
+    posts.forEach(post => {
+      if (post.author && post.author.id) {
+        authorIds.add(post.author.id);
+      }
+    });
+    
+    console.log(`Admin sees ${posts.length} posts from ${authorIds.size} different authors`);
+    
+    // If there are posts, admin should potentially see from multiple authors
+    if (posts.length > 0) {
+      expect(authorIds.size).to.be.at.least(1);
+    }
+  });
+}

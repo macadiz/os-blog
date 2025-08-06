@@ -1,0 +1,33 @@
+meta {
+  name: Update Blog Settings (Invalid Data) - Should Fail
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/setup/blog-settings
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{admin_token}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "blogTitle": "",
+    "logoUrl": "not-a-valid-url",
+    "faviconUrl": "also-not-valid"
+  }
+}
+
+tests {
+  test("should reject invalid data", function() {
+    expect(res.status).to.equal(400);
+  });
+}

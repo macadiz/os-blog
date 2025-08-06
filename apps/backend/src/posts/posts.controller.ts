@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  NotFoundException,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -37,25 +38,55 @@ export class PostsController {
 
   @RequireActiveUser()
   @Get('admin/posts')
-  findAll() {
-    return this.postsService.findAll(true); // Include unpublished posts for admin
+  findAll(@CurrentUser() user: any) {
+    // Admins can see all posts, authors can only see their own
+    if (user.role === 'ADMIN') {
+      return this.postsService.findAll(true); // Include unpublished posts for admin
+    } else {
+      return this.postsService.findByAuthor(user.id, true); // Include unpublished posts for author
+    }
   }
 
   @RequireActiveUser()
   @Get('admin/posts/:id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(id);
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+    const post = await this.postsService.findOne(id);
+
+    // Authors can only view their own posts, admins can view all
+    if (user.role !== 'ADMIN' && post.author.id !== user.id) {
+      throw new NotFoundException('Post not found');
+    }
+
+    return post;
   }
 
   @RequireActiveUser()
   @Patch('admin/posts/:id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+    @CurrentUser() user: any,
+  ) {
+    const post = await this.postsService.findOne(id);
+
+    // Authors can only update their own posts, admins can update all
+    if (user.role !== 'ADMIN' && post.author.id !== user.id) {
+      throw new NotFoundException('Post not found');
+    }
+
     return this.postsService.update(id, updatePostDto);
   }
 
   @RequireActiveUser()
   @Delete('admin/posts/:id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
+    const post = await this.postsService.findOne(id);
+
+    // Authors can only delete their own posts, admins can delete all
+    if (user.role !== 'ADMIN' && post.author.id !== user.id) {
+      throw new NotFoundException('Post not found');
+    }
+
     return this.postsService.remove(id);
   }
 }

@@ -1,0 +1,42 @@
+meta {
+  name: Update Blog Settings (Admin)
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{base_url}}/setup/blog-settings
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{admin_token}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "blogTitle": "Updated Blog Title",
+    "blogDescription": "This is an updated blog description",
+    "logoUrl": "https://example.com/new-logo.png",
+    "faviconUrl": "https://example.com/new-favicon.ico",
+    "theme": "dark"
+  }
+}
+
+tests {
+  test("should update blog settings", function() {
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('message', 'Blog settings updated successfully');
+    expect(res.body).to.have.property('settings');
+    expect(res.body.settings).to.have.property('blogTitle', 'Updated Blog Title');
+    expect(res.body.settings).to.have.property('blogDescription', 'This is an updated blog description');
+    expect(res.body.settings).to.have.property('logoUrl', 'https://example.com/new-logo.png');
+    expect(res.body.settings).to.have.property('faviconUrl', 'https://example.com/new-favicon.ico');
+    expect(res.body.settings).to.have.property('theme', 'dark');
+  });
+}

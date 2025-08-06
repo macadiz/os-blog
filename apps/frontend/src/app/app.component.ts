@@ -31,8 +31,8 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Check blog setup status and update header visibility
-    this.checkBlogSetup();
+    // Wait for auth initialization before checking blog setup
+    this.initializeApp();
 
     // Listen to route changes to update header visibility
     this.router.events
@@ -42,33 +42,49 @@ export class AppComponent implements OnInit {
       });
   }
 
+  private async initializeApp() {
+    // Wait for auth service to initialize first
+    await this.authService.waitForInitialization();
+
+    // Now check blog setup status
+    this.checkBlogSetup();
+  }
+
   private checkBlogSetup() {
     this.apiService.checkBlogSetup().subscribe({
       next: (status) => {
-        // Show header only if blog is set up AND current user is valid
-        this.showHeader = status.isSetup && status.currentUserValid;
+        // Show header only if blog is set up
+        this.showHeader = status.isSetup;
 
-        // If user is authenticated but not valid, log them out
-        if (this.authService.isAuthenticated() && !status.currentUserValid) {
-          console.warn("Current user is no longer valid, logging out...");
+        // Only check user validity if we're on admin routes and have a token
+        const currentUrl = this.router.url;
+        const isAdminRoute = currentUrl.startsWith("/admin");
+        const hasToken = !!this.authService.getToken();
+
+        if (isAdminRoute && hasToken && !status.currentUserValid) {
           this.authService.logout();
           this.router.navigate(["/setup"]);
         }
       },
       error: (error) => {
-        console.error("Error checking blog setup:", error);
         this.showHeader = false;
 
-        // If there's an authentication error, log out the user
-        if (this.authService.isAuthenticated()) {
-          console.warn("Authentication error detected, logging out...");
+        // Only log out if we're on admin routes and there's a clear auth error
+        const currentUrl = this.router.url;
+        const isAdminRoute = currentUrl.startsWith("/admin");
+
+        if (
+          isAdminRoute &&
+          this.authService.isAuthenticated() &&
+          error.status === 401
+        ) {
           this.authService.logout();
         }
       },
     });
   }
 
-  private updateHeaderVisibility() {
+  private async updateHeaderVisibility() {
     const currentUrl = this.router.url;
 
     // Hide header on setup page regardless of setup status
@@ -76,6 +92,9 @@ export class AppComponent implements OnInit {
       this.showHeader = false;
       return;
     }
+
+    // Wait for auth initialization before checking setup
+    await this.authService.waitForInitialization();
 
     // For other pages, check blog setup status
     this.checkBlogSetup();

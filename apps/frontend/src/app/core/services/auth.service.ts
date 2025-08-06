@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, of } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
-import { catchError, tap } from "rxjs/operators";
+import { catchError, tap, map } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
 import { STORAGE_KEYS } from "../../shared/constants";
 
@@ -35,30 +35,64 @@ export class AuthService {
   private baseUrl = environment.apiUrl;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  private isInitialized = false;
+  private initializationPromise: Promise<void> | null = null;
 
   constructor(
     private http: HttpClient,
     private router: Router
   ) {
     // Check for existing token on service initialization
-    this.checkExistingAuth();
+    this.initializeAuth();
+  }
+
+  private async initializeAuth(): Promise<void> {
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+
+    this.initializationPromise = new Promise((resolve) => {
+      const token = this.getToken();
+      if (token) {
+        // Validate token and get current user from backend
+        this.getCurrentUser().subscribe({
+          next: (user) => {
+            this.currentUserSubject.next(user);
+            this.isInitialized = true;
+            resolve();
+          },
+          error: () => {
+            // Token is invalid, remove it
+            this.clearAuthData();
+            this.isInitialized = true;
+            resolve();
+          },
+        });
+      } else {
+        this.isInitialized = true;
+        resolve();
+      }
+    });
+
+    return this.initializationPromise;
   }
 
   private checkExistingAuth() {
-    const token = this.getToken();
-    if (token) {
-      // Validate token and get current user from backend
-      this.getCurrentUser().subscribe({
-        next: (user) => {
-          this.currentUserSubject.next(user);
-        },
-        error: (error) => {
-          console.error("Failed to validate token:", error);
-          // Token is invalid, remove it and logout
-          this.logout();
-        },
-      });
+    // This method is now replaced by initializeAuth
+    this.initializeAuth();
+  }
+
+  private clearAuthData(): void {
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    this.currentUserSubject.next(null);
+  }
+
+  // Method to wait for initialization to complete
+  async waitForInitialization(): Promise<void> {
+    if (this.isInitialized) {
+      return Promise.resolve();
     }
+    return this.initializeAuth();
   }
 
   login(credentials: {
@@ -79,15 +113,13 @@ export class AuthService {
           }
         }),
         catchError((error) => {
-          console.error("Login failed:", error);
           throw error;
         })
       );
   }
 
   logout(): void {
-    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    this.currentUserSubject.next(null);
+    this.clearAuthData();
     this.router.navigate(["/blog"]);
   }
 
@@ -100,7 +132,10 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const hasToken = !!this.getToken();
+    const hasUser = !!this.currentUserSubject.value;
+    const result = hasToken && (hasUser || !this.isInitialized);
+    return result;
   }
 
   getCurrentUser(): Observable<User> {
@@ -109,7 +144,18 @@ export class AuthService {
       throw new Error("No authentication token");
     }
 
-    return this.http.get<User>(`${this.baseUrl}/auth/me`);
+    return this.http
+      .get<{
+        statusCode: number;
+        message: string;
+        data: User;
+      }>(`${this.baseUrl}/users/profile`)
+      .pipe(
+        map((response) => response.data), // Extract the user data from the API response format
+        catchError((error) => {
+          throw error;
+        })
+      );
   }
 
   hasRole(role: "ADMIN" | "AUTHOR"): Observable<boolean> {

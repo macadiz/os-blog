@@ -75,34 +75,85 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /auth/me:
+  /users/profile:
     get:
-      summary: Get current user
-      description: Get the current authenticated user's information
+      summary: Get current user profile
+      description: Get the current authenticated user's profile information
       tags:
-        - Authentication
+        - User Profile
       security:
         - BearerAuth: []
       responses:
         '200':
-          description: Current user information
+          description: User profile retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 'Profile retrieved successfully'
+                  data:
+                    $ref: '#/components/schemas/UserProfile'
         '401':
-          description: Unauthorized
+          description: Unauthorized - Authentication required
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /user/change-password:
     patch:
-      summary: Change user password
-      description: Change the current user's password (self-service)
+      summary: Update current user profile
+      description: Update the current authenticated user's profile
       tags:
-        - User Self-Service
+        - User Profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileDto'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 'Profile updated successfully'
+                  data:
+                    $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Validation error or conflict (email/username already exists)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/profile/change-password:
+    patch:
+      summary: Change own password
+      description: Change the current user's password (all authenticated users)
+      tags:
+        - User Profile
       security:
         - BearerAuth: []
       requestBody:
@@ -146,6 +197,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /setup/blog-status:
+    get:
+      summary: Get blog setup status
+      description: Check the current blog setup status including authentication state
+      tags:
+        - Setup
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          description: Optional JWT token for authentication
+          schema:
+            type: string
+            format: Bearer {token}
+      responses:
+        '200':
+          description: Blog status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  setupRequired:
+                    type: boolean
+                    description: Whether initial setup is required
+                    example: false
+                  hasAdminUser:
+                    type: boolean
+                    description: Whether an admin user exists
+                    example: true
+                  currentUser:
+                    allOf:
+                      - $ref: '#/components/schemas/User'
+                      - nullable: true
+                    description: Current authenticated user (if authenticated)
+                  authError:
+                    type: boolean
+                    description: Whether there was an authentication error
+                    example: false
 
   /posts/published:
     get:
@@ -193,15 +286,18 @@ paths:
 
   /admin/posts:
     get:
-      summary: Get all posts (admin)
-      description: Retrieve all posts including drafts (admin only)
+      summary: Get posts based on user role
+      description: |
+        Retrieve posts based on user role:
+        - Admin users: Can see all posts including drafts
+        - Author users: Can only see their own posts including drafts
       tags:
         - Posts (Admin)
       security:
         - BearerAuth: []
       responses:
         '200':
-          description: List of all posts
+          description: List of posts (filtered by user role)
           content:
             application/json:
               schema:
@@ -251,7 +347,10 @@ paths:
   /admin/posts/{id}:
     get:
       summary: Get post by ID
-      description: Retrieve a specific post by its ID (admin only)
+      description: |
+        Retrieve a specific post by its ID. Role-based access:
+        - Admin users: Can access any post
+        - Author users: Can only access their own posts
       tags:
         - Posts (Admin)
       security:
@@ -851,6 +950,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlogSettings'
+    put:
+      summary: Update blog settings
+      description: Update the blog settings (admin only)
+      tags:
+        - Setup
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlogSettingsDto'
+      responses:
+        '200':
+          description: Blog settings updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Blog settings updated successfully'
+                  settings:
+                    $ref: '#/components/schemas/BlogSettings'
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /insights:
     get:
@@ -1244,10 +1387,85 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /users/me:
+    get:
+      summary: '[DEPRECATED] Get current user profile'
+      description: "DEPRECATED: Use /users/profile instead. Get the current authenticated user's profile"
+      deprecated: true
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 'Profile retrieved successfully'
+                  data:
+                    $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: '[DEPRECATED] Update current user profile'
+      description: "DEPRECATED: Use /users/profile instead. Update the current authenticated user's profile"
+      deprecated: true
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileDto'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 'Profile updated successfully'
+                  data:
+                    $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Validation error or conflict (email/username already exists)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /users/me/change-password:
     patch:
-      summary: Change own password
-      description: Change the current user's password (all authenticated users)
+      summary: '[DEPRECATED] Change own password'
+      description: "DEPRECATED: Use /users/profile/change-password instead. Change the current user's password (all authenticated users)"
+      deprecated: true
       tags:
         - Users
       security:
@@ -1755,6 +1973,10 @@ components:
     BlogSettings:
       type: object
       properties:
+        id:
+          type: string
+          description: Blog settings ID
+          example: 'default'
         blogTitle:
           type: string
           description: The title of the blog
@@ -1769,6 +1991,81 @@ components:
           nullable: true
           description: URL to the blog logo
           example: 'https://example.com/logo.png'
+        faviconUrl:
+          type: string
+          nullable: true
+          description: URL to the blog favicon
+          example: 'https://example.com/favicon.ico'
+        theme:
+          type: string
+          description: Blog theme
+          example: 'default'
+        emailSettings:
+          type: object
+          nullable: true
+          description: Email configuration settings
+        socialLinks:
+          type: object
+          nullable: true
+          description: Social media links
+        seoSettings:
+          type: object
+          nullable: true
+          description: SEO configuration settings
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    BlogSettingsDto:
+      type: object
+      required:
+        - blogTitle
+      properties:
+        blogTitle:
+          type: string
+          description: The title of the blog
+          maxLength: 100
+          example: 'My Awesome Blog'
+        blogDescription:
+          type: string
+          nullable: true
+          description: Description of the blog
+          maxLength: 500
+          example: 'A blog about technology and life'
+        logoUrl:
+          type: string
+          nullable: true
+          description: URL to the blog logo
+          format: uri
+          example: 'https://example.com/logo.png'
+        faviconUrl:
+          type: string
+          nullable: true
+          description: URL to the blog favicon
+          format: uri
+          example: 'https://example.com/favicon.ico'
+        theme:
+          type: string
+          nullable: true
+          description: Blog theme
+          example: 'default'
+        emailSettings:
+          type: object
+          nullable: true
+          description: Email configuration settings
+        socialLinks:
+          type: object
+          nullable: true
+          description: Social media links
+        seoSettings:
+          type: object
+          nullable: true
+          description: SEO configuration settings
 
     BlogInsights:
       type: object
@@ -1900,6 +2197,85 @@ components:
           type: boolean
           description: Whether the user account is active
           example: true
+
+    UpdateProfileDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          maxLength: 50
+          description: User first name
+          example: 'John'
+        lastName:
+          type: string
+          maxLength: 50
+          description: User last name
+          example: 'Doe'
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: 'john.doe@example.com'
+        username:
+          type: string
+          maxLength: 50
+          description: Unique username
+          example: 'johndoe'
+        profilePicture:
+          type: string
+          format: uri
+          nullable: true
+          description: URL to user's profile picture
+          example: 'https://example.com/avatar.jpg'
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: User ID
+          example: 'cldj8w5k40000r6o8k5p1q2z7'
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: 'john.doe@example.com'
+        username:
+          type: string
+          description: Unique username
+          example: 'johndoe'
+        firstName:
+          type: string
+          nullable: true
+          description: User first name
+          example: 'John'
+        lastName:
+          type: string
+          nullable: true
+          description: User last name
+          example: 'Doe'
+        profilePicture:
+          type: string
+          nullable: true
+          description: URL to user's profile picture
+          example: 'https://example.com/avatar.jpg'
+        role:
+          type: string
+          enum: [ADMIN, AUTHOR]
+          description: User role
+          example: 'AUTHOR'
+        isActive:
+          type: boolean
+          description: Whether the user account is active
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
 
     UserResponse:
       type: object
@@ -2079,5 +2455,7 @@ tags:
     description: Initial blog setup endpoints
   - name: Users
     description: User management endpoints (admin only)
+  - name: User Profile
+    description: Current user profile management endpoints
   - name: Insights
     description: Blog statistics and insights endpoints

@@ -1,0 +1,29 @@
+/* Blog Settings Component Styles */
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Custom focus styles for better accessibility */
+.focus\:ring-2:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Form validation styles */
+.border-red-300 {
+  border-color: rgb(252 165 165);
+}
+
+.border-red-300:focus {
+  border-color: rgb(252 165 165);
+  box-shadow: 0 0 0 2px rgba(252 165 165, 0.5);
+}

@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { ApiService, BlogPost } from "../../../core/services/api.service";
+import { BlogUnavailableComponent } from "../../../shared/components/blog-unavailable/blog-unavailable.component";
 
 interface BlogSettings {
   blogTitle: string;
@@ -11,7 +12,7 @@ interface BlogSettings {
 @Component({
   selector: "app-blog",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, BlogUnavailableComponent],
   templateUrl: "./blog.component.html",
   styleUrls: ["./blog.component.css"],
 })
@@ -19,6 +20,7 @@ export class BlogComponent implements OnInit {
   posts: BlogPost[] = [];
   blogSettings: BlogSettings | null = null;
   isLoading = true;
+  isBlogUnavailable = false;
 
   constructor(private apiService: ApiService) {}
 
@@ -32,8 +34,10 @@ export class BlogComponent implements OnInit {
       next: (settings: BlogSettings) => {
         this.blogSettings = settings;
       },
-      error: (error: any) => {
-        console.error("Failed to load blog settings:", error);
+      error: () => {
+        // If settings fail to load, show blog unavailable page
+        this.isBlogUnavailable = true;
+        this.isLoading = false;
       },
     });
   }
@@ -44,8 +48,7 @@ export class BlogComponent implements OnInit {
         this.posts = posts;
         this.isLoading = false;
       },
-      error: (error: any) => {
-        console.error("Failed to load posts:", error);
+      error: () => {
         this.isLoading = false;
       },
     });

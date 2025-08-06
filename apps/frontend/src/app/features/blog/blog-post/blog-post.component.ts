@@ -75,10 +75,9 @@ export class BlogPostComponent implements OnInit, AfterViewChecked {
           this.updateMetaDescription(post.excerpt);
         }
       },
-      error: (error: any) => {
-        console.error("Failed to load post:", error);
-        this.errorMessage = "Post not found or failed to load";
-        this.isLoading = false;
+      error: () => {
+        this.loading = false;
+        this.router.navigate(["/404"]);
       },
     });
   }

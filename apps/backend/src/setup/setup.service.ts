@@ -1,6 +1,7 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateBlogSettingsDto } from './dto/update-blog-settings.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -95,6 +96,33 @@ export class SetupService {
     });
   }
 
+  async updateBlogSettings(updateBlogSettingsDto: UpdateBlogSettingsDto) {
+    return await this.prisma.blogSettings.upsert({
+      where: { id: 'default' },
+      create: {
+        id: 'default',
+        blogTitle: updateBlogSettingsDto.blogTitle,
+        blogDescription: updateBlogSettingsDto.blogDescription || '',
+        logoUrl: updateBlogSettingsDto.logoUrl,
+        faviconUrl: updateBlogSettingsDto.faviconUrl,
+        theme: updateBlogSettingsDto.theme || 'default',
+        emailSettings: updateBlogSettingsDto.emailSettings,
+        socialLinks: updateBlogSettingsDto.socialLinks,
+        seoSettings: updateBlogSettingsDto.seoSettings,
+      },
+      update: {
+        blogTitle: updateBlogSettingsDto.blogTitle,
+        blogDescription: updateBlogSettingsDto.blogDescription,
+        logoUrl: updateBlogSettingsDto.logoUrl,
+        faviconUrl: updateBlogSettingsDto.faviconUrl,
+        theme: updateBlogSettingsDto.theme,
+        emailSettings: updateBlogSettingsDto.emailSettings,
+        socialLinks: updateBlogSettingsDto.socialLinks,
+        seoSettings: updateBlogSettingsDto.seoSettings,
+      },
+    });
+  }
+
   async getBlogSetupStatus(currentUserId?: string, hasAuthError = false) {
     try {
       // Check if there are active admin users
@@ -156,13 +184,12 @@ export class SetupService {
         hasPosts,
         currentUserValid,
       };
-    } catch (error) {
-      console.error('Error checking blog setup status:', error);
+    } catch {
+      // Return error state if unable to determine setup status
       return {
         isSetup: false,
-        hasAdminUsers: false,
-        hasSettings: false,
-        hasPosts: false,
+        adminExists: false,
+        hasBasicSettings: false,
         currentUserValid: false,
       };
     }
@@ -231,8 +258,7 @@ export class SetupService {
         // Add context about what data is shown
         scope: currentUser?.role === 'ADMIN' ? 'global' : 'user',
       };
-    } catch (error) {
-      console.error('Error getting blog insights:', error);
+    } catch {
       return {
         totalPosts: 0,
         publishedPosts: 0,

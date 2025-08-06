@@ -1,0 +1,24 @@
+meta {
+  name: Get Blog Settings
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/setup/blog-settings
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+tests {
+  test("should return blog settings", function() {
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('blogTitle');
+    expect(res.body).to.have.property('blogDescription');
+    expect(res.body).to.have.property('id', 'default');
+  });
+}

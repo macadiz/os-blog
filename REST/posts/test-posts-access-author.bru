@@ -1,0 +1,33 @@
+meta {
+  name: Test Posts Access for Authors
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/posts
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authorToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Author should only see their own posts", function() {
+    const posts = res.getBody();
+    expect(posts).to.be.an("array");
+    
+    // All posts should belong to the current author
+    posts.forEach(post => {
+      expect(post.author.id).to.equal("{{regularAuthorId}}");
+    });
+    
+    console.log(`Author sees ${posts.length} of their own posts`);
+  });
+}

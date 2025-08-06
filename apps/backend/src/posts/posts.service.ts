@@ -140,6 +140,36 @@ export class PostsService {
     return posts.map((post) => this.transformPost(post));
   }
 
+  async findByAuthor(authorId: string, includeUnpublished = false) {
+    const posts = await this.prisma.post.findMany({
+      where: {
+        authorId,
+        ...(includeUnpublished ? {} : { published: true }),
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        category: true,
+        postTags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return posts.map((post) => this.transformPost(post));
+  }
+
   async findPublished() {
     return this.findAll(false);
   }

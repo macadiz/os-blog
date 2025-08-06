@@ -22,6 +22,7 @@ model User {
     password            String // hashed
     firstName           String?   @map("first_name")
     lastName            String?   @map("last_name")
+    profilePicture      String?   @map("profile_picture") // URL to profile picture
     role                UserRole  @default(ADMIN)
     isActive            Boolean   @default(true) @map("is_active")
     isTemporaryPassword Boolean   @default(false) @map("is_temporary_password")

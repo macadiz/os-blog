@@ -38,6 +38,12 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       label: "New Post",
       exact: true, // Use exact matching
     },
+    {
+      routerLink: ["/admin/profile"],
+      icon: "person",
+      label: "My Profile",
+      exact: true, // Use exact matching
+    },
   ];
 
   // Admin-only menu items
@@ -89,6 +95,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     if (url.includes("/posts/new")) return "New Post";
     if (url.includes("/posts/edit")) return "Edit Post";
     if (url.includes("/posts")) return "All Posts";
+    if (url.includes("/profile")) return "My Profile";
     if (url.includes("/users")) return "Users";
     if (url.includes("/categories/new")) return "New Category";
     if (url.includes("/categories") && url.includes("/edit"))
@@ -97,7 +104,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     if (url.includes("/tags/new")) return "New Tag";
     if (url.includes("/tags") && url.includes("/edit")) return "Edit Tag";
     if (url.includes("/tags")) return "Tags";
-    if (url.includes("/settings")) return "Settings";
+    if (url.includes("/settings")) return "Blog Settings";
 
     return "Admin Panel";
   }

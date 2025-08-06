@@ -30,6 +30,12 @@ export class PostsListComponent implements OnInit {
     // Get current user
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
+
+      // For non-admin users, always show only their posts
+      if (user && user.role !== "ADMIN") {
+        this.showMyPostsOnly = true;
+      }
+
       this.loadPosts();
     });
   }
@@ -44,10 +50,9 @@ export class PostsListComponent implements OnInit {
         this.filterPosts();
         this.isLoading = false;
       },
-      error: (error) => {
+      error: () => {
         this.errorMessage = "Failed to load posts";
         this.isLoading = false;
-        console.error("Error loading posts:", error);
       },
     });
   }
@@ -65,8 +70,11 @@ export class PostsListComponent implements OnInit {
   }
 
   togglePostFilter() {
-    this.showMyPostsOnly = !this.showMyPostsOnly;
-    this.filterPosts();
+    // Only admins can toggle between "all posts" and "my posts"
+    if (this.currentUser?.role === "ADMIN") {
+      this.showMyPostsOnly = !this.showMyPostsOnly;
+      this.filterPosts();
+    }
   }
 
   get filterButtonText(): string {
@@ -74,6 +82,10 @@ export class PostsListComponent implements OnInit {
   }
 
   get currentFilterText(): string {
+    // Non-admin users always see "My Posts"
+    if (this.currentUser?.role !== "ADMIN") {
+      return "My Posts";
+    }
     return this.showMyPostsOnly ? "My Posts" : "All Posts";
   }
 
@@ -132,9 +144,8 @@ export class PostsListComponent implements OnInit {
           this.posts = this.posts.filter((post) => post.id !== postId);
           this.filterPosts(); // Re-filter after deletion
         },
-        error: (error) => {
+        error: () => {
           this.errorMessage = "Failed to delete post";
-          console.error("Error deleting post:", error);
         },
       });
     }

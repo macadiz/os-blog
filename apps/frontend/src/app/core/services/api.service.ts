@@ -113,6 +113,7 @@ export interface User {
   username: string;
   firstName?: string;
   lastName?: string;
+  profilePicture?: string;
   role: "ADMIN" | "AUTHOR";
   isActive: boolean;
   isTemporaryPassword?: boolean;
@@ -166,6 +167,25 @@ export interface BlogSettings {
   blogTitle: string;
   blogDescription?: string;
   logoUrl?: string;
+}
+
+export interface BlogSettingsDto {
+  blogTitle: string;
+  blogDescription?: string;
+  logoUrl?: string;
+  faviconUrl?: string;
+  theme?: string;
+  emailSettings?: any;
+  socialLinks?: any;
+  seoSettings?: any;
+}
+
+export interface UpdateProfileDto {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  username?: string;
+  profilePicture?: string;
 }
 
 export interface SetupStatusResponse {
@@ -236,6 +256,15 @@ export class ApiService {
 
   getBlogSettings(): Observable<BlogSettings> {
     return this.http.get<BlogSettings>(`${this.baseUrl}/setup/blog-settings`);
+  }
+
+  updateBlogSettings(
+    settings: BlogSettingsDto
+  ): Observable<{ message: string; settings: BlogSettings }> {
+    return this.http.put<{ message: string; settings: BlogSettings }>(
+      `${this.baseUrl}/setup/blog-settings`,
+      settings
+    );
   }
 
   checkBlogSetup(): Observable<BlogSetupStatus> {
@@ -374,14 +403,27 @@ export class ApiService {
       .pipe(map((response) => response.data));
   }
 
+  // Profile management methods
+  getCurrentProfile(): Observable<User> {
+    return this.http
+      .get<ApiResponse<User>>(`${this.baseUrl}/users/profile`)
+      .pipe(map((response) => response.data));
+  }
+
+  updateProfile(profileData: UpdateProfileDto): Observable<User> {
+    return this.http
+      .patch<ApiResponse<User>>(`${this.baseUrl}/users/profile`, profileData)
+      .pipe(map((response) => response.data));
+  }
+
   changePassword(changePasswordData: {
     currentPassword: string;
     newPassword: string;
-  }): Observable<{ message: string }> {
+  }): Observable<any> {
     return this.http
       .patch<
-        ApiResponse<{ message: string }>
-      >(`${this.baseUrl}/users/me/change-password`, changePasswordData)
+        ApiResponse<any>
+      >(`${this.baseUrl}/users/profile/change-password`, changePasswordData)
       .pipe(map((response) => response.data));
   }
 }

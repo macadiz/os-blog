@@ -1,0 +1,47 @@
+import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+
+@Component({
+  selector: "app-blog-unavailable",
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div class="max-w-md w-full text-center">
+        <div class="mb-8">
+          <span
+            class="material-symbols-outlined text-6xl text-gray-400 mb-4 block"
+          >
+            error_outline
+          </span>
+          <h1 class="text-3xl font-bold text-gray-900 mb-4">
+            Blog Unavailable
+          </h1>
+          <p class="text-lg text-gray-600 mb-6">
+            We're sorry, but the blog is temporarily unavailable. Please try
+            again later.
+          </p>
+          <div class="bg-gray-100 rounded-lg p-4 mb-6">
+            <p class="text-sm text-gray-700">
+              If you're the administrator and continue to see this message,
+              please check your server configuration and database connection.
+            </p>
+          </div>
+          <button
+            (click)="refreshPage()"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            <span class="material-symbols-outlined mr-2 text-lg">refresh</span>
+            Try Again
+          </button>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [],
+})
+export class BlogUnavailableComponent {
+  refreshPage() {
+    window.location.reload();
+  }
+}

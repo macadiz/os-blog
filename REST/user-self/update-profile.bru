@@ -1,0 +1,39 @@
+meta {
+  name: Update User Profile
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{base_url}}/users/profile
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{admin_token}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "firstName": "Updated First",
+    "lastName": "Updated Last",
+    "profilePicture": "https://example.com/new-avatar.jpg"
+  }
+}
+
+tests {
+  test("should update user profile", function() {
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('statusCode', 200);
+    expect(res.body).to.have.property('message', 'Profile updated successfully');
+    expect(res.body).to.have.property('data');
+    expect(res.body.data).to.have.property('firstName', 'Updated First');
+    expect(res.body.data).to.have.property('lastName', 'Updated Last');
+    expect(res.body.data).to.have.property('profilePicture', 'https://example.com/new-avatar.jpg');
+  });
+}

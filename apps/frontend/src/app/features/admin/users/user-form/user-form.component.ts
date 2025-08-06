@@ -87,55 +87,29 @@ export class UserFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.userForm.invalid) {
-      this.markFormGroupTouched();
-      return;
-    }
+    if (this.userForm.valid) {
+      this.isLoading = true;
+      const userData = this.userForm.value as CreateUserDto;
 
-    this.isSubmitting = true;
-    const formValue = this.userForm.value;
-
-    if (this.isEditMode && this.userId) {
-      // Update user
-      const updateData: UpdateUserDto = {
-        email: formValue.email,
-        username: formValue.username,
-        firstName: formValue.firstName || undefined,
-        lastName: formValue.lastName || undefined,
-        role: formValue.role,
-      };
-
-      this.apiService.updateUser(this.userId, updateData).subscribe({
-        next: () => {
-          this.router.navigate(["/admin/users"]);
-        },
-        error: (error: any) => {
-          console.error("Error updating user:", error);
-          alert("Failed to update user. Please try again.");
-          this.isSubmitting = false;
-        },
-      });
-    } else {
-      // Create user
-      const createData: CreateUserDto = {
-        email: formValue.email,
-        username: formValue.username,
-        firstName: formValue.firstName || undefined,
-        lastName: formValue.lastName || undefined,
-        password: formValue.password,
-        role: formValue.role,
-      };
-
-      this.apiService.createUser(createData).subscribe({
-        next: () => {
-          this.router.navigate(["/admin/users"]);
-        },
-        error: (error: any) => {
-          console.error("Error creating user:", error);
-          alert("Failed to create user. Please try again.");
-          this.isSubmitting = false;
-        },
-      });
+      if (this.mode === "edit" && this.userId) {
+        this.apiService.updateUser(this.userId, userData).subscribe({
+          next: () => {
+            this.router.navigate(["/admin/users"]);
+          },
+          error: () => {
+            this.isLoading = false;
+          },
+        });
+      } else {
+        this.apiService.createUser(userData).subscribe({
+          next: () => {
+            this.router.navigate(["/admin/users"]);
+          },
+          error: () => {
+            this.isLoading = false;
+          },
+        });
+      }
     }
   }
 

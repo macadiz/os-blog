@@ -42,9 +42,7 @@ export class AdminDashboardComponent implements OnInit {
         this.setupStatCards(insights);
         this.isLoading = false;
       },
-      error: (error: any) => {
-        console.error("Error loading dashboard insights:", error);
-        this.errorMessage = "Failed to load dashboard statistics.";
+      error: () => {
         this.isLoading = false;
       },
     });
