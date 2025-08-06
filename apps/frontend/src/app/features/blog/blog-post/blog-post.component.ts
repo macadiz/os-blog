@@ -76,7 +76,7 @@ export class BlogPostComponent implements OnInit, AfterViewChecked {
         }
       },
       error: () => {
-        this.loading = false;
+        this.isLoading = false;
         this.router.navigate(["/404"]);
       },
     });

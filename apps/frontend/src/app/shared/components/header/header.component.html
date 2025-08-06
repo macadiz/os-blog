@@ -161,6 +161,14 @@
             {{ user.role === "ADMIN" ? "Admin Dashboard" : "Author Dashboard" }}
           </a>
           <a
+            [routerLink]="['/admin/profile']"
+            (click)="closeMobileMenu()"
+            routerLinkActive="bg-blue-50 text-blue-600"
+            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+          >
+            My Profile
+          </a>
+          <a
             [routerLink]="['/admin/posts']"
             (click)="closeMobileMenu()"
             routerLinkActive="bg-blue-50 text-blue-600"

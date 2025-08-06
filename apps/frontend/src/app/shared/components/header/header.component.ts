@@ -61,6 +61,12 @@ export class HeaderComponent implements OnInit {
         type: "link",
       },
       {
+        label: "My Profile",
+        icon: "person",
+        routerLink: ["/admin/profile"],
+        type: "link",
+      },
+      {
         label: "My Posts",
         icon: "article",
         routerLink: ["/admin/posts"],

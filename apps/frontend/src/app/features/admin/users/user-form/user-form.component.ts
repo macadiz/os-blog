@@ -77,8 +77,7 @@ export class UserFormComponent implements OnInit {
         });
         this.isLoading = false;
       },
-      error: (error: any) => {
-        console.error("Error loading user:", error);
+      error: () => {
         alert("Failed to load user data. Please try again.");
         this.router.navigate(["/admin/users"]);
         this.isLoading = false;
@@ -91,7 +90,7 @@ export class UserFormComponent implements OnInit {
       this.isLoading = true;
       const userData = this.userForm.value as CreateUserDto;
 
-      if (this.mode === "edit" && this.userId) {
+      if (this.isEditMode && this.userId) {
         this.apiService.updateUser(this.userId, userData).subscribe({
           next: () => {
             this.router.navigate(["/admin/users"]);
