@@ -3,16 +3,16 @@
 
 <!-- Show normal blog content if settings loaded successfully -->
 <div *ngIf="!isBlogUnavailable" class="min-h-screen bg-gray-50">
-  <!-- Hero Section -->
-  <section class="bg-white border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <!-- Mobile Hero Section (visible only on mobile) -->
+  <section class="lg:hidden bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
       <div class="text-center">
-        <h1 class="text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
           {{ blogSettings?.blogTitle || "Open Blog" }}
         </h1>
         <p
           *ngIf="blogSettings?.blogDescription"
-          class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+          class="text-lg text-gray-600 leading-relaxed"
         >
           {{ blogSettings?.blogDescription ?? "" }}
         </p>
@@ -26,6 +26,20 @@
       <!-- Sidebar with Filters -->
       <aside class="lg:col-span-1 mb-8 lg:mb-0">
         <div class="sticky top-8 space-y-6">
+          <!-- Desktop Blog Header (visible only on desktop) -->
+          <div
+            class="hidden lg:block bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+          >
+            <h1 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">
+              {{ blogSettings?.blogTitle || "Open Blog" }}
+            </h1>
+            <p
+              *ngIf="blogSettings?.blogDescription"
+              class="text-sm text-gray-600 leading-relaxed"
+            >
+              {{ blogSettings?.blogDescription ?? "" }}
+            </p>
+          </div>
           <!-- Search Card -->
           <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3
@@ -195,12 +209,12 @@
       <!-- Main Content -->
       <main class="lg:col-span-3">
         <!-- Results Header -->
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center justify-between mb-6">
           <div>
-            <h2 class="text-2xl font-bold text-gray-900">
+            <h2 class="text-xl font-semibold text-gray-900">
               {{ hasActiveFilters ? "Search Results" : "Latest Posts" }}
             </h2>
-            <p class="text-gray-600 mt-1">
+            <p class="text-gray-600 text-sm mt-1">
               <span *ngIf="hasActiveFilters">
                 {{ filteredPostsCount }} of {{ posts.length }} posts found
               </span>
