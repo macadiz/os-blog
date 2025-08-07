@@ -7,10 +7,12 @@ import {
   Param,
   Delete,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PostsQueryDto } from './dto/posts-query.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RequireActiveUser } from '../auth/decorators/require-active-user.decorator';
 
@@ -20,8 +22,13 @@ export class PostsController {
 
   // Public endpoints
   @Get('posts/published')
-  findPublished() {
-    return this.postsService.findPublished();
+  findPublished(@Query() query: PostsQueryDto) {
+    return this.postsService.findPublished(query);
+  }
+
+  @Get('posts/metadata')
+  getBlogMetadata() {
+    return this.postsService.getBlogMetadata();
   }
 
   @Get('posts/slug/:slug')

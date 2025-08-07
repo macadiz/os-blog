@@ -7,6 +7,12 @@ import {
   BlogPost,
   Category,
   Tag,
+  PostsQueryDto,
+  PaginatedResponse,
+  PaginationMeta,
+  BlogMetadata,
+  CategoryWithCount,
+  TagWithCount,
 } from "../../../core/services/api.service";
 import { BlogUnavailableComponent } from "../../../shared/components/blog-unavailable/blog-unavailable.component";
 
@@ -24,17 +30,27 @@ interface BlogSettings {
 })
 export class BlogComponent implements OnInit {
   posts: BlogPost[] = [];
-  filteredPosts: BlogPost[] = [];
-  categories: Category[] = [];
-  tags: Tag[] = [];
+  allPosts: BlogPost[] = []; // Keep all loaded posts for client-side filtering
+  categories: CategoryWithCount[] = [];
+  tags: TagWithCount[] = [];
   blogSettings: BlogSettings | null = null;
   isLoading = true;
   isBlogUnavailable = false;
+  isLoadingMore = false;
+
+  // Pagination
+  pagination: PaginationMeta | null = null;
+  currentQuery: PostsQueryDto = {
+    page: 1,
+    limit: 20,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  };
 
   // Filter properties
   searchQuery = "";
-  selectedCategoryId = "";
-  selectedTagIds: string[] = [];
+  selectedCategorySlug = "";
+  selectedTagSlugs: string[] = [];
   showFilters = false;
 
   constructor(private apiService: ApiService) {}
@@ -42,8 +58,7 @@ export class BlogComponent implements OnInit {
   ngOnInit() {
     this.loadBlogSettings();
     this.loadPosts();
-    this.loadCategories();
-    this.loadTags();
+    this.loadBlogMetadata();
   }
 
   private loadBlogSettings() {
@@ -60,10 +75,11 @@ export class BlogComponent implements OnInit {
   }
 
   private loadPosts() {
-    this.apiService.getPublishedPosts().subscribe({
-      next: (posts: BlogPost[]) => {
-        this.posts = posts;
-        this.filteredPosts = posts;
+    this.apiService.getPublishedPosts(this.currentQuery).subscribe({
+      next: (response: PaginatedResponse<BlogPost>) => {
+        this.posts = response.data;
+        this.allPosts = [...response.data]; // Store all posts for filtering
+        this.pagination = response.pagination;
         this.isLoading = false;
       },
       error: () => {
@@ -72,10 +88,51 @@ export class BlogComponent implements OnInit {
     });
   }
 
-  private loadCategories() {
-    this.apiService.getCategories().subscribe({
-      next: (categories: Category[]) => {
-        this.categories = categories;
+  loadMorePosts() {
+    if (!this.pagination?.hasNext || this.isLoadingMore) return;
+
+    this.isLoadingMore = true;
+    const nextPageQuery = {
+      ...this.currentQuery,
+      page: (this.currentQuery.page || 1) + 1,
+    };
+
+    this.apiService.getPublishedPosts(nextPageQuery).subscribe({
+      next: (response: PaginatedResponse<BlogPost>) => {
+        this.posts = [...this.posts, ...response.data];
+        this.allPosts = [...this.allPosts, ...response.data];
+        this.pagination = response.pagination;
+        this.currentQuery = nextPageQuery;
+        this.isLoadingMore = false;
+      },
+      error: () => {
+        this.isLoadingMore = false;
+      },
+    });
+  }
+
+  // Apply server-side filters by reloading posts
+  applyServerFilters() {
+    this.currentQuery = {
+      ...this.currentQuery,
+      page: 1, // Reset to first page
+      search: this.searchQuery || undefined,
+      category: this.selectedCategorySlug || undefined,
+      tags:
+        this.selectedTagSlugs.length > 0 ? this.selectedTagSlugs : undefined, // Use multiple tags
+    };
+
+    this.isLoading = true;
+    this.posts = [];
+    this.allPosts = [];
+    this.loadPosts();
+  }
+
+  private loadBlogMetadata() {
+    this.apiService.getBlogMetadata().subscribe({
+      next: (metadata: BlogMetadata) => {
+        this.categories = metadata.categories;
+        this.tags = metadata.tags;
       },
       error: () => {
         // Fail silently for filters
@@ -83,72 +140,43 @@ export class BlogComponent implements OnInit {
     });
   }
 
-  private loadTags() {
-    this.apiService.getTags().subscribe({
-      next: (tags: Tag[]) => {
-        this.tags = tags;
-      },
-      error: () => {
-        // Fail silently for filters
-      },
-    });
-  }
-
-  // Filter methods
+  // Filter methods - now use server-side filtering
   applyFilters() {
-    let filtered = [...this.posts];
-
-    // Search filter
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase().trim();
-      filtered = filtered.filter(
-        (post) =>
-          post.title.toLowerCase().includes(query) ||
-          post.excerpt?.toLowerCase().includes(query) ||
-          post.content.toLowerCase().includes(query)
-      );
-    }
-
-    // Category filter
-    if (this.selectedCategoryId) {
-      filtered = filtered.filter(
-        (post) => post.category?.id === this.selectedCategoryId
-      );
-    }
-
-    // Tags filter
-    if (this.selectedTagIds.length > 0) {
-      filtered = filtered.filter((post) =>
-        post.tags.some((tag) => this.selectedTagIds.includes(tag.id))
-      );
-    }
-
-    this.filteredPosts = filtered;
+    this.applyServerFilters();
   }
 
   onSearchChange() {
-    this.applyFilters();
+    // Debounce search to avoid too many API calls
+    setTimeout(() => {
+      this.applyFilters();
+    }, 500);
   }
 
   onCategoryChange() {
     this.applyFilters();
   }
 
-  onTagToggle(tagId: string) {
-    const index = this.selectedTagIds.indexOf(tagId);
+  onTagToggle(tagSlug: string) {
+    const index = this.selectedTagSlugs.indexOf(tagSlug);
     if (index > -1) {
-      this.selectedTagIds.splice(index, 1);
+      this.selectedTagSlugs.splice(index, 1);
     } else {
-      this.selectedTagIds.push(tagId);
+      this.selectedTagSlugs.push(tagSlug); // Support multiple tags
     }
     this.applyFilters();
   }
 
   clearFilters() {
     this.searchQuery = "";
-    this.selectedCategoryId = "";
-    this.selectedTagIds = [];
-    this.filteredPosts = [...this.posts];
+    this.selectedCategorySlug = "";
+    this.selectedTagSlugs = [];
+    this.currentQuery = {
+      page: 1,
+      limit: 20,
+      sortBy: "createdAt",
+      sortOrder: "desc",
+    };
+    this.loadPosts();
   }
 
   toggleFilters() {
@@ -158,30 +186,40 @@ export class BlogComponent implements OnInit {
   get hasActiveFilters(): boolean {
     return (
       this.searchQuery.trim() !== "" ||
-      this.selectedCategoryId !== "" ||
-      this.selectedTagIds.length > 0
+      this.selectedCategorySlug !== "" ||
+      this.selectedTagSlugs.length > 0
     );
   }
 
   get filteredPostsCount(): number {
-    return this.filteredPosts.length;
+    return this.pagination?.total || this.posts.length;
   }
 
-  isTagSelected(tagId: string): boolean {
-    return this.selectedTagIds.includes(tagId);
+  get currentPostsCount(): number {
+    return this.posts.length;
   }
 
-  getPostsCountByCategory(categoryId: string): number {
-    return this.posts.filter((post) => post.category?.id === categoryId).length;
+  get hasMorePosts(): boolean {
+    return this.pagination?.hasNext || false;
   }
 
-  getCategoryName(categoryId: string): string {
-    const category = this.categories.find((c) => c.id === categoryId);
+  isTagSelected(tagSlug: string): boolean {
+    return this.selectedTagSlugs.includes(tagSlug);
+  }
+
+  getPostsCountByCategory(categorySlug: string): number {
+    // Use the postCount from metadata instead of filtering current posts
+    const category = this.categories.find((c) => c.slug === categorySlug);
+    return category ? category.postCount : 0;
+  }
+
+  getCategoryName(categorySlug: string): string {
+    const category = this.categories.find((c) => c.slug === categorySlug);
     return category ? category.name : "";
   }
 
-  getTagName(tagId: string): string {
-    const tag = this.tags.find((t) => t.id === tagId);
+  getTagName(tagSlug: string): string {
+    const tag = this.tags.find((t) => t.slug === tagSlug);
     return tag ? tag.name : "";
   }
 

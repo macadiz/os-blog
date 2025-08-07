@@ -6,6 +6,8 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PostsQueryDto } from './dto/posts-query.dto';
+import { PaginatedResponse } from '../common/dto/pagination.dto';
 
 @Injectable()
 export class PostsService {
@@ -170,8 +172,206 @@ export class PostsService {
     return posts.map((post) => this.transformPost(post));
   }
 
-  async findPublished() {
-    return this.findAll(false);
+  async findPublished(
+    query: PostsQueryDto = {},
+  ): Promise<PaginatedResponse<any>> {
+    const {
+      page = 1,
+      limit = 20,
+      search,
+      category,
+      tag,
+      tags,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = query;
+
+    // Ensure page and limit are numbers
+    const pageNum = typeof page === 'string' ? parseInt(page, 10) : page;
+    const limitNum = typeof limit === 'string' ? parseInt(limit, 10) : limit;
+
+    // Validate and constrain values
+    const validPage = Math.max(1, pageNum || 1);
+    const validLimit = Math.min(50, Math.max(1, limitNum || 20));
+
+    // Calculate skip value for pagination
+    const skip = (validPage - 1) * validLimit;
+
+    // Build where clause
+    const where: any = {
+      published: true,
+    };
+
+    // Add search filter
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { content: { contains: search, mode: 'insensitive' } },
+        { excerpt: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Add category filter
+    if (category) {
+      where.category = {
+        slug: category,
+      };
+    }
+
+    // Add tag filter - support both single tag and multiple tags
+    const tagsToFilter = tags || (tag ? [tag] : []);
+    if (tagsToFilter.length > 0) {
+      where.postTags = {
+        some: {
+          tag: {
+            slug: {
+              in: tagsToFilter,
+            },
+          },
+        },
+      };
+    }
+
+    // Build order by clause
+    const orderBy: any = {};
+    if (sortBy === 'publishedAt') {
+      orderBy.publishedAt = sortOrder;
+    } else if (sortBy === 'title') {
+      orderBy.title = sortOrder;
+    } else {
+      orderBy.createdAt = sortOrder;
+    }
+
+    // Get total count for pagination
+    const total = await this.prisma.post.count({ where });
+
+    // Get paginated posts
+    const posts = await this.prisma.post.findMany({
+      where,
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        category: true,
+        postTags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
+      orderBy,
+      skip,
+      take: validLimit,
+    });
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / validLimit);
+    const hasNext = validPage < totalPages;
+    const hasPrevious = validPage > 1;
+
+    return {
+      data: posts.map((post) => this.transformPost(post)),
+      pagination: {
+        page: validPage,
+        limit: validLimit,
+        total,
+        totalPages,
+        hasNext,
+        hasPrevious,
+      },
+    };
+  }
+
+  async getBlogMetadata() {
+    // Get categories with post counts
+    const categoriesWithCounts = await this.prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        color: true,
+        _count: {
+          select: {
+            posts: {
+              where: {
+                published: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+
+    // Get tags that are used in published posts
+    const tagsWithCounts = await this.prisma.tag.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        _count: {
+          select: {
+            postTags: {
+              where: {
+                post: {
+                  published: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      where: {
+        postTags: {
+          some: {
+            post: {
+              published: true,
+            },
+          },
+        },
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+
+    // Transform the data to include post counts
+    const categories = categoriesWithCounts.map((category) => ({
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      description: category.description,
+      color: category.color,
+      postCount: category._count.posts,
+    }));
+
+    const tags = tagsWithCounts.map((tag) => ({
+      id: tag.id,
+      name: tag.name,
+      slug: tag.slug,
+      postCount: tag._count.postTags,
+    }));
+
+    // Get total published posts count
+    const totalPosts = await this.prisma.post.count({
+      where: {
+        published: true,
+      },
+    });
+
+    return {
+      categories,
+      tags,
+      totalPosts,
+    };
   }
 
   async findOne(id: string) {
@@ -263,15 +463,29 @@ export class PostsService {
       }
     }
 
+    // Prepare publishedAt value
+    let publishedAt = existingPost.publishedAt;
+    if (updatePostDto.published) {
+      if (updatePostDto.publishedAt) {
+        // Convert string to Date if needed
+        publishedAt =
+          typeof updatePostDto.publishedAt === 'string'
+            ? new Date(updatePostDto.publishedAt)
+            : updatePostDto.publishedAt;
+      } else if (!existingPost.publishedAt) {
+        // Set to current date if publishing for the first time
+        publishedAt = new Date();
+      }
+      // If already published and no new publishedAt provided, keep existing
+    }
+
     // Update post
     const updatedPost = await this.prisma.post.update({
       where: { id },
       data: {
         ...postData,
         slug,
-        publishedAt: updatePostDto.published
-          ? new Date()
-          : existingPost.publishedAt,
+        publishedAt,
       },
       include: {
         author: {
@@ -356,6 +570,7 @@ export class PostsService {
       updatedAt: post.updatedAt,
       metaTitle: post.metaTitle,
       metaDescription: post.metaDescription,
+      categoryId: post.categoryId, // Include categoryId for form editing
       author: post.author,
       category: post.category,
       tags: post.postTags?.map((postTag: any) => postTag.tag) || [],

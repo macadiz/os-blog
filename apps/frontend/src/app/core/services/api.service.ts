@@ -106,6 +106,31 @@ export interface UserQueryDto {
   sortOrder?: "asc" | "desc";
 }
 
+export interface PostsQueryDto {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  tag?: string; // Keep for backward compatibility
+  tags?: string[]; // New field for multiple tags
+  sortBy?: "createdAt" | "publishedAt" | "title";
+  sortOrder?: "asc" | "desc";
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: PaginationMeta;
+}
+
 // Response models matching OpenAPI specification
 export interface User {
   id: string;
@@ -161,6 +186,28 @@ export interface Tag {
   slug: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface CategoryWithCount {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  color?: string;
+  postCount: number;
+}
+
+export interface TagWithCount {
+  id: string;
+  name: string;
+  slug: string;
+  postCount: number;
+}
+
+export interface BlogMetadata {
+  categories: CategoryWithCount[];
+  tags: TagWithCount[];
+  totalPosts: number;
 }
 
 export interface BlogSettings {
@@ -276,8 +323,32 @@ export class ApiService {
   }
 
   // Public post endpoints
-  getPublishedPosts(): Observable<BlogPost[]> {
-    return this.http.get<BlogPost[]>(`${this.baseUrl}/posts/published`);
+  getPublishedPosts(
+    query?: PostsQueryDto
+  ): Observable<PaginatedResponse<BlogPost>> {
+    let params = "";
+    if (query) {
+      const queryParams = new URLSearchParams();
+      if (query.page) queryParams.append("page", query.page.toString());
+      if (query.limit) queryParams.append("limit", query.limit.toString());
+      if (query.search) queryParams.append("search", query.search);
+      if (query.category) queryParams.append("category", query.category);
+      if (query.tag) queryParams.append("tag", query.tag);
+      // Handle multiple tags
+      if (query.tags && query.tags.length > 0) {
+        queryParams.append("tags", query.tags.join(","));
+      }
+      if (query.sortBy) queryParams.append("sortBy", query.sortBy);
+      if (query.sortOrder) queryParams.append("sortOrder", query.sortOrder);
+      params = queryParams.toString() ? `?${queryParams.toString()}` : "";
+    }
+    return this.http.get<PaginatedResponse<BlogPost>>(
+      `${this.baseUrl}/posts/published${params}`
+    );
+  }
+
+  getBlogMetadata(): Observable<BlogMetadata> {
+    return this.http.get<BlogMetadata>(`${this.baseUrl}/posts/metadata`);
   }
 
   getPostBySlug(slug: string): Observable<BlogPost> {

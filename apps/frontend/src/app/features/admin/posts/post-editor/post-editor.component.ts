@@ -103,7 +103,7 @@ export class PostEditorComponent implements OnInit {
             : "",
           metaTitle: post.metaTitle,
           metaDescription: post.metaDescription,
-          categoryId: post.categoryId,
+          categoryId: post.categoryId || "", // Convert null/undefined to empty string for select placeholder
         });
 
         this.selectedTagIds = post.tags.map((tag: Tag) => tag.id);

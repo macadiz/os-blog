@@ -242,19 +242,93 @@ paths:
 
   /posts/published:
     get:
-      summary: Get published posts
-      description: Retrieve all published blog posts (public endpoint)
+      summary: Get published posts with pagination
+      description: Retrieve published blog posts with pagination, filtering, and sorting support (public endpoint)
+      tags:
+        - Posts (Public)
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination
+          example: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+          description: Number of posts per page (max 50)
+          example: 20
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search term for post title, content, or excerpt
+          example: 'javascript'
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Filter by category slug
+          example: 'technology'
+        - in: query
+          name: tag
+          schema:
+            type: string
+          description: Filter by single tag slug (for backward compatibility)
+          example: 'javascript'
+        - in: query
+          name: tags
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          description: Filter by multiple tag slugs (comma-separated or array). Posts matching ANY of the tags will be returned.
+          example: ['javascript', 'react', 'nodejs']
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [createdAt, publishedAt, title]
+            default: createdAt
+          description: Field to sort by
+          example: 'publishedAt'
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort order
+          example: 'desc'
+      responses:
+        '200':
+          description: Paginated list of published posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPostsResponse'
+
+  /posts/metadata:
+    get:
+      summary: Get blog metadata
+      description: Retrieve categories with post counts and available tags for the blog (public endpoint)
       tags:
         - Posts (Public)
       responses:
         '200':
-          description: List of published posts
+          description: Blog metadata including categories and tags
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BlogPost'
+                $ref: '#/components/schemas/BlogMetadataResponse'
 
   /posts/slug/{slug}:
     get:
@@ -1419,6 +1493,103 @@ components:
           example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
         user:
           $ref: '#/components/schemas/User'
+
+    PaginatedPostsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlogPost'
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              description: Current page number
+              example: 1
+            limit:
+              type: integer
+              description: Number of items per page
+              example: 20
+            total:
+              type: integer
+              description: Total number of items
+              example: 150
+            totalPages:
+              type: integer
+              description: Total number of pages
+              example: 8
+            hasNext:
+              type: boolean
+              description: Whether there is a next page
+              example: true
+            hasPrevious:
+              type: boolean
+              description: Whether there is a previous page
+              example: false
+
+    BlogMetadataResponse:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: Category ID
+                example: '123e4567-e89b-12d3-a456-426614174000'
+              name:
+                type: string
+                description: Category name
+                example: 'Technology'
+              slug:
+                type: string
+                description: Category slug
+                example: 'technology'
+              description:
+                type: string
+                nullable: true
+                description: Category description
+                example: 'Posts about technology and programming'
+              color:
+                type: string
+                nullable: true
+                description: Category color (hex code)
+                example: '#3B82F6'
+              postCount:
+                type: integer
+                description: Number of published posts in this category
+                example: 15
+        tags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: Tag ID
+                example: '123e4567-e89b-12d3-a456-426614174001'
+              name:
+                type: string
+                description: Tag name
+                example: 'JavaScript'
+              slug:
+                type: string
+                description: Tag slug
+                example: 'javascript'
+              postCount:
+                type: integer
+                description: Number of published posts with this tag
+                example: 8
+        totalPosts:
+          type: integer
+          description: Total number of published posts
+          example: 42
 
     ChangePasswordDto:
       type: object
