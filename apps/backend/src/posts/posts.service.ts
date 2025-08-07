@@ -186,16 +186,8 @@ export class PostsService {
       sortOrder = 'desc',
     } = query;
 
-    // Ensure page and limit are numbers
-    const pageNum = typeof page === 'string' ? parseInt(page, 10) : page;
-    const limitNum = typeof limit === 'string' ? parseInt(limit, 10) : limit;
-
-    // Validate and constrain values
-    const validPage = Math.max(1, pageNum || 1);
-    const validLimit = Math.min(50, Math.max(1, limitNum || 20));
-
     // Calculate skip value for pagination
-    const skip = (validPage - 1) * validLimit;
+    const skip = (page - 1) * limit;
 
     // Build where clause
     const where: any = {
@@ -266,19 +258,19 @@ export class PostsService {
       },
       orderBy,
       skip,
-      take: validLimit,
+      take: limit,
     });
 
     // Calculate pagination metadata
-    const totalPages = Math.ceil(total / validLimit);
-    const hasNext = validPage < totalPages;
-    const hasPrevious = validPage > 1;
+    const totalPages = Math.ceil(total / limit);
+    const hasNext = page < totalPages;
+    const hasPrevious = page > 1;
 
     return {
       data: posts.map((post) => this.transformPost(post)),
       pagination: {
-        page: validPage,
-        limit: validLimit,
+        page,
+        limit,
         total,
         totalPages,
         hasNext,
