@@ -1,0 +1,91 @@
+import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { Router } from "@angular/router";
+
+@Component({
+  selector: "app-api-error",
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div class="max-w-md w-full text-center">
+        <div class="mb-8">
+          <span
+            class="material-symbols-outlined text-6xl text-red-400 mb-4 block"
+          >
+            cloud_off
+          </span>
+          <h1 class="text-3xl font-bold text-gray-900 mb-4">
+            Service Unavailable
+          </h1>
+          <p class="text-lg text-gray-600 mb-6">
+            We're sorry, but our services are temporarily unavailable. This
+            could be due to:
+          </p>
+          <div class="bg-gray-100 rounded-lg p-4 mb-6 text-left">
+            <ul class="text-sm text-gray-700 space-y-2">
+              <li class="flex items-start">
+                <span
+                  class="material-symbols-outlined text-gray-400 mr-2 text-sm mt-0.5"
+                  >radio_button_checked</span
+                >
+                Server maintenance
+              </li>
+              <li class="flex items-start">
+                <span
+                  class="material-symbols-outlined text-gray-400 mr-2 text-sm mt-0.5"
+                  >radio_button_checked</span
+                >
+                Network connectivity issues
+              </li>
+              <li class="flex items-start">
+                <span
+                  class="material-symbols-outlined text-gray-400 mr-2 text-sm mt-0.5"
+                  >radio_button_checked</span
+                >
+                Database connectivity problems
+              </li>
+            </ul>
+          </div>
+          <div class="space-y-3">
+            <button
+              (click)="refreshPage()"
+              class="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <span class="material-symbols-outlined mr-2 text-lg"
+                >refresh</span
+              >
+              Try Again
+            </button>
+            <button
+              (click)="goBack()"
+              class="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+            >
+              <span class="material-symbols-outlined mr-2 text-lg"
+                >arrow_back</span
+              >
+              Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [],
+})
+export class ApiErrorComponent {
+  constructor(private router: Router) {}
+
+  refreshPage() {
+    window.location.reload();
+  }
+
+  goBack() {
+    // Try to go back, or fallback to root
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate(["/"]);
+    }
+  }
+}

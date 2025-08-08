@@ -11,6 +11,7 @@ import {
   BlogSettings,
   BlogSettingsDto,
 } from "../../../core/services/api.service";
+import { TitleService } from "../../../core/services/title.service";
 
 @Component({
   selector: "app-blog-settings",
@@ -28,7 +29,8 @@ export class BlogSettingsComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private titleService: TitleService
   ) {
     this.settingsForm = this.fb.group({
       blogTitle: ["", [Validators.required, Validators.maxLength(100)]],
@@ -84,6 +86,8 @@ export class BlogSettingsComponent implements OnInit {
         next: (response) => {
           this.message = response.message;
           this.saving = false;
+          // Refresh the title service to update titles across the app
+          this.titleService.refreshBlogSettings();
           // Optionally refresh the form with updated data
           setTimeout(() => {
             this.message = "";

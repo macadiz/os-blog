@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewChecked } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { ApiService, BlogPost } from "../../../core/services/api.service";
+import { TitleService } from "../../../core/services/title.service";
 import { marked } from "marked";
 
 // Import Prism for syntax highlighting
@@ -24,7 +25,8 @@ export class BlogPostComponent implements OnInit, AfterViewChecked {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private titleService: TitleService
   ) {
     // Configure marked options for better security and formatting
     marked.setOptions({
@@ -61,37 +63,19 @@ export class BlogPostComponent implements OnInit, AfterViewChecked {
 
         this.isLoading = false;
 
-        // Update page title
-        if (post.metaTitle) {
-          document.title = post.metaTitle;
-        } else {
-          document.title = post.title;
-        }
-
-        // Update meta description
-        if (post.metaDescription) {
-          this.updateMetaDescription(post.metaDescription);
-        } else if (post.excerpt) {
-          this.updateMetaDescription(post.excerpt);
-        }
+        // Update page title and meta using title service
+        this.titleService.setPostTitle(
+          post.title,
+          post.metaTitle,
+          post.metaDescription,
+          post.excerpt
+        );
       },
       error: () => {
         this.isLoading = false;
         this.router.navigate(["/404"]);
       },
     });
-  }
-
-  private updateMetaDescription(description: string) {
-    const metaTag = document.querySelector('meta[name="description"]');
-    if (metaTag) {
-      metaTag.setAttribute("content", description);
-    } else {
-      const newMetaTag = document.createElement("meta");
-      newMetaTag.setAttribute("name", "description");
-      newMetaTag.setAttribute("content", description);
-      document.head.appendChild(newMetaTag);
-    }
   }
 
   ngAfterViewChecked() {
@@ -108,6 +92,8 @@ export class BlogPostComponent implements OnInit, AfterViewChecked {
   }
 
   goBack() {
+    // Restore blog title when going back
+    this.titleService.setBlogTitle();
     this.router.navigate(["/blog"]);
   }
 }

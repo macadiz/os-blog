@@ -4,6 +4,7 @@ import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
 import { HeaderComponent } from "./shared/components/header/header.component";
 import { ApiService } from "./core/services/api.service";
 import { AuthService } from "./core/services/auth.service";
+import { TitleService } from "./core/services/title.service";
 import { filter } from "rxjs/operators";
 
 @Component({
@@ -21,12 +22,12 @@ import { filter } from "rxjs/operators";
   styles: [],
 })
 export class AppComponent implements OnInit {
-  title = "Open Blog";
   showHeader = false;
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
+    private titleService: TitleService,
     private router: Router
   ) {}
 
@@ -34,11 +35,12 @@ export class AppComponent implements OnInit {
     // Wait for auth initialization before checking blog setup
     this.initializeApp();
 
-    // Listen to route changes to update header visibility
+    // Listen to route changes to update header visibility and page titles
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
         this.updateHeaderVisibility();
+        this.updatePageTitle();
       });
   }
 
@@ -67,18 +69,35 @@ export class AppComponent implements OnInit {
         }
       },
       error: (error) => {
+        console.warn("Blog setup check failed:", error);
+
+        // Don't show header if setup check fails
         this.showHeader = false;
 
-        // Only log out if we're on admin routes and there's a clear auth error
         const currentUrl = this.router.url;
         const isAdminRoute = currentUrl.startsWith("/admin");
 
+        // Only handle auth errors specifically for admin routes
         if (
           isAdminRoute &&
-          this.authService.isAuthenticated() &&
-          error.status === 401
+          error.status === 401 &&
+          this.authService.isAuthenticated()
         ) {
           this.authService.logout();
+          this.router.navigate(["/login"]);
+          return;
+        }
+
+        // For severe API errors (500, network issues), redirect to API error page
+        if (error.status === 500 || error.status === 0 || !error.status) {
+          this.router.navigate(["/api-error"]);
+          return;
+        }
+
+        // For blog routes, let the components handle the error display
+        // Only redirect to setup if it's clearly a setup issue (404)
+        if (error.status === 404 && !currentUrl.startsWith("/blog")) {
+          this.router.navigate(["/setup"]);
         }
       },
     });
@@ -98,5 +117,24 @@ export class AppComponent implements OnInit {
 
     // For other pages, check blog setup status
     this.checkBlogSetup();
+  }
+
+  private updatePageTitle() {
+    const currentUrl = this.router.url;
+
+    // Set appropriate title based on current route
+    if (currentUrl === "/blog" || currentUrl === "/") {
+      // Blog homepage - title service will handle this with blog settings
+      this.titleService.setBlogTitle();
+    } else if (currentUrl.startsWith("/admin")) {
+      // Admin pages - let admin layout handle specific titles
+      // or set a general admin title
+      this.titleService.setCustomTitle("Admin");
+    } else if (currentUrl.startsWith("/setup")) {
+      this.titleService.setCustomTitle("Setup");
+    } else if (currentUrl.startsWith("/login")) {
+      this.titleService.setCustomTitle("Login");
+    }
+    // Individual blog posts will set their own titles in the blog-post component
   }
 }

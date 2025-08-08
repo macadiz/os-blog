@@ -4,6 +4,10 @@ import { RouterModule, Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { ApiService } from "../../../core/services/api.service";
 import {
+  TitleService,
+  BlogSettings,
+} from "../../../core/services/title.service";
+import {
   AuthService,
   User as AuthUser,
 } from "../../../core/services/auth.service";
@@ -11,11 +15,6 @@ import {
   DropdownMenuItemComponent,
   DropdownMenuItem,
 } from "../dropdown-menu-item/dropdown-menu-item.component";
-
-interface BlogSettings {
-  blogTitle: string;
-  blogDescription?: string;
-}
 
 @Component({
   selector: "app-header",
@@ -25,7 +24,7 @@ interface BlogSettings {
   styleUrls: ["./header.component.css"],
 })
 export class HeaderComponent implements OnInit {
-  blogSettings: BlogSettings | null = null;
+  blogSettings$: Observable<BlogSettings | null>;
   currentUser$: Observable<AuthUser | null>;
   showUserMenu = false;
   showMobileMenu = false;
@@ -33,14 +32,15 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private titleService: TitleService,
     private authService: AuthService,
     private router: Router
   ) {
     this.currentUser$ = this.authService.currentUser$;
+    this.blogSettings$ = this.titleService.getBlogSettings$();
   }
 
   ngOnInit() {
-    this.loadBlogSettings();
     this.setupDropdownMenuItems();
 
     // Close dropdowns when clicking outside
@@ -86,17 +86,6 @@ export class HeaderComponent implements OnInit {
         action: () => this.logout(),
       },
     ];
-  }
-
-  private loadBlogSettings() {
-    this.apiService.getBlogSettings().subscribe({
-      next: (settings: BlogSettings) => {
-        this.blogSettings = settings;
-      },
-      error: () => {
-        // Silently handle error - header will show default title
-      },
-    });
   }
 
   toggleUserMenu() {

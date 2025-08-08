@@ -59,6 +59,13 @@ export const routes: Routes = [
     canActivate: [globalSetupGuard, authGuard, passwordChangeGuard],
   },
   {
+    path: "api-error",
+    loadComponent: () =>
+      import("./shared/components/api-error/api-error.component").then(
+        (m) => m.ApiErrorComponent
+      ),
+  },
+  {
     path: "**",
     redirectTo: "/blog",
   },

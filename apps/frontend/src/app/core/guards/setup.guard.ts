@@ -17,9 +17,13 @@ export const setupGuard: CanActivateFn = (route, state) => {
         return false; // Redirect to blog if setup is already complete
       }
     }),
-    catchError(() => {
-      // If API call fails, assume setup is needed
-      return of(true);
+    catchError((error) => {
+      console.error("Setup guard: API error detected", error);
+
+      // If the API is completely unavailable, redirect to error page
+      // This handles cases where someone goes directly to /setup but the API is down
+      router.navigate(["/api-error"]);
+      return of(false);
     })
   );
 };

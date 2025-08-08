@@ -74,3 +74,8 @@ This is a modern blogging platform built with:
 
 ## Component rules
 - When executing any command, take in consideration the context of the component that impacts the execution and make sure that you are actually using the command at the right path
+
+## Environment information
+- When running curl/fetch commands always check from terminal or ask if the backend is running.
+- To check in which port the backend is running, read the `.env` file within the backend project directory.
+- When checking frontend stuff check from terminal or ask if the frontend is running.

@@ -8,7 +8,7 @@
             >article</span
           >
           <span class="text-xl font-bold text-gray-900">
-            {{ blogSettings?.blogTitle || "Open Blog" }}
+            {{ (blogSettings$ | async)?.blogTitle || "Open Blog" }}
           </span>
         </a>
       </div>

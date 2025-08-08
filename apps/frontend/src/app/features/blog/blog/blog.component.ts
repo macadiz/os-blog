@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { FormsModule } from "@angular/forms";
+import { Observable } from "rxjs";
 import {
   ApiService,
   BlogPost,
@@ -14,12 +15,11 @@ import {
   CategoryWithCount,
   TagWithCount,
 } from "../../../core/services/api.service";
+import {
+  TitleService,
+  BlogSettings,
+} from "../../../core/services/title.service";
 import { BlogUnavailableComponent } from "../../../shared/components/blog-unavailable/blog-unavailable.component";
-
-interface BlogSettings {
-  blogTitle: string;
-  blogDescription?: string;
-}
 
 @Component({
   selector: "app-blog",
@@ -33,7 +33,7 @@ export class BlogComponent implements OnInit {
   allPosts: BlogPost[] = []; // Keep all loaded posts for client-side filtering
   categories: CategoryWithCount[] = [];
   tags: TagWithCount[] = [];
-  blogSettings: BlogSettings | null = null;
+  blogSettings$: Observable<BlogSettings | null>;
   isLoading = true;
   isBlogUnavailable = false;
   isLoadingMore = false;
@@ -53,23 +53,57 @@ export class BlogComponent implements OnInit {
   selectedTagSlugs: string[] = [];
   showFilters = false;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private titleService: TitleService
+  ) {
+    this.blogSettings$ = this.titleService.getBlogSettings$();
+  }
 
   ngOnInit() {
     this.loadBlogSettings();
-    this.loadPosts();
-    this.loadBlogMetadata();
   }
 
   private loadBlogSettings() {
-    this.apiService.getBlogSettings().subscribe({
-      next: (settings: BlogSettings) => {
-        this.blogSettings = settings;
+    this.titleService.getBlogSettings$().subscribe({
+      next: (settings: BlogSettings | null) => {
+        if (settings) {
+          // Settings loaded successfully
+          this.titleService.setBlogTitle(settings.blogDescription);
+          // Now load the blog content
+          this.loadPosts();
+          this.loadBlogMetadata();
+        } else {
+          // Settings failed to load, but check if it's just empty settings or an error
+          // Try to load posts to see if the API is available
+          this.checkBlogAvailability();
+        }
       },
       error: () => {
-        // If settings fail to load, show blog unavailable page
+        // Settings failed to load completely
         this.isBlogUnavailable = true;
         this.isLoading = false;
+        this.titleService.setBlogTitle();
+      },
+    });
+  }
+
+  private checkBlogAvailability() {
+    // Try to load posts to determine if the blog is available
+    this.apiService.getPublishedPosts({ page: 1, limit: 1 }).subscribe({
+      next: (response) => {
+        // API is working, but settings might be missing
+        // Load default settings and continue
+        this.titleService.setBlogTitle();
+        this.loadPosts();
+        this.loadBlogMetadata();
+      },
+      error: (error) => {
+        // API is not available
+        console.error("Blog API unavailable:", error);
+        this.isBlogUnavailable = true;
+        this.isLoading = false;
+        this.titleService.setBlogTitle();
       },
     });
   }
