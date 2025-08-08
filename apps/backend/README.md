@@ -58,12 +58,6 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## API Documentation
-
-When running in development, visit:
-- Swagger UI: `http://localhost:3001/api/docs`
-- OpenAPI JSON: `http://localhost:3001/api/docs-json`
-
 ## Environment Variables
 
 The application uses environment variables for configuration. Copy `.env.example` to `.env` and configure the values below:
