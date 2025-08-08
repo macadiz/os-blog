@@ -106,7 +106,7 @@ Create `apps/backend/.env` with:
 # Database
 DATABASE_URL="postgresql://username:password@localhost:5432/open_blog?schema=public"
 
-# JWT Configuration  
+# JWT Configuration
 JWT_SECRET="your-super-secret-jwt-key"
 JWT_EXPIRES_IN="7d"
 
@@ -114,11 +114,11 @@ JWT_EXPIRES_IN="7d"
 NODE_ENV="development"
 PORT=3001
 
-# Setup
-ADMIN_SETUP_ENABLED=true
-```
-
-### Frontend Configuration
+# CORS Configuration
+CORS_ORIGINS="http://localhost:4200,http://localhost:3000"
+CORS_ALLOW_CREDENTIALS=true
+CORS_MAX_AGE=86400
+```### Frontend Configuration
 
 Update `apps/frontend/src/environments/environment.ts`:
 
