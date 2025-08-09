@@ -9,6 +9,7 @@ import { PostsModule } from './posts/posts.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TagsModule } from './tags/tags.module';
 import { SetupModule } from './setup/setup.module';
+import { FilesModule } from './files/files.module';
 import { HttpsRedirectMiddleware } from './common/middleware/https-redirect.middleware';
 import { ProductionConfig } from './common/config/production.config';
 
@@ -24,6 +25,7 @@ import { ProductionConfig } from './common/config/production.config';
     CategoriesModule,
     TagsModule,
     SetupModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

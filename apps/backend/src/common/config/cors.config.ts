@@ -1,4 +1,5 @@
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { Logger } from '@nestjs/common';
 
 export interface CorsConfigOptions {
   origins: string[];
@@ -7,6 +8,8 @@ export interface CorsConfigOptions {
 }
 
 export class CorsConfig {
+  private static readonly logger = new Logger(CorsConfig.name);
+
   /**
    * Creates CORS configuration based on environment variables
    */
@@ -37,7 +40,7 @@ export class CorsConfig {
           .map((origin) => origin.trim())
           .filter((origin) => origin.length > 0);
 
-        console.log(`[CORS] Allowing origins: ${allowedOrigins.join(', ')}`);
+        CorsConfig.logger.log(`Allowing origins: ${allowedOrigins.join(', ')}`);
       }
     } else {
       // Default development origins if none specified
@@ -48,8 +51,8 @@ export class CorsConfig {
           'http://127.0.0.1:3000',
           'http://127.0.0.1:4200',
         ];
-        console.log(
-          `[CORS] Using default development origins: ${allowedOrigins.join(', ')}`,
+        CorsConfig.logger.log(
+          `Using default development origins: ${allowedOrigins.join(', ')}`,
         );
       } else {
         throw new Error(
@@ -75,10 +78,10 @@ export class CorsConfig {
     };
 
     // Log CORS configuration (without sensitive details)
-    console.log(`[CORS] Configuration:`);
-    console.log(`   - Credentials: ${corsCredentials}`);
-    console.log(`   - Max Age: ${corsMaxAge}s`);
-    console.log(`   - Environment: ${nodeEnv}`);
+    CorsConfig.logger.log(`Configuration:`);
+    CorsConfig.logger.log(`   - Credentials: ${corsCredentials}`);
+    CorsConfig.logger.log(`   - Max Age: ${corsMaxAge}s`);
+    CorsConfig.logger.log(`   - Environment: ${nodeEnv}`);
 
     return corsConfig;
   }
@@ -123,6 +126,6 @@ export class CorsConfig {
       throw new Error('CORS_MAX_AGE must be a valid number');
     }
 
-    console.log('[OK] CORS configuration validated successfully');
+    CorsConfig.logger.log('CORS configuration validated successfully');
   }
 }

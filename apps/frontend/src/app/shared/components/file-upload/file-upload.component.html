@@ -1,0 +1,121 @@
+<div class="file-upload-container" [attr.data-component-id]="componentId">
+  <!-- Current File Display -->
+  <div *ngIf="currentFileUrl && !previewUrl" class="current-file mb-4">
+    <div
+      class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
+    >
+      <div class="flex items-center space-x-3">
+        <img
+          *ngIf="config.showPreview && currentFileUrl"
+          [src]="currentFileUrl"
+          [class]="getPreviewImageClass()"
+          alt="Current file"
+        />
+        <div class="flex-1">
+          <p class="text-sm font-medium text-gray-900">Current file</p>
+          <p class="text-xs text-gray-500">Click remove to delete</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        (click)="removeFile()"
+        [disabled]="disabled || isUploading"
+        class="text-red-600 hover:text-red-800 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Remove
+      </button>
+    </div>
+  </div>
+
+  <!-- Upload Area -->
+  <div
+    class="upload-area relative cursor-pointer"
+    [class.drag-over]="isDragOver"
+    [class.disabled]="disabled"
+    [class.cursor-not-allowed]="disabled || isUploading"
+    [class.cursor-pointer]="!disabled && !isUploading"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="onUploadAreaClick()"
+  >
+    <!-- File Input -->
+    <input
+      #fileInput
+      type="file"
+      [accept]="config.accept"
+      (change)="onFileSelected($event)"
+      [disabled]="disabled || isUploading"
+      class="hidden"
+      [id]="componentId + '-input'"
+    />
+
+    <!-- Upload Content -->
+    <div class="upload-content p-6 text-center">
+      <!-- Preview -->
+      <div
+        *ngIf="previewUrl && config.showPreview"
+        class="preview-container mb-4"
+      >
+        <img
+          [src]="previewUrl"
+          [class]="getPreviewImageClass()"
+          alt="Preview"
+          class="mx-auto"
+        />
+      </div>
+
+      <!-- Upload Icon -->
+      <div *ngIf="!previewUrl" class="upload-icon mb-4">
+        <span
+          class="material-symbols-outlined mx-auto text-gray-400 text-5xl block"
+        >
+          upload
+        </span>
+      </div>
+
+      <!-- Upload Text -->
+      <div class="upload-text">
+        <p class="text-sm text-gray-600 mb-1">
+          <span *ngIf="!isUploading">
+            {{
+              config.placeholder || "Click to select a file or drag and drop"
+            }}
+          </span>
+          <span *ngIf="isUploading" class="text-blue-600">
+            Uploading your file...
+          </span>
+        </p>
+        <p class="text-xs text-gray-500">
+          {{ config.accept || "Images only" }} up to
+          {{ formatFileSize(config.maxSize || 5242880) }}
+        </p>
+      </div>
+
+      <!-- Progress Bar -->
+      <div *ngIf="isUploading" class="progress-container mt-4">
+        <div class="progress-bar bg-gray-200 rounded-full h-2">
+          <div
+            class="progress-fill bg-blue-600 h-2 rounded-full transition-all duration-300"
+            [style.width.%]="uploadProgress"
+          ></div>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">
+          Uploading... {{ uploadProgress }}%
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation Error -->
+  <div *ngIf="validationError" class="error-message mt-2">
+    <p class="text-sm text-red-600">{{ validationError }}</p>
+  </div>
+
+  <!-- File Info -->
+  <div *ngIf="selectedFile" class="file-info mt-2">
+    <p class="text-xs text-gray-500">
+      {{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})
+    </p>
+  </div>
+</div>

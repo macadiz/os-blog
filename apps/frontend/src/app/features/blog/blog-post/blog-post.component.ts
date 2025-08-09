@@ -86,9 +86,9 @@ export class BlogPostComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  onImageError(event: any) {
-    // Hide the image if it fails to load
-    event.target.style.display = "none";
+  onImageError(event: Event) {
+    const target = event.target as HTMLImageElement;
+    target.style.display = "none";
   }
 
   goBack() {

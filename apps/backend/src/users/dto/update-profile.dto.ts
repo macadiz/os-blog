@@ -3,7 +3,8 @@ import {
   IsOptional,
   IsEmail,
   MaxLength,
-  IsUrl,
+  Matches,
+  ValidateIf,
 } from 'class-validator';
 
 export class UpdateProfileDto {
@@ -33,6 +34,9 @@ export class UpdateProfileDto {
   username?: string;
 
   @IsOptional()
-  @IsUrl({}, { message: 'Profile picture must be a valid URL' })
-  profilePicture?: string;
+  @ValidateIf((o) => o.profilePicture !== null)
+  @Matches(/^(https?:\/\/[\w\-.]+(:\d+)?\/|\/)/i, {
+    message: 'Profile picture must be a valid URL or relative path',
+  })
+  profilePicture?: string | null;
 }

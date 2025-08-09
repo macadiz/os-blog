@@ -1461,6 +1461,206 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  # File Upload and Management Endpoints
+  /files/upload/{category}:
+    post:
+      summary: Upload a file to a specific category
+      tags:
+        - Files
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [settings, profile_pictures, blog_images]
+          description: The category directory for the file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The image file to upload (JPEG, PNG, GIF, WebP, SVG)
+      responses:
+        '201':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadResponse'
+        '400':
+          description: Invalid file or upload error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - JWT token required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /files/replace/{category}/{filename}:
+    post:
+      summary: Replace an existing file (transactional update)
+      tags:
+        - Files
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [settings, profile_pictures, blog_images]
+          description: The category directory for the file
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The filename to replace
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The new image file
+      responses:
+        '200':
+          description: File replaced successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadResponse'
+        '400':
+          description: Invalid file or upload error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: File to replace not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /files/{category}/{filename}:
+    get:
+      summary: Serve a static file
+      tags:
+        - Files
+      parameters:
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [settings, profile_pictures, blog_images]
+          description: The category directory
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The filename to serve
+      responses:
+        '200':
+          description: File served successfully
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: File not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete a file
+      tags:
+        - Files
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [settings, profile_pictures, blog_images]
+          description: The category directory
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The filename to delete
+      responses:
+        '200':
+          description: File deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileDeleteResponse'
+        '404':
+          description: File not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - JWT token required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /files/{category}/{filename}/info:
+    get:
+      summary: Get file information without downloading
+      tags:
+        - Files
+      parameters:
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [settings, profile_pictures, blog_images]
+          description: The category directory
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The filename to check
+      responses:
+        '200':
+          description: File information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileInfoResponse'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -2500,6 +2700,59 @@ components:
           description: Success message
           example: 'Operation completed successfully'
 
+    # File Upload Response Schemas
+    FileUploadResponse:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: Generated unique filename
+          example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef.jpg'
+        originalName:
+          type: string
+          description: Original filename from upload
+          example: 'profile-picture.jpg'
+        url:
+          type: string
+          description: URL to access the file
+          example: '/api/files/profile_pictures/a1b2c3d4-e5f6-7890-1234-567890abcdef.jpg'
+        size:
+          type: integer
+          description: File size in bytes
+          example: 1024576
+        mimeType:
+          type: string
+          description: MIME type of the file
+          example: 'image/jpeg'
+
+    FileDeleteResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Deletion confirmation message
+          example: 'File deleted successfully'
+
+    FileInfoResponse:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: The filename
+          example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef.jpg'
+        category:
+          type: string
+          description: The file category
+          example: 'profile_pictures'
+        url:
+          type: string
+          description: URL to access the file
+          example: '/api/files/profile_pictures/a1b2c3d4-e5f6-7890-1234-567890abcdef.jpg'
+        exists:
+          type: boolean
+          description: Whether the file exists
+          example: true
+
 tags:
   - name: Health
     description: API health check endpoints
@@ -2521,3 +2774,5 @@ tags:
     description: Current user profile management endpoints
   - name: Insights
     description: Blog statistics and insights endpoints
+  - name: Files
+    description: File upload and management endpoints

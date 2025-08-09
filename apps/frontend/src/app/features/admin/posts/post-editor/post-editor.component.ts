@@ -17,19 +17,6 @@ import {
   Tag,
 } from "../../../../core/services/api.service";
 
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-  excerpt?: string;
-  published: boolean;
-  featuredImage?: string;
-  metaTitle?: string;
-  metaDescription?: string;
-  categoryId?: string;
-  tags: Tag[];
-}
-
 @Component({
   selector: "app-post-editor",
   standalone: true,

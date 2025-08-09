@@ -13,11 +13,17 @@ import {
   UpdateProfileDto,
 } from "../../../core/services/api.service";
 import { AuthService } from "../../../core/services/auth.service";
+import { FileUploadService } from "../../../core/services/file-upload.service";
+import { ProfilePictureUploadComponent } from "../../../shared/components/profile-picture-upload/profile-picture-upload.component";
+import {
+  FileCategory,
+  FileUploadResponse,
+} from "../../../shared/components/file-upload/file-upload.component";
 
 @Component({
   selector: "app-user-profile",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ProfilePictureUploadComponent],
   templateUrl: "./user-profile.component.html",
   styleUrls: ["./user-profile.component.css"],
 })
@@ -32,11 +38,14 @@ export class UserProfileComponent implements OnInit {
   passwordMessage = "";
   passwordError = "";
   currentUser: User | null = null;
+  private imageExplicitlyRemoved = false;
+  private originalProfilePictureUrl?: string;
 
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
     private authService: AuthService,
+    private fileUploadService: FileUploadService,
     private router: Router
   ) {
     // Initialize profile form
@@ -45,7 +54,7 @@ export class UserProfileComponent implements OnInit {
       lastName: ["", [Validators.maxLength(50)]],
       email: ["", [Validators.required, Validators.email]],
       username: ["", [Validators.required, Validators.maxLength(50)]],
-      profilePicture: ["", [Validators.pattern("https?://.+")]],
+      profilePicture: [""],
     });
 
     // Initialize password form
@@ -81,6 +90,8 @@ export class UserProfileComponent implements OnInit {
     this.apiService.getCurrentProfile().subscribe({
       next: (user: User) => {
         this.currentUser = user;
+        this.imageExplicitlyRemoved = false; // Reset flag when loading fresh data
+        this.originalProfilePictureUrl = user.profilePicture; // Store original URL
         this.profileForm.patchValue({
           firstName: user.firstName || "",
           lastName: user.lastName || "",
@@ -106,6 +117,50 @@ export class UserProfileComponent implements OnInit {
     });
   }
 
+  onProfilePictureUploaded(fileResponse: FileUploadResponse) {
+    this.imageExplicitlyRemoved = false;
+    this.profileForm.patchValue({
+      profilePicture: fileResponse.url,
+    });
+  }
+
+  onProfilePictureRemoved() {
+    this.imageExplicitlyRemoved = true;
+    this.profileForm.patchValue({
+      profilePicture: "",
+    });
+  }
+
+  onProfilePictureUploadError(error: string) {
+    this.error = error;
+  }
+
+  private deleteOldProfilePicture(oldUrl: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const filename = this.fileUploadService.extractFilenameFromUrl(oldUrl);
+      const category = this.fileUploadService.extractCategoryFromUrl(oldUrl);
+
+      if (filename && category) {
+        this.fileUploadService.deleteFile(filename, category).subscribe({
+          next: () => {
+            resolve();
+          },
+          error: (error) => {
+            // If file doesn't exist (404), that's actually fine - it's already gone
+            if (error.status === 404) {
+              resolve();
+            } else {
+              // Don't reject - we don't want to fail the profile update if file deletion fails
+              resolve();
+            }
+          },
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
+
   onSubmitProfile() {
     if (this.profileForm.valid) {
       this.saving = true;
@@ -118,14 +173,34 @@ export class UserProfileComponent implements OnInit {
         lastName: formValue.lastName || undefined,
         email: formValue.email,
         username: formValue.username,
-        profilePicture: formValue.profilePicture || undefined,
+        profilePicture: this.imageExplicitlyRemoved
+          ? null
+          : formValue.profilePicture?.length
+            ? formValue.profilePicture
+            : undefined,
       };
 
       this.apiService.updateProfile(profileData).subscribe({
-        next: (updatedUser) => {
+        next: async (updatedUser) => {
+          // If profile update was successful, handle old file deletion
+          const shouldDeleteOldFile =
+            this.originalProfilePictureUrl &&
+            (this.imageExplicitlyRemoved ||
+              (profileData.profilePicture &&
+                profileData.profilePicture !== this.originalProfilePictureUrl));
+
+          if (shouldDeleteOldFile) {
+            // Delete the old profile picture file from server
+            await this.deleteOldProfilePicture(this.originalProfilePictureUrl!);
+          }
+
+          // Update local state
           this.currentUser = updatedUser;
+          this.imageExplicitlyRemoved = false;
+          this.originalProfilePictureUrl = updatedUser.profilePicture;
           this.message = "Profile updated successfully";
           this.saving = false;
+
           // Clear message after 3 seconds
           setTimeout(() => {
             this.message = "";
@@ -263,5 +338,22 @@ export class UserProfileComponent implements OnInit {
     if (this.currentUser) {
       this.currentUser.profilePicture = undefined;
     }
+  }
+
+  // Get current profile picture URL for file upload component
+  get currentProfilePictureUrl(): string | undefined {
+    // If image was explicitly removed, don't show any image
+    if (this.imageExplicitlyRemoved) {
+      return undefined;
+    }
+
+    const formValue = this.profileForm.value.profilePicture;
+    // If form has a value (uploaded new image), use that
+    if (formValue) {
+      return formValue;
+    }
+
+    // Otherwise, use the current user's profile picture
+    return this.currentUser?.profilePicture;
   }
 }

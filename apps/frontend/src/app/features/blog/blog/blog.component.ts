@@ -261,21 +261,8 @@ export class BlogComponent implements OnInit {
     return post.id;
   }
 
-  onImageError(event: any) {
-    // Hide the broken image and show placeholder
-    const imgElement = event.target;
-    const container = imgElement.parentElement;
-
-    // Hide the image
-    imgElement.style.display = "none";
-
-    // Create and show placeholder
-    const placeholder = document.createElement("div");
-    placeholder.className =
-      "h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center";
-    placeholder.innerHTML = `
-      <span class="material-symbols-outlined text-4xl text-gray-400">image</span>
-    `;
-    container.appendChild(placeholder);
+  onImageError(event: Event) {
+    const target = event.target as HTMLImageElement;
+    target.style.display = "none";
   }
 }

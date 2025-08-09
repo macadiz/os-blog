@@ -12,9 +12,11 @@ This is the backend API for Open Blog, built with [NestJS](https://github.com/ne
 - Blog post CRUD operations
 - Category and tag management
 - User management with role-based access
+- **File upload and management** (images for logos, avatars, blog posts)
 - PostgreSQL database with Prisma ORM
 - Comprehensive API documentation (OpenAPI/Swagger)
 - CORS configuration for production safety
+- **Static file serving** with caching and security
 
 ## Environment Setup
 

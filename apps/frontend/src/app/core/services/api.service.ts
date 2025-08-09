@@ -214,6 +214,11 @@ export interface BlogSettings {
   blogTitle: string;
   blogDescription?: string;
   logoUrl?: string;
+  faviconUrl?: string;
+  theme?: string;
+  emailSettings?: any;
+  socialLinks?: any;
+  seoSettings?: any;
 }
 
 export interface BlogSettingsDto {

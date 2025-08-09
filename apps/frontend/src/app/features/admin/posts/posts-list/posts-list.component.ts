@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterModule } from "@angular/router";
-import { ApiService } from "../../../../core/services/api.service";
-import { AuthService } from "../../../../core/services/auth.service";
+import { ApiService, BlogPost } from "../../../../core/services/api.service";
+import { AuthService, User } from "../../../../core/services/auth.service";
 import { CreateButtonComponent } from "../../../../shared/components/create-button/create-button.component";
 
 @Component({
@@ -13,11 +13,11 @@ import { CreateButtonComponent } from "../../../../shared/components/create-butt
   styleUrls: ["./posts-list.component.css"],
 })
 export class PostsListComponent implements OnInit {
-  posts: any[] = [];
-  filteredPosts: any[] = [];
+  posts: BlogPost[] = [];
+  filteredPosts: BlogPost[] = [];
   isLoading = false;
   errorMessage = "";
-  currentUser: any = null;
+  currentUser: User | null = null;
   showMyPostsOnly = true; // Default to showing only user's posts
 
   constructor(
@@ -61,7 +61,7 @@ export class PostsListComponent implements OnInit {
     if (this.showMyPostsOnly && this.currentUser) {
       // Show only posts by current user
       this.filteredPosts = this.posts.filter(
-        (post) => post.author && post.author.id === this.currentUser.id
+        (post) => post.author && post.author.id === this.currentUser!.id
       );
     } else {
       // Show all posts
@@ -89,7 +89,7 @@ export class PostsListComponent implements OnInit {
     return this.showMyPostsOnly ? "My Posts" : "All Posts";
   }
 
-  canEditPost(post: any): boolean {
+  canEditPost(post: BlogPost): boolean {
     if (!this.currentUser) return false;
 
     // Admins can edit all posts, authors can only edit their own
@@ -99,7 +99,7 @@ export class PostsListComponent implements OnInit {
     );
   }
 
-  canDeletePost(post: any): boolean {
+  canDeletePost(post: BlogPost): boolean {
     if (!this.currentUser) return false;
 
     // Admins can delete all posts, authors can only delete their own
@@ -109,7 +109,7 @@ export class PostsListComponent implements OnInit {
     );
   }
 
-  getAuthorName(author: any): string {
+  getAuthorName(author: User | null): string {
     if (!author) return "Unknown Author";
 
     if (author.firstName && author.lastName) {
@@ -119,7 +119,7 @@ export class PostsListComponent implements OnInit {
     return author.username || author.email || "Unknown Author";
   }
 
-  getAuthorInitials(author: any): string {
+  getAuthorInitials(author: User | null): string {
     if (!author) return "?";
 
     if (author.firstName && author.lastName) {

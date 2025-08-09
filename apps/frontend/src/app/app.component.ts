@@ -11,14 +11,7 @@ import { filter } from "rxjs/operators";
   selector: "app-root",
   standalone: true,
   imports: [CommonModule, RouterOutlet, HeaderComponent],
-  template: `
-    <div class="min-h-screen bg-gray-50">
-      <app-header *ngIf="showHeader"></app-header>
-      <main class="flex-1">
-        <router-outlet></router-outlet>
-      </main>
-    </div>
-  `,
+  templateUrl: "./app.component.html",
   styles: [],
 })
 export class AppComponent implements OnInit {

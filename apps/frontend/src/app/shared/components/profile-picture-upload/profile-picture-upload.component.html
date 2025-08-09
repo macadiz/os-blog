@@ -1,0 +1,133 @@
+<div class="profile-picture-upload">
+  <!-- Hidden file input -->
+  <input
+    #fileInput
+    type="file"
+    accept="image/*"
+    (change)="onFileSelected($event)"
+    class="hidden"
+    [disabled]="disabled || isUploading"
+  />
+
+  <!-- Main avatar container -->
+  <div class="relative inline-block">
+    <!-- Avatar circle -->
+    <div
+      class="relative rounded-full overflow-hidden border-3 border-gray-200 cursor-pointer transition-all duration-200 hover:border-gray-300 hover:shadow-lg"
+      [class]="getAvatarSizeClass()"
+      [class.cursor-not-allowed]="disabled"
+      [class.opacity-50]="disabled"
+      (click)="onAvatarClick()"
+    >
+      <!-- Image display -->
+      <div
+        *ngIf="getDisplayImageUrl(); else avatarFallback"
+        class="w-full h-full"
+      >
+        <img
+          [src]="getDisplayImageUrl()!"
+          [alt]="userName + ' profile picture'"
+          class="w-full h-full object-cover"
+        />
+      </div>
+
+      <!-- Avatar fallback with initials -->
+      <ng-template #avatarFallback>
+        <div
+          class="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+        >
+          <span
+            class="text-white font-semibold"
+            [class]="getUserInitialsFontSize()"
+          >
+            {{ getUserInitials() }}
+          </span>
+        </div>
+      </ng-template>
+
+      <!-- Upload progress overlay -->
+      <div
+        *ngIf="isUploading"
+        class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      >
+        <!-- Circular progress -->
+        <div class="relative" [class]="getProgressSizeClass()">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+            <!-- Background circle -->
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.2)"
+              stroke-width="8"
+            />
+            <!-- Progress circle -->
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              fill="none"
+              stroke="white"
+              stroke-width="8"
+              stroke-linecap="round"
+              [style.stroke-dasharray]="2 * pi * 40"
+              [style.stroke-dashoffset]="
+                2 * pi * 40 * (1 - uploadProgress / 100)
+              "
+              class="transition-all duration-300"
+            />
+          </svg>
+          <!-- Progress percentage -->
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span class="text-white text-xs font-medium"
+              >{{ uploadProgress }}%</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit icon overlay -->
+      <div
+        *ngIf="showEditIcon && !isUploading"
+        class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center"
+      >
+        <div
+          class="opacity-0 hover:opacity-100 transition-opacity duration-200"
+        >
+          <span
+            class="material-symbols-outlined text-white"
+            [class]="getEditIconSizeClass()"
+          >
+            photo_camera
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Remove button -->
+    <button
+      *ngIf="
+        showRemoveButton && (getDisplayImageUrl() || previewUrl) && !isUploading
+      "
+      type="button"
+      (click)="onRemoveImage()"
+      [disabled]="disabled"
+      class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center border-2 border-white shadow-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      [class]="getRemoveButtonSizeClass()"
+      title="Remove picture"
+    >
+      <span class="material-symbols-outlined text-xs">close</span>
+    </button>
+  </div>
+
+  <!-- Upload instruction text -->
+  <div *ngIf="!getDisplayImageUrl() && !isUploading" class="text-center mt-2">
+    <p class="text-sm text-gray-500">Click to upload</p>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="validationError" class="mt-2">
+    <p class="text-sm text-red-600">{{ validationError }}</p>
+  </div>
+</div>

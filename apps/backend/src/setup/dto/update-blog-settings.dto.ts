@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsUrl, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  MaxLength,
+  Matches,
+  ValidateIf,
+} from 'class-validator';
 
 export class UpdateBlogSettingsDto {
   @IsString()
@@ -15,12 +21,18 @@ export class UpdateBlogSettingsDto {
   blogDescription?: string;
 
   @IsOptional()
-  @IsUrl({}, { message: 'Logo URL must be a valid URL' })
-  logoUrl?: string;
+  @ValidateIf((o) => o.logoUrl !== null)
+  @Matches(/^(https?:\/\/[\w\-.]+(:\d+)?\/|\/)/i, {
+    message: 'Logo URL must be a valid URL or relative path',
+  })
+  logoUrl?: string | null;
 
   @IsOptional()
-  @IsUrl({}, { message: 'Favicon URL must be a valid URL' })
-  faviconUrl?: string;
+  @ValidateIf((o) => o.faviconUrl !== null)
+  @Matches(/^(https?:\/\/[\w\-.]+(:\d+)?\/|\/)/i, {
+    message: 'Favicon URL must be a valid URL or relative path',
+  })
+  faviconUrl?: string | null;
 
   @IsOptional()
   @IsString()

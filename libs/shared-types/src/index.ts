@@ -9,7 +9,7 @@ export interface User {
   username: string;
   firstName?: string;
   lastName?: string;
-  profilePicture?: string;
+  profilePicture?: string | null;
   role: UserRole;
   isActive: boolean;
   createdAt: Date;
@@ -61,8 +61,8 @@ export interface BlogSettings {
   id: string;
   blogTitle: string;
   blogDescription: string;
-  logoUrl?: string;
-  faviconUrl?: string;
+  logoUrl?: string | null;
+  faviconUrl?: string | null;
   theme: string;
   emailSettings?: any;
   socialLinks?: any;
@@ -83,8 +83,8 @@ export interface CreateAdminDto {
 export interface BlogSettingsDto {
   blogTitle: string;
   blogDescription?: string;
-  logoUrl?: string;
-  faviconUrl?: string;
+  logoUrl?: string | null;
+  faviconUrl?: string | null;
   theme?: string;
   emailSettings?: any;
   socialLinks?: any;
@@ -96,7 +96,7 @@ export interface UpdateProfileDto {
   lastName?: string;
   email?: string;
   username?: string;
-  profilePicture?: string;
+  profilePicture?: string | null;
 }
 
 export interface LoginDto {
@@ -117,4 +117,30 @@ export interface SetupStatusResponse {
 export interface CreateAdminResponse {
   message: string;
   admin: Omit<User, "password">;
+}
+
+// File Upload Types
+export interface FileUploadResponse {
+  filename: string;
+  originalName: string;
+  size: number;
+  mimeType: string;
+  category: FileCategory;
+  url: string;
+}
+
+export interface FileInfo {
+  filename: string;
+  originalName: string;
+  size: number;
+  mimeType: string;
+  category: FileCategory;
+  url: string;
+  uploadedAt: Date;
+}
+
+export enum FileCategory {
+  SETTINGS = "settings",
+  PROFILE_PICTURES = "profile_pictures",
+  BLOG_IMAGES = "blog_images",
 }

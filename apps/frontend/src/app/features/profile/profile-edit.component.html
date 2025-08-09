@@ -1,0 +1,125 @@
+<div class="profile-edit-container max-w-2xl mx-auto p-6">
+  <div class="header mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Profile</h1>
+    <p class="text-gray-600">Update your profile information and picture</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state text-center py-8">
+    <div class="loading-spinner mx-auto mb-4"></div>
+    <p class="text-gray-500">Loading profile...</p>
+  </div>
+
+  <!-- Profile Form -->
+  <form
+    *ngIf="!isLoading"
+    [formGroup]="profileForm"
+    (ngSubmit)="onSubmit()"
+    class="profile-form"
+  >
+    <!-- Message Display -->
+    <div
+      *ngIf="message"
+      class="message mb-6"
+      [class.error]="isError"
+      [class.success]="!isError"
+    >
+      <p>{{ message }}</p>
+    </div>
+
+    <!-- Profile Picture Section -->
+    <div class="form-section mb-8">
+      <h2 class="section-title mb-4">Profile Picture</h2>
+      <app-file-upload
+        [config]="profilePictureConfig"
+        [currentFileUrl]="currentProfilePictureUrl"
+        [disabled]="isSaving"
+        (fileUploaded)="onProfilePictureUploaded($event)"
+        (fileRemoved)="onProfilePictureRemoved()"
+        (uploadError)="onUploadError($event)"
+      >
+      </app-file-upload>
+    </div>
+
+    <!-- Personal Information Section -->
+    <div class="form-section mb-8">
+      <h2 class="section-title mb-4">Personal Information</h2>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="firstName" class="form-label">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            class="form-input"
+            placeholder="Enter your first name"
+            [disabled]="isSaving"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName" class="form-label">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            class="form-input"
+            placeholder="Enter your last name"
+            [disabled]="isSaving"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Information Section -->
+    <div class="form-section mb-8">
+      <h2 class="section-title mb-4">Account Information</h2>
+
+      <div class="form-group mb-4">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-input"
+          placeholder="Enter your email"
+          [disabled]="isSaving"
+        />
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="username" class="form-label">Username</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-input"
+          placeholder="Enter your username"
+          [disabled]="isSaving"
+        />
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        [disabled]="!profileForm.valid || isSaving"
+        class="btn btn-primary"
+      >
+        <span *ngIf="isSaving" class="loading-spinner-small mr-2"></span>
+        {{ isSaving ? "Saving..." : "Save Changes" }}
+      </button>
+
+      <button
+        type="button"
+        (click)="loadCurrentProfile()"
+        [disabled]="isSaving"
+        class="btn btn-secondary ml-3"
+      >
+        Reset
+      </button>
+    </div>
+  </form>
+</div>
