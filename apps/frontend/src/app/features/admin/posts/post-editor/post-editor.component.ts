@@ -16,11 +16,19 @@ import {
   Category,
   Tag,
 } from "../../../../core/services/api.service";
+import {
+  FileUploadComponent,
+  FileUploadConfig,
+} from "../../../../shared/components/file-upload/file-upload.component";
+import {
+  FileCategory,
+  FileUploadResponse,
+} from "../../../../shared/components/file-upload/file-upload.component";
 
 @Component({
   selector: "app-post-editor",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FileUploadComponent],
   templateUrl: "./post-editor.component.html",
   styles: [],
 })
@@ -35,6 +43,33 @@ export class PostEditorComponent implements OnInit {
   categories: Category[] = [];
   tags: Tag[] = [];
   selectedTagIds: string[] = [];
+
+  // File upload configuration for featured image
+  featuredImageUploadConfig: FileUploadConfig = {
+    category: FileCategory.BLOG_IMAGES,
+    accept: "image/*",
+    maxSize: 5 * 1024 * 1024, // 5MB for post images
+    placeholder: "Upload featured image",
+    showPreview: true,
+    previewSize: "large",
+  };
+
+  onFeaturedImageUploaded(response: FileUploadResponse) {
+    this.postForm.patchValue({
+      featuredImage: response.url, // Store the full URL instead of just filename
+    });
+  }
+
+  onFeaturedImageRemoved() {
+    this.postForm.patchValue({
+      featuredImage: null,
+    });
+  }
+
+  onUploadError(error: any) {
+    console.error("File upload error:", error);
+    // Could show an error toast or message to the user
+  }
 
   constructor(
     private fb: FormBuilder,

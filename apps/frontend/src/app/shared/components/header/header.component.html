@@ -4,9 +4,23 @@
       <!-- Logo/Brand -->
       <div class="flex items-center">
         <a [routerLink]="['/blog']" class="flex items-center">
-          <span class="material-symbols-outlined text-blue-600 text-3xl mr-2"
-            >article</span
-          >
+          <!-- Dynamic Logo or Fallback Icon -->
+          <ng-container *ngIf="blogSettings$ | async as settings">
+            <img
+              *ngIf="settings.logoUrl; else fallbackIcon"
+              [src]="settings.logoUrl"
+              [alt]="settings.blogTitle + ' logo'"
+              class="h-8 w-auto mr-2"
+              loading="lazy"
+            />
+            <ng-template #fallbackIcon>
+              <span
+                class="material-symbols-outlined text-blue-600 text-3xl mr-2"
+                >article</span
+              >
+            </ng-template>
+          </ng-container>
+
           <span class="text-xl font-bold text-gray-900">
             {{ (blogSettings$ | async)?.blogTitle || "Open Blog" }}
           </span>

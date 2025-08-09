@@ -188,16 +188,13 @@
           <!-- Featured Image -->
           <div class="bg-gray-50 p-4 rounded-lg">
             <h3 class="text-lg font-medium mb-3">Featured Image</h3>
-            <div class="form-group">
-              <label for="featuredImage" class="form-label">Image URL</label>
-              <input
-                type="url"
-                id="featuredImage"
-                formControlName="featuredImage"
-                class="form-input"
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
+            <app-file-upload
+              [config]="featuredImageUploadConfig"
+              [currentFileUrl]="postForm.get('featuredImage')?.value"
+              (fileUploaded)="onFeaturedImageUploaded($event)"
+              (fileRemoved)="onFeaturedImageRemoved()"
+              (uploadError)="onUploadError($event)"
+            ></app-file-upload>
           </div>
 
           <!-- Category -->

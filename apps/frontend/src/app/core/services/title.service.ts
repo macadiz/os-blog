@@ -1,12 +1,11 @@
 import { Injectable } from "@angular/core";
 import { Title, Meta } from "@angular/platform-browser";
-import { ApiService } from "./api.service";
+import { ApiService, BlogSettings } from "./api.service";
+import { FaviconService } from "./favicon.service";
 import { BehaviorSubject, Observable } from "rxjs";
 
-export interface BlogSettings {
-  blogTitle: string;
-  blogDescription?: string;
-}
+// Re-export BlogSettings for components
+export { BlogSettings };
 
 @Injectable({
   providedIn: "root",
@@ -18,7 +17,8 @@ export class TitleService {
   constructor(
     private title: Title,
     private meta: Meta,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private faviconService: FaviconService
   ) {
     this.loadBlogSettings();
   }
@@ -27,12 +27,16 @@ export class TitleService {
     this.apiService.getBlogSettings().subscribe({
       next: (settings: BlogSettings) => {
         this.blogSettingsSubject.next(settings);
+        // Update favicon when settings are loaded
+        this.faviconService.setFavicon(settings.faviconUrl);
       },
       error: (error) => {
         console.warn("Failed to load blog settings:", error);
         // Fallback to default, but signal that there was an error
         // This allows components to detect when the blog is unavailable
         this.blogSettingsSubject.next(null);
+        // Set default favicon on error
+        this.faviconService.setFavicon(null);
       },
     });
   }
