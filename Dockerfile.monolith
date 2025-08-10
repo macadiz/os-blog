@@ -1,0 +1,70 @@
+# Open Blog Monolith - Single Container Deployment
+# This creates a single container with all services
+
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    gnupg \
+    lsb-release \
+    supervisor \
+    nginx \
+    postgresql \
+    postgresql-contrib \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+
+# Create app user
+RUN useradd -r -s /bin/bash -m -d /app app
+
+# Set working directory
+WORKDIR /app
+
+# Copy built application (we'll build this externally)
+COPY --chown=app:app dist/ ./
+
+# Create required directories
+RUN mkdir -p /var/log/supervisor /app/static && \
+    chown -R app:app /app/static
+
+# Install Node.js dependencies
+USER app
+WORKDIR /app/backend
+RUN npm ci --only=production && npm cache clean --force
+
+# Switch back to root for system configuration
+USER root
+
+# Configure nginx
+COPY monolith/nginx.conf /etc/nginx/nginx.conf
+
+# Configure supervisor
+COPY monolith/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Copy startup script
+COPY monolith/start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+# Configure PostgreSQL (initialize empty database)
+USER postgres
+RUN /etc/init.d/postgresql start && \
+    /etc/init.d/postgresql stop
+USER root
+
+# Expose port
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost/health || exit 1
+
+# Start script
+CMD ["/app/start.sh"]

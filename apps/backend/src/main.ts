@@ -21,8 +21,6 @@ async function bootstrap() {
 
   const logger = new Logger('Bootstrap');
 
-  app.setGlobalPrefix('/api');
-
   // Configure trust proxy if enabled
   if (ProductionConfig.shouldTrustProxy()) {
     const trustProxyConfig = ProductionConfig.getTrustProxyConfig();
@@ -49,9 +47,7 @@ async function bootstrap() {
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
 
-  logger.log(
-    `[STARTUP] Application is running on: http://localhost:${port}/api`,
-  );
+  logger.log(`[STARTUP] Application is running on: http://localhost:${port}`);
 
   // Log production features status
   if (ProductionConfig.shouldForceHttps()) {

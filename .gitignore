@@ -7,3 +7,4 @@ apps/frontend/node_modules
 apps/frontend/dist
 apps/backend/static/profile_pictures
 apps/backend/static/blog_images
+dist/

@@ -16,7 +16,8 @@
     "prisma:migrate": "npm run prisma:migrate --workspace=apps/backend",
     "prisma:generate": "npm run prisma:generate --workspace=apps/backend",
     "prisma:studio": "npm run prisma:studio --workspace=apps/backend",
-    "compose": "docker compose --env-file ./.env up -d"
+    "docker:build": "./build.sh",
+    "docker:setup": "./setup.sh"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
