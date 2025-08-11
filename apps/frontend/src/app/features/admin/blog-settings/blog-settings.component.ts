@@ -23,6 +23,7 @@ import {
   FileCategory,
   FileUploadResponse,
 } from "../../../shared/components/file-upload/file-upload.component";
+import { resolveFileUrl } from "../../../core/services/resolve-file-url.util";
 
 @Component({
   selector: "app-blog-settings",
@@ -32,6 +33,13 @@ import {
   styleUrls: ["./blog-settings.component.css"],
 })
 export class BlogSettingsComponent implements OnInit {
+  getLogoSrc(logoUrl: string | undefined | null): string | undefined {
+    return resolveFileUrl(logoUrl);
+  }
+
+  getFaviconSrc(faviconUrl: string | undefined | null): string | undefined {
+    return resolveFileUrl(faviconUrl);
+  }
   settingsForm: FormGroup;
   loading = false;
   saving = false;
@@ -287,25 +295,21 @@ export class BlogSettingsComponent implements OnInit {
   }
 
   get currentLogoUrl(): string | undefined {
-    // If logo was explicitly removed, don't show any image
     if (this.logoExplicitlyRemoved) {
       return undefined;
     }
-    // Use form value if available, otherwise fall back to current settings
     const formLogoUrl = this.settingsForm.get("logoUrl")?.value;
     const settingsLogoUrl = this.currentSettings?.logoUrl;
-    return formLogoUrl || settingsLogoUrl;
+    return this.getLogoSrc(formLogoUrl || settingsLogoUrl);
   }
 
   get currentFaviconUrl(): string | undefined {
-    // If favicon was explicitly removed, don't show any image
     if (this.faviconExplicitlyRemoved) {
       return undefined;
     }
-    // Use form value if available, otherwise fall back to current settings
     const formFaviconUrl = this.settingsForm.get("faviconUrl")?.value;
     const settingsFaviconUrl = (this.currentSettings as any)?.faviconUrl;
-    return formFaviconUrl || settingsFaviconUrl;
+    return this.getFaviconSrc(formFaviconUrl || settingsFaviconUrl);
   }
 
   // Helper method to check if a field has errors

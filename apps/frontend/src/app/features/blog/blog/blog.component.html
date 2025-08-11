@@ -315,7 +315,7 @@
                     class="h-full w-full"
                   >
                     <img
-                      [src]="post.featuredImage"
+                      [src]="getFeaturedImageSrc(post.featuredImage)"
                       [alt]="post.title"
                       class="post-image"
                       (error)="onImageError($event)"

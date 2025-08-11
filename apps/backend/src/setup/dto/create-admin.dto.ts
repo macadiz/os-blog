@@ -34,6 +34,8 @@ export class CreateAdminDto {
   @IsString()
   @IsOptional()
   blogDescription?: string;
+
+  // logo and favicon will be handled as files in the controller, not as DTO fields
 }
 
 export class BlogSettingsDto {

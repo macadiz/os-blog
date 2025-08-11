@@ -15,6 +15,7 @@ import {
   DropdownMenuItemComponent,
   DropdownMenuItem,
 } from "../dropdown-menu-item/dropdown-menu-item.component";
+import { resolveFileUrl } from "../../../core/services/resolve-file-url.util";
 
 @Component({
   selector: "app-header",
@@ -24,6 +25,9 @@ import {
   styleUrls: ["./header.component.css"],
 })
 export class HeaderComponent implements OnInit {
+  getLogoSrc(logoUrl: string | undefined | null): string | undefined {
+    return resolveFileUrl(logoUrl);
+  }
   blogSettings$: Observable<BlogSettings | null>;
   currentUser$: Observable<AuthUser | null>;
   showUserMenu = false;

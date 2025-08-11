@@ -15,6 +15,7 @@ import {
   CategoryWithCount,
   TagWithCount,
 } from "../../../core/services/api.service";
+import { resolveFileUrl } from "../../../core/services/resolve-file-url.util";
 import {
   TitleService,
   BlogSettings,
@@ -58,6 +59,11 @@ export class BlogComponent implements OnInit {
     private titleService: TitleService
   ) {
     this.blogSettings$ = this.titleService.getBlogSettings$();
+  }
+
+  // Helper to resolve featured image URLs for posts
+  getFeaturedImageSrc(featuredImage?: string | null): string | undefined {
+    return resolveFileUrl(featuredImage);
   }
 
   ngOnInit() {

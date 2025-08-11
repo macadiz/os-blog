@@ -87,6 +87,8 @@ export class FilesController {
     res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year
     res.setHeader('ETag', `"${filename}"`);
 
+    console.log(filePath);
+
     res.sendFile(filePath);
   }
 

@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { resolveFileUrl } from "./resolve-file-url.util";
 
 @Injectable({
   providedIn: "root",
@@ -20,7 +21,11 @@ export class FaviconService {
     });
 
     // Create new favicon link
-    this.createFaviconLink(faviconUrl);
+    this.createFaviconLink(this.resolveFaviconUrl(faviconUrl));
+  }
+
+  private resolveFaviconUrl(faviconUrl: string): string {
+    return resolveFileUrl(faviconUrl) || faviconUrl;
   }
 
   private setDefaultFavicon(): void {

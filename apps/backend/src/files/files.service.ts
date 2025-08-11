@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { promises as fs } from 'fs';
 import * as path from 'path';
@@ -22,7 +27,7 @@ export interface UploadResult {
 @Injectable()
 export class FilesService {
   private readonly logger = new Logger(FilesService.name);
-  private readonly staticDir = path.join(process.cwd(), 'static');
+  private readonly staticDir: string;
   private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
   private readonly allowedMimeTypes = [
     'image/jpeg',
@@ -32,11 +37,19 @@ export class FilesService {
     'image/webp',
     'image/svg+xml',
   ];
-  private readonly baseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.baseUrl =
-      this.configService.get<string>('BASE_URL') || 'http://localhost:3001';
+    // Use different static paths based on environment
+    const nodeEnv = this.configService.get('NODE_ENV', 'development');
+    if (nodeEnv === 'production') {
+      // In production (Docker), use the shared static volume
+      this.staticDir = '/app/static';
+    } else {
+      // In development, use local static folder
+      this.staticDir = path.join(process.cwd(), 'static');
+    }
+
+    this.logger.log(`Static directory: ${this.staticDir} (env: ${nodeEnv})`);
     void this.ensureDirectoriesExist();
   }
 
@@ -70,7 +83,7 @@ export class FilesService {
         filename,
         originalName: file.originalname,
         path: filePath,
-        url: `${this.baseUrl}/api/files/${category}/${filename}`,
+        url: `/files/${category}/${filename}`,
         size: file.size,
         mimeType: file.mimetype,
       };
@@ -131,7 +144,7 @@ export class FilesService {
    * Get the full URL for a file
    */
   getFileUrl(category: FileCategory, filename: string): string {
-    return `${this.baseUrl}/api/files/${category}/${filename}`;
+    return `/files/${category}/${filename}`;
   }
 
   /**
@@ -173,6 +186,20 @@ export class FilesService {
         await fs.mkdir(dir, { recursive: true });
         this.logger.log(`[SETUP] Created directory: ${dir}`);
       }
+    }
+  }
+
+  /**
+   * Serve a file by category and filename
+   */
+  async serveFile(category: FileCategory, filename: string): Promise<string> {
+    const filePath = this.getFilePath(category, filename);
+
+    try {
+      await fs.access(filePath);
+      return filePath;
+    } catch {
+      throw new NotFoundException(`File not found: ${filename} in ${category}`);
     }
   }
 }

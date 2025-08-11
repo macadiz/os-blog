@@ -2,11 +2,19 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateBlogSettingsDto } from './dto/update-blog-settings.dto';
+import {
+  FilesService,
+  FileCategory,
+  UploadResult,
+} from '../files/files.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class SetupService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private filesService: FilesService,
+  ) {}
 
   async isSetupRequired(): Promise<boolean> {
     const adminCount = await this.prisma.user.count({
@@ -15,7 +23,11 @@ export class SetupService {
     return adminCount === 0;
   }
 
-  async createInitialAdmin(createAdminDto: CreateAdminDto) {
+  async createInitialAdmin(
+    createAdminDto: CreateAdminDto,
+    logoFile?: Express.Multer.File,
+    faviconFile?: Express.Multer.File,
+  ) {
     const setupRequired = await this.isSetupRequired();
 
     if (!setupRequired) {
@@ -47,6 +59,24 @@ export class SetupService {
       saltRounds,
     );
 
+    // Handle file uploads if present
+    let logoUrl: string | undefined;
+    let faviconUrl: string | undefined;
+    if (logoFile) {
+      const uploadResult: UploadResult = await this.filesService.uploadFile(
+        logoFile,
+        FileCategory.SETTINGS,
+      );
+      logoUrl = uploadResult.url;
+    }
+    if (faviconFile) {
+      const uploadResult: UploadResult = await this.filesService.uploadFile(
+        faviconFile,
+        FileCategory.SETTINGS,
+      );
+      faviconUrl = uploadResult.url;
+    }
+
     // Create admin user and blog settings in a transaction
     const result = await this.prisma.$transaction(async (prisma) => {
       // Create admin user
@@ -77,10 +107,14 @@ export class SetupService {
           id: 'default',
           blogTitle: createAdminDto.blogTitle,
           blogDescription: createAdminDto.blogDescription,
+          logoUrl,
+          faviconUrl,
         },
         update: {
           blogTitle: createAdminDto.blogTitle,
           blogDescription: createAdminDto.blogDescription,
+          logoUrl,
+          faviconUrl,
         },
       });
 
@@ -123,7 +157,7 @@ export class SetupService {
     });
   }
 
-  async getBlogSetupStatus(currentUserId?: string, hasAuthError = false) {
+  async getBlogSetupStatus(currentUserId?: string) {
     try {
       // Check if there are active admin users
       const adminUsers = await this.prisma.user.findMany({
@@ -154,10 +188,7 @@ export class SetupService {
       // Handle authentication status
       let currentUserValid = true;
 
-      if (hasAuthError) {
-        // Invalid token was provided
-        currentUserValid = false;
-      } else if (currentUserId !== undefined) {
+      if (currentUserId !== undefined) {
         // Valid token was provided, check if user still exists
         const currentUser = await this.prisma.user.findFirst({
           where: {
@@ -168,7 +199,7 @@ export class SetupService {
         });
         currentUserValid = !!currentUser;
       }
-      // If currentUserId is undefined and no auth error, treat as unauthenticated (valid)
+      // If currentUserId is undefined, treat as unauthenticated (valid)
 
       // Blog is considered "set up" if there are admin users and settings exist
       // Current user validity only affects setup status when there IS an authenticated user

@@ -1,3 +1,7 @@
+/**
+ * Create admin and blog settings with files (multipart)
+ */
+// ...existing code...
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
@@ -277,7 +281,7 @@ export interface ErrorResponse {
   providedIn: "root",
 })
 export class ApiService {
-  private readonly baseUrl = environment.apiUrl;
+  public readonly baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -304,6 +308,13 @@ export class ApiService {
       `${this.baseUrl}/setup/admin`,
       setupData
     );
+  }
+
+  /**
+   * Create admin and blog settings with files (multipart)
+   */
+  createAdminMultipart(formData: FormData): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/setup/admin`, formData);
   }
 
   getBlogSettings(): Observable<BlogSettings> {

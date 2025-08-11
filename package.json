@@ -20,14 +20,23 @@
     "docker:setup": "./setup.sh"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
     "@types/node": "^20.11.0",
+    "concurrently": "^8.2.2",
     "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": ["blog", "angular", "nestjs", "prisma", "jwt"],
+  "keywords": [
+    "blog",
+    "angular",
+    "nestjs",
+    "prisma",
+    "jwt"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@nestjs/serve-static": "^5.0.3"
+  }
 }

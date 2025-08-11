@@ -1,4 +1,9 @@
-import { Component, OnInit, AfterViewChecked } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  AfterViewChecked,
+  ViewEncapsulation,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { ApiService, BlogPost } from "../../../core/services/api.service";
@@ -14,6 +19,7 @@ declare var Prism: any;
   imports: [CommonModule, RouterModule],
   templateUrl: "./blog-post.component.html",
   styleUrls: ["./blog-post.component.css"],
+  encapsulation: ViewEncapsulation.None, // Disable view encapsulation
 })
 export class BlogPostComponent implements OnInit, AfterViewChecked {
   post: BlogPost | null = null;

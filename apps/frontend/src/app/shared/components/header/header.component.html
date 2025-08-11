@@ -8,7 +8,7 @@
           <ng-container *ngIf="blogSettings$ | async as settings">
             <img
               *ngIf="settings.logoUrl; else fallbackIcon"
-              [src]="settings.logoUrl"
+              [src]="getLogoSrc(settings.logoUrl)"
               [alt]="settings.blogTitle + ' logo'"
               class="h-8 w-auto mr-2"
               loading="lazy"

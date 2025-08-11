@@ -8,7 +8,10 @@ import {
   HttpStatus,
   Request,
   UseGuards,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -33,8 +36,28 @@ export class SetupController {
 
   @Post('setup/admin')
   @HttpCode(HttpStatus.CREATED)
-  async createAdmin(@Body() createAdminDto: CreateAdminDto) {
-    const admin = await this.setupService.createInitialAdmin(createAdminDto);
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'logo', maxCount: 1 },
+      { name: 'favicon', maxCount: 1 },
+    ]),
+  )
+  async createAdmin(
+    @Body() createAdminDto: CreateAdminDto,
+    @UploadedFiles()
+    files: {
+      logo?: Express.Multer.File[];
+      favicon?: Express.Multer.File[];
+    },
+  ) {
+    // Extract individual files from the fields
+    const logoFile = files?.logo?.[0];
+    const faviconFile = files?.favicon?.[0];
+    const admin = await this.setupService.createInitialAdmin(
+      createAdminDto,
+      logoFile,
+      faviconFile,
+    );
     return {
       message: 'Admin user created successfully',
       admin,
@@ -65,12 +88,10 @@ export class SetupController {
   @Get('setup/blog-status')
   @UseGuards(OptionalJwtAuthGuard)
   async getBlogSetupStatus(@Request() req?: any) {
-    // Check if there was an authentication error
+    // If there was an authentication error, treat as unauthenticated (public)
     if (req.authError) {
-      // Invalid token was provided
-      return await this.setupService.getBlogSetupStatus(undefined, true);
+      return await this.setupService.getBlogSetupStatus(undefined);
     }
-
     // Get current user ID from request (if authenticated)
     const currentUserId = req?.user?.id;
     return await this.setupService.getBlogSetupStatus(currentUserId);
