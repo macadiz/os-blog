@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Open Blog Deployment Setup
-echo "🚀 Open Blog Deployment"
+# OS Blog Deployment Setup
+echo "🚀 OS Blog Deployment"
 echo "======================="
 echo ""
 
@@ -86,17 +86,17 @@ echo "✅ Configuration ready for container runtime (no .env file will be create
 echo ""
 
 # Ask user if they want to start
-read -p "Start Open Blog now? (Y/n): " START_NOW
+read -p "Start OS Blog now? (Y/n): " START_NOW
 START_NOW=${START_NOW:-Y}
 
 if [[ $START_NOW =~ ^[Yy]$ ]]; then
     echo ""
-    echo "🚀 Starting Open Blog..."
+    echo "🚀 Starting OS Blog..."
     
     # Create named volumes for persistent data (reuse existing if they exist)
     echo "📦 Creating persistent volumes..."
-    docker volume create openblog-database-data >/dev/null 2>&1 || true
-    docker volume create openblog-static-files >/dev/null 2>&1 || true
+    docker volume create os-blog-database-data >/dev/null 2>&1 || true
+    docker volume create os-blog-static-files >/dev/null 2>&1 || true
     echo "✅ Volumes ready (will reuse existing data if present)"
     
     # Stop any existing container
@@ -110,8 +110,8 @@ if [[ $START_NOW =~ ^[Yy]$ ]]; then
                 --name os-blog \
                 -p $PORT:80 \
                 -p $POSTGRES_PORT:5432 \
-                -v openblog-database-data:/var/lib/postgresql/14/main \
-                -v openblog-static-files:/app/static \
+                -v os-blog-database-data:/var/lib/postgresql/14/main \
+                -v os-blog-static-files:/app/static \
                 $DOCKER_ENV_VARS \
                 --restart unless-stopped \
                 os-blog:latest
@@ -119,8 +119,8 @@ if [[ $START_NOW =~ ^[Yy]$ ]]; then
             docker run -d \
                 --name os-blog \
                 -p $PORT:80 \
-                -v openblog-database-data:/var/lib/postgresql/14/main \
-                -v openblog-static-files:/app/static \
+                -v os-blog-database-data:/var/lib/postgresql/14/main \
+                -v os-blog-static-files:/app/static \
                 $DOCKER_ENV_VARS \
                 --restart unless-stopped \
                 os-blog:latest
@@ -128,7 +128,7 @@ if [[ $START_NOW =~ ^[Yy]$ ]]; then
     
     if [ $? -eq 0 ]; then
         echo ""
-        echo "🎉 Open Blog is starting!"
+        echo "🎉 OS Blog is starting!"
         echo ""
         echo "📍 Access your blog: http://localhost:$PORT"
         echo "🔧 Admin setup: http://localhost:$PORT/setup"
@@ -137,21 +137,21 @@ if [[ $START_NOW =~ ^[Yy]$ ]]; then
         echo "🔐 JWT secret: [saved in environment]"
         echo ""
         echo "� Persistent data volumes:"
-        echo "   • Database: openblog-database-data"
-        echo "   • Files/uploads: openblog-static-files"
+        echo "   • Database: os-blog-database-data"
+        echo "   • Files/uploads: os-blog-static-files"
         echo ""
         echo "📊 Check status: docker ps"
         echo "📝 View logs: docker logs os-blog -f"
         echo "🛑 Stop: docker stop os-blog"
         echo "�️  Remove (keeps data): docker rm os-blog"
-        echo "🗑️  Remove volumes: docker volume rm openblog-database-data openblog-static-files"
+        echo "🗑️  Remove volumes: docker volume rm os-blog-database-data os-blog-static-files"
         echo ""
         echo "⏳ Note: First startup may take 1-2 minutes while the database initializes"
         echo "� Subsequent starts will reuse existing database and be much faster"
         echo "�💡 Tip: Re-running this script will reuse existing data and settings"
         echo "🗃️  Your data persists across container rebuilds and updates"
     else
-        echo "❌ Failed to start Open Blog"
+        echo "❌ Failed to start OS Blog"
         exit 1
     fi
 else
@@ -159,8 +159,8 @@ else
     echo "✅ Setup complete!"
     echo ""
     echo "📦 Persistent volumes created:"
-    echo "   • Database: openblog-database-data"
-    echo "   • Files/uploads: openblog-static-files"
+    echo "   • Database: os-blog-database-data"
+    echo "   • Files/uploads: os-blog-static-files"
     echo ""
     echo "To start later, run this script again or use:"
     echo "  docker start os-blog"
@@ -169,4 +169,4 @@ else
 fi
 
 echo ""
-echo "🙏 Thank you for using Open Blog!"
+echo "🙏 Thank you for using OS Blog!"

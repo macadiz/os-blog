@@ -1,4 +1,4 @@
-# Open Blog
+# OS Blog
 
 A modern, full-stack blogging platform built with Angular, NestJS, and PostgreSQL.
 
@@ -28,7 +28,7 @@ The setup scripts will automatically generate secure passwords if you don't prov
 
 ## 🐳 Quick Start with Docker
 
-The simplest way to deploy Open Blog is using our container setup:
+The simplest way to deploy OS Blog is using our container setup:
 
 ```bash
 # Clone the repository

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Build script for Open Blog
+# Build script for OS Blog
 # Builds the frontend and backend, then creates a Docker image
 
 set -e
 
-echo "🏗️  Building Open Blog..."
+echo "🏗️  Building OS Blog..."
 
 # Clean previous builds
 echo "🧹 Cleaning previous builds..."
@@ -37,7 +37,7 @@ docker build -t os-blog:latest .
 
 echo "✅ Build complete!"
 echo ""
-echo "🚀 To run Open Blog:"
+echo "🚀 To run OS Blog:"
 echo "   docker run -p 80:80 -e POSTGRES_PASSWORD=your_password os-blog:latest"
 echo ""
 echo "🌐 Access your blog at: http://localhost"

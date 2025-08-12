@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Starting Open Blog..."
+echo "🚀 Starting OS Blog..."
 
 # Validate required environment variables FIRST
 if [ -z "$POSTGRES_PASSWORD" ]; then

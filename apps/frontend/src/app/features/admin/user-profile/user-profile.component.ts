@@ -19,6 +19,7 @@ import {
   FileCategory,
   FileUploadResponse,
 } from "../../../shared/components/file-upload/file-upload.component";
+import { ImageUrlUtil } from "../../../core/utils/image-url.util";
 
 @Component({
   selector: "app-user-profile",
@@ -350,10 +351,14 @@ export class UserProfileComponent implements OnInit {
     const formValue = this.profileForm.value.profilePicture;
     // If form has a value (uploaded new image), use that
     if (formValue) {
-      return formValue;
+      return ImageUrlUtil.getAbsoluteImageUrl(formValue);
     }
 
     // Otherwise, use the current user's profile picture
-    return this.currentUser?.profilePicture;
+    if (this.currentUser?.profilePicture) {
+      return ImageUrlUtil.getAbsoluteImageUrl(this.currentUser.profilePicture);
+    }
+
+    return undefined;
   }
 }

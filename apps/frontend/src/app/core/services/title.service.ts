@@ -50,7 +50,7 @@ export class TitleService {
       this.title.setTitle(settings.blogTitle);
       this.setMetaDescription(description || settings.blogDescription || "");
     } else {
-      this.title.setTitle("Open Blog");
+      this.title.setTitle("OS Blog");
       this.setMetaDescription(description || "A modern blogging platform");
     }
   }
@@ -65,7 +65,7 @@ export class TitleService {
     excerpt?: string
   ) {
     const settings = this.blogSettingsSubject.value;
-    const blogName = settings?.blogTitle || "Open Blog";
+    const blogName = settings?.blogTitle || "OS Blog";
 
     // Use metaTitle if available, otherwise use post title + blog name
     const finalTitle = metaTitle || `${postTitle} - ${blogName}`;
@@ -81,7 +81,7 @@ export class TitleService {
    */
   setCustomTitle(pageTitle: string) {
     const settings = this.blogSettingsSubject.value;
-    const blogName = settings?.blogTitle || "Open Blog";
+    const blogName = settings?.blogTitle || "OS Blog";
     this.title.setTitle(`${pageTitle} - ${blogName}`);
   }
 

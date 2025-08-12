@@ -83,7 +83,7 @@ export class FilesService {
         filename,
         originalName: file.originalname,
         path: filePath,
-        url: `/files/${category}/${filename}`,
+        url: this.getRelativeFileUrl(category, filename), // Store clean relative path
         size: file.size,
         mimeType: file.mimetype,
       };
@@ -141,10 +141,27 @@ export class FilesService {
   }
 
   /**
-   * Get the full URL for a file
+   * Get the relative URL for a file (without environment-specific prefixes)
+   * This should be stored in the database
+   */
+  getRelativeFileUrl(category: FileCategory, filename: string): string {
+    return `/files/${category}/${filename}`;
+  }
+
+  /**
+   * Get the full URL for a file (with environment-specific prefixes)
+   * This should be used when serving/displaying URLs
    */
   getFileUrl(category: FileCategory, filename: string): string {
-    return `/files/${category}/${filename}`;
+    const nodeEnv = this.configService.get('NODE_ENV', 'development');
+
+    // In production, URLs need /api prefix for Nginx routing
+    // In development, NestJS serves directly without /api prefix
+    if (nodeEnv === 'production') {
+      return `/api/files/${category}/${filename}`;
+    } else {
+      return `/files/${category}/${filename}`;
+    }
   }
 
   /**

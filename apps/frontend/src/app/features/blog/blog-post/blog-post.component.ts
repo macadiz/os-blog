@@ -8,6 +8,7 @@ import { CommonModule } from "@angular/common";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { ApiService, BlogPost } from "../../../core/services/api.service";
 import { TitleService } from "../../../core/services/title.service";
+import { ImageUrlUtil } from "../../../core/utils/image-url.util";
 import { marked } from "marked";
 
 // Import Prism for syntax highlighting
@@ -65,7 +66,9 @@ export class BlogPostComponent implements OnInit, AfterViewChecked {
         if (post.content) {
           this.parsedContent = marked(post.content) as string;
           // Process relative image URLs in the content
-          this.parsedContent = this.processContentImages(this.parsedContent);
+          this.parsedContent = ImageUrlUtil.processContentImages(
+            this.parsedContent
+          );
           this.highlightPending = true; // Flag to trigger syntax highlighting
         }
 
@@ -86,30 +89,6 @@ export class BlogPostComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  /**
-   * Process images in content to convert relative URLs to absolute
-   */
-  private processContentImages(content: string): string {
-    const baseUrl = window.location.origin;
-
-    // Replace img src attributes that are relative paths
-    return content.replace(
-      /<img([^>]+)src=["']([^"']+)["']([^>]*)>/gi,
-      (match, before, src, after) => {
-        // If it's already an absolute URL, leave it as is
-        if (src.startsWith("http://") || src.startsWith("https://")) {
-          return match;
-        }
-
-        // Convert relative path to absolute URL
-        const absoluteSrc = src.startsWith("/")
-          ? `${baseUrl}${src}`
-          : `${baseUrl}/${src}`;
-        return `<img${before}src="${absoluteSrc}"${after}>`;
-      }
-    );
-  }
-
   ngAfterViewChecked() {
     // Highlight code blocks after content is rendered
     if (this.highlightPending && typeof Prism !== "undefined") {
@@ -124,25 +103,10 @@ export class BlogPostComponent implements OnInit, AfterViewChecked {
   }
 
   /**
-   * Convert relative image URL to absolute URL if needed
+   * Convert relative image URL to absolute URL based on environment
    */
   getAbsoluteImageUrl(imagePath: string): string {
-    if (!imagePath) return "";
-
-    // If it's already an absolute URL (starts with http/https), return as is
-    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
-      return imagePath;
-    }
-
-    // If it's a relative path, prepend the base URL
-    const baseUrl = window.location.origin;
-
-    // Ensure proper path formatting
-    if (imagePath.startsWith("/")) {
-      return `${baseUrl}${imagePath}`;
-    } else {
-      return `${baseUrl}/${imagePath}`;
-    }
+    return ImageUrlUtil.getAbsoluteImageUrl(imagePath);
   }
 
   goBack() {

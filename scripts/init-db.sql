@@ -1,4 +1,4 @@
--- Open Blog Database Initialization Script
+-- OS Blog Database Initialization Script
 -- This script sets up the initial database configuration
 
 -- Create extensions if they don't exist
@@ -14,5 +14,5 @@ SET timezone = 'UTC';
 -- Log initialization
 DO $$
 BEGIN
-    RAISE NOTICE 'Open Blog database initialized successfully at %', NOW();
+    RAISE NOTICE 'OS Blog database initialized successfully at %', NOW();
 END $$;

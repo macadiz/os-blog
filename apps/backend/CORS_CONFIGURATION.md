@@ -1,6 +1,6 @@
 # CORS Configuration Guide
 
-This document explains how to configure Cross-Origin Resource Sharing (CORS) for the Open Blog application.
+This document explains how to configure Cross-Origin Resource Sharing (CORS) for the OS Blog application.
 
 ## Overview
 

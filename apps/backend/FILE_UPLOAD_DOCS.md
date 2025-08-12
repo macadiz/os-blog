@@ -2,7 +2,7 @@
 
 ## Overview
 
-The file upload system provides secure image upload and management capabilities for the Open Blog platform. It supports three main categories of files and provides transactional file replacement.
+The file upload system provides secure image upload and management capabilities for the OS Blog platform. It supports three main categories of files and provides transactional file replacement.
 
 ## Features
 

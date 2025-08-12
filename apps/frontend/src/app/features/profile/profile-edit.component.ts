@@ -19,6 +19,7 @@ import {
   FileCategory,
   FileUploadResponse,
 } from "../../shared/components/file-upload/file-upload.component";
+import { ImageUrlUtil } from "../../core/utils/image-url.util";
 
 @Component({
   selector: "app-profile-edit",
@@ -143,9 +144,10 @@ export class ProfileEditComponent implements OnInit {
     setTimeout(() => (this.message = ""), 5000);
   }
 
-  get currentProfilePictureUrl(): string | undefined {
-    return (
-      this.profileForm.value.profilePicture || this.currentUser?.profilePicture
-    );
+  get currentProfilePictureUrl(): string | null {
+    if (!this.currentUser?.profilePicture) {
+      return null;
+    }
+    return ImageUrlUtil.getAbsoluteImageUrl(this.currentUser.profilePicture);
   }
 }

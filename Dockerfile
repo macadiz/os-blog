@@ -1,4 +1,4 @@
-# Open Blog - Single Container Deployment
+# OS Blog - Single Container Deployment
 # Production-ready Docker container with all services
 
 FROM ubuntu:22.04

@@ -1,7 +1,7 @@
 {
   "name": "@os-blog/shared-types",
   "version": "1.0.0",
-  "description": "Shared types for Open Blog monorepo",
+  "description": "Shared types for OS Blog monorepo",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

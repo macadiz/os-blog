@@ -1,10 +1,10 @@
-# Open Blog - Backend API
+# OS Blog - Backend API
 
-A NestJS-based backend API for the Open Blog platform.
+A NestJS-based backend API for the OS Blog platform.
 
 ## Description
 
-This is the backend API for Open Blog, built with [NestJS](https://github.com/nestjs/nest) framework and TypeScript. It provides authentication, blog post management, and administrative features.
+This is the backend API for OS Blog, built with [NestJS](https://github.com/nestjs/nest) framework and TypeScript. It provides authentication, blog post management, and administrative features.
 
 ## Features
 

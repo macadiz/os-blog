@@ -57,7 +57,7 @@ export class FileUploadComponent implements OnDestroy {
     previewSize: "medium",
   };
 
-  @Input() currentFileUrl?: string;
+  @Input() currentFileUrl?: string | null;
   @Input() disabled = false;
 
   @Output() fileUploaded = new EventEmitter<FileUploadResponse>();
@@ -237,7 +237,7 @@ export class FileUploadComponent implements OnDestroy {
     return `${sizeClass} object-cover rounded-lg border-2 border-gray-300`;
   }
 
-  getDisplayUrl(): string | undefined {
+  getDisplayUrl(): string | undefined | null {
     return this.previewUrl || this.currentFileUrl;
   }
 
