@@ -60,7 +60,7 @@ fi
 echo ""
 
 # Check if image exists
-if ! docker image inspect open-blog:latest >/dev/null 2>&1; then
+if ! docker image inspect os-blog:latest >/dev/null 2>&1; then
     echo "🔨 Building application..."
     if ! bash build.sh; then
         echo "❌ Build failed. Please check the build output above."
@@ -100,30 +100,30 @@ if [[ $START_NOW =~ ^[Yy]$ ]]; then
     echo "✅ Volumes ready (will reuse existing data if present)"
     
     # Stop any existing container
-    docker stop open-blog 2>/dev/null || true
-    docker rm open-blog 2>/dev/null || true
+    docker stop os-blog 2>/dev/null || true
+    docker rm os-blog 2>/dev/null || true
     
 
         # Start the container with persistent volumes
         if [[ $EXPOSE_DB =~ ^[Yy]$ ]]; then
             docker run -d \
-                --name open-blog \
+                --name os-blog \
                 -p $PORT:80 \
                 -p $POSTGRES_PORT:5432 \
                 -v openblog-database-data:/var/lib/postgresql/14/main \
                 -v openblog-static-files:/app/static \
                 $DOCKER_ENV_VARS \
                 --restart unless-stopped \
-                open-blog:latest
+                os-blog:latest
         else
             docker run -d \
-                --name open-blog \
+                --name os-blog \
                 -p $PORT:80 \
                 -v openblog-database-data:/var/lib/postgresql/14/main \
                 -v openblog-static-files:/app/static \
                 $DOCKER_ENV_VARS \
                 --restart unless-stopped \
-                open-blog:latest
+                os-blog:latest
         fi
     
     if [ $? -eq 0 ]; then
@@ -141,9 +141,9 @@ if [[ $START_NOW =~ ^[Yy]$ ]]; then
         echo "   • Files/uploads: openblog-static-files"
         echo ""
         echo "📊 Check status: docker ps"
-        echo "📝 View logs: docker logs open-blog -f"
-        echo "🛑 Stop: docker stop open-blog"
-        echo "�️  Remove (keeps data): docker rm open-blog"
+        echo "📝 View logs: docker logs os-blog -f"
+        echo "🛑 Stop: docker stop os-blog"
+        echo "�️  Remove (keeps data): docker rm os-blog"
         echo "🗑️  Remove volumes: docker volume rm openblog-database-data openblog-static-files"
         echo ""
         echo "⏳ Note: First startup may take 1-2 minutes while the database initializes"
@@ -163,7 +163,7 @@ else
     echo "   • Files/uploads: openblog-static-files"
     echo ""
     echo "To start later, run this script again or use:"
-    echo "  docker start open-blog"
+    echo "  docker start os-blog"
     echo ""
     echo "Your configuration is ready for deployment"
 fi

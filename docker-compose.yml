@@ -2,7 +2,7 @@ services:
   # PostgreSQL Database
   database:
     image: postgres:15-alpine
-    container_name: ${COMPOSE_PROJECT_NAME:-open-blog}_database
+    container_name: ${COMPOSE_PROJECT_NAME:-os-blog}_database
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-open_blog}
       POSTGRES_USER: ${POSTGRES_USER:-blog_user}
@@ -35,7 +35,7 @@ services:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
-    container_name: ${COMPOSE_PROJECT_NAME:-open-blog}_backend
+    container_name: ${COMPOSE_PROJECT_NAME:-os-blog}_backend
     environment:
       # Database configuration using service name for dynamic networking
       DATABASE_URL: postgresql://${POSTGRES_USER:-blog_user}:${POSTGRES_PASSWORD:-blog_password}@database:5432/${POSTGRES_DB:-open_blog}
@@ -83,7 +83,7 @@ services:
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
-    container_name: ${COMPOSE_PROJECT_NAME:-open-blog}_frontend
+    container_name: ${COMPOSE_PROJECT_NAME:-os-blog}_frontend
     environment:
       BACKEND_URL: http://backend:3000
     ports:
@@ -110,10 +110,10 @@ services:
 networks:
   app-network:
     driver: bridge
-    name: ${COMPOSE_PROJECT_NAME:-open-blog}_network
+    name: ${COMPOSE_PROJECT_NAME:-os-blog}_network
 
 volumes:
   postgres_data:
-    name: ${COMPOSE_PROJECT_NAME:-open-blog}_postgres_data
+    name: ${COMPOSE_PROJECT_NAME:-os-blog}_postgres_data
   static_files:
-    name: ${COMPOSE_PROJECT_NAME:-open-blog}_static_files
+    name: ${COMPOSE_PROJECT_NAME:-os-blog}_static_files

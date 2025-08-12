@@ -33,11 +33,11 @@ echo "📦 Copying shared types..."
 cp -r libs dist/ || true
 
 echo "🐳 Building Docker image..."
-docker build -t open-blog:latest .
+docker build -t os-blog:latest .
 
 echo "✅ Build complete!"
 echo ""
 echo "🚀 To run Open Blog:"
-echo "   docker run -p 80:80 -e POSTGRES_PASSWORD=your_password open-blog:latest"
+echo "   docker run -p 80:80 -e POSTGRES_PASSWORD=your_password os-blog:latest"
 echo ""
 echo "🌐 Access your blog at: http://localhost"

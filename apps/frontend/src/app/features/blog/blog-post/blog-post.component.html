@@ -34,7 +34,7 @@
     <!-- Featured Image -->
     <div *ngIf="post.featuredImage" class="w-full">
       <img
-        [src]="post.featuredImage"
+        [src]="getAbsoluteImageUrl(post.featuredImage)"
         [alt]="post.title"
         class="w-full h-64 md:h-96 object-cover"
         (error)="onImageError($event)"

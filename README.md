@@ -33,7 +33,7 @@ The simplest way to deploy Open Blog is using our container setup:
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd open-blog
+cd os-blog
 
 # Run the interactive setup script
 ./setup.sh
@@ -62,11 +62,11 @@ cp .env.example .env
 # Build and run
 ./build.sh
 docker run -d \
-  --name open-blog \
+  --name os-blog \
   -p 80:80 \
   --env-file .env \
   --restart unless-stopped \
-  open-blog:latest
+  os-blog:latest
 ```
 
 ## 🛠️ Development Setup
@@ -143,7 +143,7 @@ This project is licensed under the MIT License.
 **Container won't start:**
 - Check that ports 80 is available
 - Verify environment variables are set
-- Check Docker logs: `docker logs open-blog`
+- Check Docker logs: `docker logs os-blog`
 
 **Database connection issues:**
 - Ensure PostgreSQL password is correct
@@ -157,7 +157,7 @@ This project is licensed under the MIT License.
 
 ### Getting Help
 
-- Check the logs: `docker logs open-blog`
+- Check the logs: `docker logs os-blog`
 - Review the API documentation at `/api`
 - Open an issue on GitHub
 
