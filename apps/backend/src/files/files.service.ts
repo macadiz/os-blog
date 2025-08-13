@@ -43,7 +43,7 @@ export class FilesService {
     const nodeEnv = this.configService.get('NODE_ENV', 'development');
     if (nodeEnv === 'production') {
       // In production (Docker), use the shared static volume
-      this.staticDir = '/app/static';
+      this.staticDir = '/var/www/static';
     } else {
       // In development, use local static folder
       this.staticDir = path.join(process.cwd(), 'static');

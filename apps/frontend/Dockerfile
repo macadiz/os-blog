@@ -15,6 +15,9 @@ RUN npm ci
 COPY apps/frontend ./apps/frontend
 COPY libs/shared-types ./libs/shared-types
 
+# Modify angular.json to use local node_modules
+RUN sed -i 's#../../node_modules#./node_modules#g' apps/frontend/angular.json
+
 # Build the frontend application
 WORKDIR /app/apps/frontend
 RUN npm run build

@@ -16,7 +16,8 @@
     "prisma:migrate": "npm run prisma:migrate --workspace=apps/backend",
     "prisma:generate": "npm run prisma:generate --workspace=apps/backend",
     "prisma:studio": "npm run prisma:studio --workspace=apps/backend",
-    "docker:build": "./build.sh",
+    "docker:build": "docker build -t os-blog:latest . --platform linux/amd64",
+    "docker:build-arm": "docker build -t os-blog:latest-arm . --platform linux/arm64",
     "docker:setup": "./setup.sh"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@nestjs/serve-static": "^5.0.3"
+    "@nestjs/serve-static": "^5.0.3",
+    "brace-expansion": "^4.0.1"
   }
 }

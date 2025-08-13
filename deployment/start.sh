@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 echo "🚀 Starting OS Blog..."
@@ -37,19 +37,33 @@ echo "  User: $POSTGRES_USER"
 echo "  Password: [HIDDEN - Length: ${#POSTGRES_PASSWORD} chars]"
 echo "  JWT Secret: [HIDDEN - Length: ${#JWT_SECRET} chars]"
 
+# Initialize PostgreSQL database directory if empty
+if [ -z "$(ls -A /var/lib/postgresql/data)" ]; then
+  echo "Initializing PostgreSQL database directory..."
+  mkdir -p /var/lib/postgresql/data
+  chown -R postgres:postgres /var/lib/postgresql/data
+  su postgres -c "initdb -D /var/lib/postgresql/data"
+fi
+
+# Ensure /run/postgresql directory exists before starting PostgreSQL
+mkdir -p /run/postgresql
+chown -R postgres:postgres /run/postgresql
+chmod 775 /run/postgresql
+
 # Start PostgreSQL
 echo "🗄️  Starting PostgreSQL..."
 echo "🔍 Checking PostgreSQL service status..."
-service postgresql status || echo "PostgreSQL service not running"
+su postgres -c "pg_ctl -D /var/lib/postgresql/data status" || echo "PostgreSQL service not running"
 
 echo "🔍 Available PostgreSQL versions:"
 ls -la /etc/postgresql/ || echo "No PostgreSQL config directories found"
 
 echo "🔍 Starting PostgreSQL service..."
-service postgresql start
+su postgres -c "pg_ctl -D /var/lib/postgresql/data start"
 
+# Check PostgreSQL service status
 echo "🔍 PostgreSQL service status after start:"
-service postgresql status || echo "Failed to get status"
+su postgres -c "pg_ctl -D /var/lib/postgresql/data status" || echo "Failed to get status"
 
 echo "🔍 Checking if PostgreSQL is listening on port 5432..."
 netstat -tlnp | grep :5432 || echo "PostgreSQL not listening on 5432"
@@ -71,26 +85,26 @@ echo "✅ PostgreSQL is ready!"
 
 # Initialize database if it doesn't exist (first run or empty volume)
 echo "🔧 Checking database setup..."
-DB_EXISTS=$(runuser -l postgres -c "psql -tAc \"SELECT 1 FROM pg_database WHERE datname='$POSTGRES_DB'" 2>/dev/null || echo "")
+DB_EXISTS=$(su -l postgres -c "psql -tAc \"SELECT 1 FROM pg_database WHERE datname='$POSTGRES_DB'" 2>/dev/null || echo "")
 
 # Check if the database user exists before creating it
-USER_EXISTS=$(runuser -l postgres -c "psql -tAc \"SELECT 1 FROM pg_user WHERE usename='$POSTGRES_USER'\"" 2>/dev/null || echo "")
+USER_EXISTS=$(su -l postgres -c "psql -tAc \"SELECT 1 FROM pg_user WHERE usename='$POSTGRES_USER'\"" 2>/dev/null || echo "")
 
 if [ -z "$USER_EXISTS" ]; then
     echo "👤 Creating database user: $POSTGRES_USER"
-    runuser -l postgres -c "createuser $POSTGRES_USER -d"
-    runuser -l postgres -c "psql -c \"ALTER USER $POSTGRES_USER PASSWORD '$POSTGRES_PASSWORD';\""
+    su -l postgres -c "createuser $POSTGRES_USER -d"
+    su -l postgres -c "psql -c \"ALTER USER $POSTGRES_USER PASSWORD '$POSTGRES_PASSWORD';\""
 else
     echo "👤 Database user exists, updating password..."
-    runuser -l postgres -c "psql -c \"ALTER USER $POSTGRES_USER PASSWORD '$POSTGRES_PASSWORD';\"" 2>/dev/null || true
+    su -l postgres -c "psql -c \"ALTER USER $POSTGRES_USER PASSWORD '$POSTGRES_PASSWORD';\"" 2>/dev/null || true
 fi
 
 # Check if the database exists before creating it
-DB_EXISTS=$(runuser -l postgres -c "psql -tAc \"SELECT 1 FROM pg_database WHERE datname='$POSTGRES_DB'\"" 2>/dev/null || echo "")
+DB_EXISTS=$(su -l postgres -c "psql -tAc \"SELECT 1 FROM pg_database WHERE datname='$POSTGRES_DB'\"" 2>/dev/null || echo "")
 
 if [ -z "$DB_EXISTS" ]; then
     echo "🗄️  Creating database: $POSTGRES_DB"
-    runuser -l postgres -c "createdb $POSTGRES_DB -O $POSTGRES_USER"
+    su -l postgres -c "createdb $POSTGRES_DB -O $POSTGRES_USER"
     
     # Run database migrations for new database
     echo "📋 Running database migrations..."
@@ -106,14 +120,32 @@ else
     echo "✅ Database migration check completed!"
 fi
 
+# Move files from /app/frontend/dist/frontend to /app/frontend/dist
+if [ -d "/app/frontend/dist/frontend" ]; then
+    mv /app/frontend/dist/frontend/* /app/frontend/dist/
+    rmdir /app/frontend/dist/frontend
+fi
+
 # Start nginx in the background
 echo "🌐 Starting nginx..."
 
 # Ensure static directories exist with proper permissions
 echo "📁 Setting up static file directories..."
-mkdir -p /app/static/settings /app/static/profile_pictures /app/static/blog_images
-chown -R www-data:www-data /app/static
-chmod -R 755 /app/static
+mkdir -p /var/www/static/settings /var/www/static/profile_pictures /var/www/static/blog_images
+chown -R www-data:www-data /var/www/static
+chmod -R 755 /var/www/static
+chown -R www-data:www-data /app/frontend/dist
+chmod -R 755 /app/frontend/dist
+
+# Ensure Nginx required directories exist with proper permissions
+mkdir -p /var/lib/nginx/logs /var/lib/nginx/tmp/client_body
+chown -R www-data:www-data /var/lib/nginx
+chmod -R 755 /var/lib/nginx
+
+# Ensure Nginx log directory exists with proper permissions
+mkdir -p /var/log/nginx
+chown -R www-data:www-data /var/log/nginx
+chmod -R 755 /var/log/nginx
 
 nginx
 
@@ -129,7 +161,7 @@ export PORT=3000
 export DATABASE_URL="postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB"
 export CORS_ORIGINS=${CORS_ORIGINS:-"http://localhost"}
 export BASE_URL=${BASE_URL:-"http://localhost:$PORT"}
-node main.js &
+node dist/main.js &
 BACKEND_PID=$!
 
 echo "✅ All services started!"
@@ -141,7 +173,7 @@ cleanup() {
     echo "🛑 Shutting down services..."
     kill $BACKEND_PID 2>/dev/null || true
     nginx -s quit 2>/dev/null || true
-    service postgresql stop 2>/dev/null || true
+    su postgres -c "pg_ctl -D /var/lib/postgresql/data stop" 2>/dev/null || true
     exit 0
 }
 
