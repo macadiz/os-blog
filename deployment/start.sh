@@ -68,6 +68,9 @@ su postgres -c "pg_ctl -D /var/lib/postgresql/data status" || echo "Failed to ge
 echo "🔍 Checking if PostgreSQL is listening on port 5432..."
 netstat -tlnp | grep :5432 || echo "PostgreSQL not listening on 5432"
 
+# Verify PostgreSQL is listening on all interfaces
+netstat -tlnp | grep :5432 || echo "PostgreSQL is not listening on 0.0.0.0:5432"
+
 # Wait for PostgreSQL to be ready
 echo "⏳ Waiting for PostgreSQL..."
 RETRY_COUNT=0
@@ -82,6 +85,20 @@ until pg_isready -h localhost -p 5432 -U postgres; do
   sleep 2
 done
 echo "✅ PostgreSQL is ready!"
+
+# Configure PostgreSQL to listen on all network interfaces
+PG_CONF="/var/lib/postgresql/data/postgresql.conf"
+PG_HBA="/var/lib/postgresql/data/pg_hba.conf"
+
+if [ -f "$PG_CONF" ]; then
+  echo "Configuring PostgreSQL to listen on all interfaces..."
+  sed -i "s|^#*listen_addresses =.*|listen_addresses = '*'|" "$PG_CONF"
+fi
+
+if [ -f "$PG_HBA" ]; then
+  echo "Allowing external connections to PostgreSQL..."
+  echo "host all all 0.0.0.0/0 md5" >> "$PG_HBA"
+fi
 
 # Initialize database if it doesn't exist (first run or empty volume)
 echo "🔧 Checking database setup..."
