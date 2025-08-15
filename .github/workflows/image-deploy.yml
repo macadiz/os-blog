@@ -1,0 +1,55 @@
+name: Image deploy
+
+on:
+  push:
+    tags:
+      - "v*" # Trigger only if tag starts with v (e.g., v1.0.0)
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # so we can push commits back
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Checkout main branch
+        run: git checkout main
+
+      - name: Extract version from tag
+        id: vars
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22" # change if needed
+
+      - name: Set Git identity
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Update package.json version
+        run: |
+          npm version $VERSION --no-git-tag-version
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to $VERSION [skip ci]"
+          git push origin HEAD:main
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            mjacadiz/os-blog:latest
+            mjacadiz/os-blog:${{ env.VERSION }}
