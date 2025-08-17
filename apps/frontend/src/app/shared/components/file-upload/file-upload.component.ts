@@ -13,6 +13,7 @@ import {
   FileUploadService,
   UploadProgressEvent,
 } from "../../../core/services/file-upload.service";
+import { environment } from "../../../../environments/environment";
 // Define the types locally instead of importing
 export enum FileCategory {
   SETTINGS = "settings",
@@ -175,7 +176,7 @@ export class FileUploadComponent implements OnDestroy {
             this.isUploading = false;
             this.uploadProgress = 100;
             this.fileUploaded.emit(event.file);
-            this.currentFileUrl = event.file.url;
+            this.currentFileUrl = this.getImageUrl(event.file.url);
           }
         },
         error: (error) => {
@@ -238,7 +239,7 @@ export class FileUploadComponent implements OnDestroy {
   }
 
   getDisplayUrl(): string | undefined | null {
-    return this.previewUrl || this.currentFileUrl;
+    return this.getImageUrl(this.previewUrl ?? this.currentFileUrl);
   }
 
   formatFileSize(bytes: number): string {
@@ -251,5 +252,20 @@ export class FileUploadComponent implements OnDestroy {
 
   getComponentId(): string {
     return this.componentId;
+  }
+
+  getImageUrl(url: string | null | undefined): string | undefined {
+    const isDev = !environment.production;
+
+    const fileUrl = url;
+
+    if (fileUrl) {
+      var r = new RegExp("^(?:[a-z+]+:)?//", "i");
+      const isURL = r.test(fileUrl);
+
+      return isURL
+        ? fileUrl
+        : `${isDev ? environment.apiUrl : window.location.origin}${fileUrl}`;
+    }
   }
 }
