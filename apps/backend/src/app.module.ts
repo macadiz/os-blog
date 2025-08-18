@@ -10,6 +10,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { TagsModule } from './tags/tags.module';
 import { SetupModule } from './setup/setup.module';
 import { FilesModule } from './files/files.module';
+import { RssModule } from './rss/rss.module';
 import { HttpsRedirectMiddleware } from './common/middleware/https-redirect.middleware';
 import { ProductionConfig } from './common/config/production.config';
 
@@ -26,6 +27,7 @@ import { ProductionConfig } from './common/config/production.config';
     TagsModule,
     SetupModule,
     FilesModule,
+    RssModule,
   ],
   controllers: [AppController],
   providers: [AppService],

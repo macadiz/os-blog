@@ -8,17 +8,32 @@ import {
   Delete,
   NotFoundException,
   Query,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsQueryDto } from './dto/posts-query.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RequireActiveUser } from '../auth/decorators/require-active-user.decorator';
+import { RssService } from './rss.service';
 
 @Controller()
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly rssService: RssService,
+  ) {}
+
+  // RSS Feed endpoint
+  @Get('feed.xml')
+  async getRssFeed(@Res() res: Response) {
+    const origin = res.req.headers.origin || res.req.headers.host;
+    const feed = await this.rssService.generateFeed(origin);
+    res.set('Content-Type', 'application/rss+xml');
+    res.send(feed);
+  }
 
   // Public endpoints
   @Get('posts/published')
