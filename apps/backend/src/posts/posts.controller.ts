@@ -17,7 +17,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsQueryDto } from './dto/posts-query.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RequireActiveUser } from '../auth/decorators/require-active-user.decorator';
-import { RssService } from './rss.service';
+import { RssService } from '../rss/rss.service';
 
 @Controller()
 export class PostsController {

@@ -16,7 +16,7 @@ export class RssService {
     // Get blog settings for feed metadata
     const settings = await this.setupService.getBlogSettings();
     let baseUrl: string;
-    
+
     const isProduction = this.configService.get('NODE_ENV') === 'production';
     if (isProduction && origin) {
       // In production, use the request's origin
@@ -49,7 +49,8 @@ export class RssService {
       include: {
         author: {
           select: {
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
@@ -76,14 +77,14 @@ export class RssService {
         content: post.content,
         author: [
           {
-            name: post.author?.name || 'Anonymous',
+            name: post.author
+              ? `${post.author.firstName} ${post.author.lastName}`
+              : 'Anonymous',
             email: post.author?.email || '',
           },
         ],
         date: post.publishedAt || post.createdAt,
-        category: post.category
-          ? [{ name: post.category.name }]
-          : undefined,
+        category: post.category ? [{ name: post.category.name }] : undefined,
       });
     });
 

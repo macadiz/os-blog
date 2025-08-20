@@ -11,6 +11,7 @@ export class RssController {
     const origin = res.req.headers.origin || res.req.headers.host;
     const feed = await this.rssService.generateFeed(origin);
     res.set('Content-Type', 'application/rss+xml');
+    res.set('Content-Disposition', 'inline');
     res.send(feed);
   }
 }

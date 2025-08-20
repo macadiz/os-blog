@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
 } from "../dropdown-menu-item/dropdown-menu-item.component";
 import { resolveFileUrl } from "../../../core/services/resolve-file-url.util";
+import { environment } from "../../../../environments/environment";
 
 @Component({
   selector: "app-header",
@@ -114,5 +115,13 @@ export class HeaderComponent implements OnInit {
     this.authService.logout();
     this.closeUserMenu();
     this.closeMobileMenu();
+  }
+
+  getRssFeedUrl(): string {
+    if (environment.production) {
+      return `${window.location.origin}${environment.apiUrl}/feed.xml`;
+    } else {
+      return `${environment.apiUrl}/feed.xml`;
+    }
   }
 }
