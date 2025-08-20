@@ -15,6 +15,10 @@ fi
 echo "✅ Docker is installed"
 echo ""
 
+echo "⚒️ Building docker image"
+echo ""
+docker build -t os-blog:latest .
+
 # Ask user for basic configuration
 echo "🔧 Configuration"
 echo "----------------"

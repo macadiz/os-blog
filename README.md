@@ -65,7 +65,33 @@ npm run dev
 
 ## Running with Docker
 
-### One-Step Setup (Recommended)
+## 🐳 Official Docker Image (Recommended)
+
+You can also run OS Blog using the official Docker image, which contains the pre-built frontend, backend, and all required dependencies.
+
+### Pull and Run from Docker Hub
+
+```bash
+docker pull macadiz/os-blog:latest
+docker run -d \
+  --name os-blog \
+  -p 8081:80 \
+  -p 5436:5432 \
+  -v openblog-database-data:/var/lib/postgresql/data \
+  -v openblog-static-files:/app/static \
+  --restart unless-stopped \
+  macadiz/os-blog:latest
+```
+
+- Access the blog at: http://localhost:8081
+
+> **Note:**
+> - The image includes both the frontend and backend, served via Nginx.
+> - You must provide a valid `.env` file with your database and JWT settings.
+> - Database and static files are persisted using Docker volumes.
+> - For first-time setup, visit `/setup` after starting the container.
+
+### One-Step Setup With local build
 
 ```bash
 ./setup.sh
@@ -76,21 +102,19 @@ npm run dev
 ### Manual Docker Build
 
 ```bash
-./build.sh
+docker build -t os-blog .
 docker run -d \
   --name os-blog \
   -p 8081:80 \
   -p 5436:5432 \
-  -v openblog-database-data:/var/lib/postgresql/14/main \
+  -v openblog-database-data:/var/lib/postgresql/data \
   -v openblog-static-files:/app/static \
   --env-file .env \
   --restart unless-stopped \
-  os-blog:latest
+  os-blog
 ```
 
 - Access the blog at: http://localhost:8081
-
----
 
 ## ℹ️ Additional Information
 
