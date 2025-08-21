@@ -114,7 +114,7 @@ if [[ $START_NOW =~ ^[Yy]$ ]]; then
                 --name os-blog \
                 -p $PORT:80 \
                 -p $POSTGRES_PORT:5432 \
-                -v os-blog-database-data:/var/lib/postgresql/14/main \
+                -v os-blog-database-data:/var/lib/postgresql/data \
                 -v os-blog-static-files:/app/static \
                 $DOCKER_ENV_VARS \
                 --restart unless-stopped \
@@ -123,7 +123,7 @@ if [[ $START_NOW =~ ^[Yy]$ ]]; then
             docker run -d \
                 --name os-blog \
                 -p $PORT:80 \
-                -v os-blog-database-data:/var/lib/postgresql/14/main \
+                -v os-blog-database-data:/var/lib/postgresql/data \
                 -v os-blog-static-files:/app/static \
                 $DOCKER_ENV_VARS \
                 --restart unless-stopped \
