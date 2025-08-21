@@ -91,13 +91,26 @@ docker run -d \
 > - Database and static files are persisted using Docker volumes.
 > - For first-time setup, visit `/setup` after starting the container.
 
-### One-Step Setup With local build
+---
+
+## Running local docker image
+
+
+### One-Step Setup (Windows)
+
+```powershell
+./setup.ps1
+```
+
+- This PowerShell script builds the Docker image, interactively configures environment variables, and starts the app on Windows.
+
+### One-Step Setup (Linux/macOS)
 
 ```bash
 ./setup.sh
 ```
 
-- This script builds the Docker image, sets up environment variables, and starts the app.
+- This shell script builds the Docker image, sets up environment variables, and starts the app on Linux/macOS.
 
 ### Manual Docker Build
 
@@ -115,6 +128,8 @@ docker run -d \
 ```
 
 - Access the blog at: http://localhost:8081
+
+---
 
 ## ℹ️ Additional Information
 
