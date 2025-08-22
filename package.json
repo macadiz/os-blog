@@ -1,6 +1,6 @@
 {
   "name": "os-blog",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A modern blogging platform with Angular frontend and NestJS backend",
   "private": true,
   "workspaces": [
