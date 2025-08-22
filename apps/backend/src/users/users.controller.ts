@@ -9,6 +9,7 @@ import {
   Query,
   HttpStatus,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -23,6 +24,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @Throttle({ medium: { limit: 10, ttl: 60000 } }) // 10 user creations per minute
   async create(@Body() createUserDto: CreateUserDto) {
     return {
       statusCode: HttpStatus.CREATED,
@@ -90,6 +92,7 @@ export class UsersController {
   }
 
   @Patch(':id/reset-password')
+  @Throttle({ medium: { limit: 3, ttl: 60000 } }) // 3 password resets per minute
   async resetPassword(@Param('id') id: string) {
     return {
       statusCode: HttpStatus.OK,
@@ -99,6 +102,7 @@ export class UsersController {
   }
 
   @Patch('change-password')
+  @Throttle({ medium: { limit: 5, ttl: 60000 } }) // 5 password changes per minute
   async changePassword(
     @Body() changePasswordDto: ChangePasswordDto,
     @CurrentUser() currentUser: any,

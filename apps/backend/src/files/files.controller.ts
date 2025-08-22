@@ -54,6 +54,8 @@ export class FilesController {
       throw new BadRequestException('No file provided');
     }
 
+    this.validateFilenameParam(filename);
+
     // Check if the file exists before replacing
     const exists = await this.filesService.fileExists(category, filename);
     if (!exists) {
@@ -72,6 +74,7 @@ export class FilesController {
     @Param('filename') filename: string,
     @Res() res: Response,
   ): Promise<void> {
+    this.validateFilenameParam(filename);
     const filePath = this.filesService.getFilePath(category, filename);
     const exists = await this.filesService.fileExists(category, filename);
 
@@ -99,6 +102,7 @@ export class FilesController {
     @Param('category', new ParseEnumPipe(FileCategory)) category: FileCategory,
     @Param('filename') filename: string,
   ): Promise<{ message: string }> {
+    this.validateFilenameParam(filename);
     const exists = await this.filesService.fileExists(category, filename);
     if (!exists) {
       throw new NotFoundException('File not found');
@@ -121,6 +125,7 @@ export class FilesController {
     url: string;
     exists: boolean;
   }> {
+    this.validateFilenameParam(filename);
     const exists = await this.filesService.fileExists(category, filename);
 
     return {
@@ -129,5 +134,43 @@ export class FilesController {
       url: this.filesService.getFileUrl(category, filename),
       exists,
     };
+  }
+
+  /**
+   * Validate filename parameter to prevent directory traversal attacks
+   */
+  private validateFilenameParam(filename: string): void {
+    if (!filename || typeof filename !== 'string') {
+      throw new BadRequestException('Invalid filename');
+    }
+
+    // Check for directory traversal sequences
+    const dangerousPatterns = [
+      '../',
+      '..\\',
+      '..%2f',
+      '..%5c', // Directory traversal
+      '%00',
+      '\0', // Null byte injection
+      '/',
+      '\\', // Path separators (shouldn't be in filename)
+    ];
+
+    const lowerFilename = filename.toLowerCase();
+    for (const pattern of dangerousPatterns) {
+      if (lowerFilename.includes(pattern.toLowerCase())) {
+        throw new BadRequestException('Invalid filename parameter');
+      }
+    }
+
+    // Additional security: ensure filename doesn't start with dots
+    if (filename.startsWith('.')) {
+      throw new BadRequestException('Invalid filename parameter');
+    }
+
+    // Ensure reasonable length
+    if (filename.length > 255) {
+      throw new BadRequestException('Filename parameter too long');
+    }
   }
 }

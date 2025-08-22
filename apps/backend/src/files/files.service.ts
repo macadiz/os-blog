@@ -183,6 +183,81 @@ export class FilesService {
         `Invalid file type. Allowed types: ${this.allowedMimeTypes.join(', ')}`,
       );
     }
+
+    // Validate filename for security
+    this.validateFilename(file.originalname);
+  }
+
+  /**
+   * Validate filename to prevent directory traversal and other security issues
+   */
+  private validateFilename(filename: string): void {
+    if (!filename || typeof filename !== 'string') {
+      throw new BadRequestException('Invalid filename');
+    }
+
+    // Check for directory traversal sequences
+    const dangerousPatterns = [
+      '../',
+      '..\\',
+      '..%2f',
+      '..%5c', // Directory traversal
+      '%00',
+      '\0', // Null byte injection
+      '/',
+      '\\', // Path separators
+      '<',
+      '>',
+      '"',
+      '|',
+      '?',
+      '*',
+      ':', // Invalid filename characters
+    ];
+
+    const lowerFilename = filename.toLowerCase();
+    for (const pattern of dangerousPatterns) {
+      if (lowerFilename.includes(pattern.toLowerCase())) {
+        throw new BadRequestException(
+          `Filename contains invalid characters: ${pattern}`,
+        );
+      }
+    }
+
+    // Check filename length
+    if (filename.length > 255) {
+      throw new BadRequestException('Filename too long (max 255 characters)');
+    }
+
+    // Check for reserved names (Windows)
+    const reservedNames = [
+      'CON',
+      'PRN',
+      'AUX',
+      'NUL',
+      'COM1',
+      'COM2',
+      'COM3',
+      'COM4',
+      'COM5',
+      'COM6',
+      'COM7',
+      'COM8',
+      'COM9',
+      'LPT1',
+      'LPT2',
+      'LPT3',
+      'LPT4',
+      'LPT5',
+      'LPT6',
+      'LPT7',
+      'LPT8',
+      'LPT9',
+    ];
+    const filenameWithoutExt = path.parse(filename).name.toUpperCase();
+    if (reservedNames.includes(filenameWithoutExt)) {
+      throw new BadRequestException('Filename uses reserved name');
+    }
   }
 
   /**

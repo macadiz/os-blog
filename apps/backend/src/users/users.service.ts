@@ -10,6 +10,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserQueryDto } from './dto/user-query.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -365,8 +366,8 @@ export class UsersService {
     // Verify user exists
     await this.findById(id);
 
-    // Generate a temporary password
-    const tempPassword = Math.random().toString(36).slice(-12);
+    // Generate a cryptographically secure temporary password
+    const tempPassword = this.generateSecurePassword(12);
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
     await this.prisma.user.update({
@@ -515,5 +516,37 @@ export class UsersService {
     });
 
     return user;
+  }
+
+  /**
+   * Generate a cryptographically secure password
+   */
+  private generateSecurePassword(length: number = 12): string {
+    // Define character sets for password generation
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const specialChars = '!@#$%^&*';
+
+    // Combine all character sets
+    const allChars = lowercase + uppercase + numbers + specialChars;
+
+    // Ensure password contains at least one character from each set
+    let password = '';
+    password += lowercase[crypto.randomInt(0, lowercase.length)];
+    password += uppercase[crypto.randomInt(0, uppercase.length)];
+    password += numbers[crypto.randomInt(0, numbers.length)];
+    password += specialChars[crypto.randomInt(0, specialChars.length)];
+
+    // Fill the rest of the password length with random characters
+    for (let i = 4; i < length; i++) {
+      password += allChars[crypto.randomInt(0, allChars.length)];
+    }
+
+    // Shuffle the password to avoid predictable patterns
+    return password
+      .split('')
+      .sort(() => crypto.randomInt(-1, 2))
+      .join('');
   }
 }
