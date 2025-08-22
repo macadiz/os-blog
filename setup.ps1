@@ -168,7 +168,7 @@ if ($START_NOW -match "^[Yy]$") {
         "run", "-d",
         "--name", "os-blog",
         "-p", "$PORT`:80",
-        "-v", "os-blog-database-data:/var/lib/postgresql/14/main",
+        "-v", "os-blog-database-data:/var/lib/postgresql/data",
         "-v", "os-blog-static-files:/app/static"
     )
     
