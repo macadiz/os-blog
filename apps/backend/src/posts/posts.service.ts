@@ -8,6 +8,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsQueryDto } from './dto/posts-query.dto';
 import { PaginatedResponse } from '../common/dto/pagination.dto';
+import { ContentUtil } from '../common/utils/content.util';
 
 @Injectable()
 export class PostsService {
@@ -53,6 +54,11 @@ export class PostsService {
     const baseSlug = this.generateSlug(createPostDto.title);
     const slug = await this.ensureUniqueSlug(baseSlug);
 
+    // Convert content to HTML
+    const htmlContent = createPostDto.content
+      ? await ContentUtil.convertToHtml(createPostDto.content)
+      : null;
+
     // Validate category if provided
     if (createPostDto.categoryId) {
       const category = await this.prisma.category.findUnique({
@@ -79,6 +85,7 @@ export class PostsService {
         ...postData,
         slug,
         authorId,
+        htmlContent,
         publishedAt: createPostDto.published ? new Date() : null,
       },
       include: {
@@ -445,6 +452,14 @@ export class PostsService {
       slug = await this.ensureUniqueSlug(baseSlug, id);
     }
 
+    // Convert content to HTML if content changed
+    let htmlContent = existingPost.htmlContent;
+    if (updatePostDto.content !== undefined) {
+      htmlContent = updatePostDto.content
+        ? await ContentUtil.convertToHtml(updatePostDto.content)
+        : null;
+    }
+
     // Validate category if provided
     if (updatePostDto.categoryId) {
       const category = await this.prisma.category.findUnique({
@@ -477,6 +492,7 @@ export class PostsService {
       data: {
         ...postData,
         slug,
+        htmlContent,
         publishedAt,
       },
       include: {
@@ -554,6 +570,7 @@ export class PostsService {
       title: post.title,
       slug: post.slug,
       content: post.content,
+      htmlContent: post.htmlContent,
       excerpt: post.excerpt,
       featuredImage: post.featuredImage,
       published: post.published,

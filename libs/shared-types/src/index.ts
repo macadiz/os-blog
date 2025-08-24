@@ -21,6 +21,7 @@ export interface Post {
   title: string;
   slug: string;
   content: string;
+  htmlContent?: string;
   excerpt?: string;
   featuredImage?: string;
   published: boolean;

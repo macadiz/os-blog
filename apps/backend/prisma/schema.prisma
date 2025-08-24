@@ -61,7 +61,8 @@ model Post {
     id            String    @id @default(cuid())
     title         String
     slug          String    @unique
-    content       String // Rich text content
+    content       String // Rich text content (markdown)
+    htmlContent   String? // HTML version of content for RSS and display
     excerpt       String? // Short description
     featuredImage String?   @map("featured_image") // Image URL
     published     Boolean   @default(false)

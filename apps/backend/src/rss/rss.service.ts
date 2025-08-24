@@ -3,6 +3,7 @@ import { Feed } from 'feed';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { SetupService } from '../setup/setup.service';
+import { ContentUtil } from '../common/utils/content.util';
 
 @Injectable()
 export class RssService {
@@ -69,12 +70,17 @@ export class RssService {
 
     // Add posts to feed
     posts.forEach((post) => {
+      // Use htmlContent if available, otherwise fallback to raw content converted to HTML
+      const content = post.htmlContent || post.content;
+      // Sanitize HTML content for RSS
+      const sanitizedContent = ContentUtil.sanitizeHtmlForRss(content);
+
       feed.addItem({
         title: post.title,
         id: `${baseUrl}/blog/${post.slug}`,
         link: `${baseUrl}/blog/${post.slug}`,
         description: post.excerpt || '',
-        content: post.content,
+        content: sanitizedContent,
         author: [
           {
             name: post.author
