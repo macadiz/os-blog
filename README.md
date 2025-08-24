@@ -48,6 +48,7 @@ Copy the example environment file and edit as needed:
 
 ```bash
 cp .env.example .env
+cp apps/backend/.env.example apps/backend/.env
 # Edit .env with your database and JWT settings
 ```
 
