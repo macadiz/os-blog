@@ -32,7 +32,7 @@ A modern, open-source blogging platform designed for creators, teams, and commun
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/macadiz/os-blog.git
 cd open-blog
 ```
 
