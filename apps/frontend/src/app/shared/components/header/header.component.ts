@@ -17,11 +17,17 @@ import {
 } from "../dropdown-menu-item/dropdown-menu-item.component";
 import { resolveFileUrl } from "../../../core/services/resolve-file-url.util";
 import { environment } from "../../../../environments/environment";
+import { MobileMenuDrawerComponent } from "./mobile-menu-drawer/mobile-menu-drawer.component";
 
 @Component({
   selector: "app-header",
   standalone: true,
-  imports: [CommonModule, RouterModule, DropdownMenuItemComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    DropdownMenuItemComponent,
+    MobileMenuDrawerComponent,
+  ],
   templateUrl: "./header.component.html",
   styleUrls: ["./header.component.css"],
 })

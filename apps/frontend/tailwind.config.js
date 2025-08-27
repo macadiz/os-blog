@@ -16,6 +16,7 @@ module.exports = {
           800: "#1e40af",
           900: "#1e3a8a",
         },
+        backdrop: "rgba(0, 0, 0, 0.3)",
       },
       fontFamily: {
         sans: [

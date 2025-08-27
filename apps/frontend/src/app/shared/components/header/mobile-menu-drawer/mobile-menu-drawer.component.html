@@ -1,0 +1,102 @@
+<button (click)="toggleOpen()">
+  <span class="material-symbols-outlined">menu</span>
+</button>
+
+<div
+  [ngClass]="{
+    hidden: !isOpen,
+  }"
+>
+  <div
+    class="absolute top-0 left-0 w-full h-full bg-backdrop z-20"
+    (click)="toggleOpen()"
+  ></div>
+  <aside
+    [ngClass]="{
+      'absolute top-0 left-0 bg-white z-20 w-3/4 h-full p-4': true,
+    }"
+  >
+    <div class="flex gap-2">
+      <div>
+        <img
+          *ngIf="logoUrl; else fallbackIcon"
+          [src]="logoUrl"
+          [alt]="blogTitle + ' logo'"
+          class="h-8 w-auto mr-2"
+          loading="lazy"
+        />
+        <ng-template #fallbackIcon>
+          <span class="material-symbols-outlined text-blue-600 text-3xl mr-2"
+            >article</span
+          >
+        </ng-template>
+      </div>
+      <span class="text-xl font-bold text-gray-900">
+        {{ blogTitle || "OS Blog" }}
+      </span>
+    </div>
+    <hr class="my-4 ml-[-16px] w-[calc(100%+32px)]" />
+    <div class="space-y-1">
+      <a
+        [routerLink]="['/blog']"
+        (click)="toggleOpen()"
+        routerLinkActive="bg-blue-50 text-blue-600"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+      >
+        Blog
+      </a>
+
+      <ng-container *ngIf="user">
+        <a
+          [routerLink]="['/admin']"
+          (click)="toggleOpen()"
+          routerLinkActive="bg-blue-50 text-blue-600"
+          class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+        >
+          {{ user.role === "ADMIN" ? "Admin Dashboard" : "Author Dashboard" }}
+        </a>
+        <a
+          [routerLink]="['/admin/profile']"
+          (click)="toggleOpen()"
+          routerLinkActive="bg-blue-50 text-blue-600"
+          class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+        >
+          My Profile
+        </a>
+        <a
+          [routerLink]="['/admin/posts']"
+          (click)="toggleOpen()"
+          routerLinkActive="bg-blue-50 text-blue-600"
+          class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+        >
+          My Posts
+        </a>
+        <a
+          [routerLink]="['/admin/posts/new']"
+          (click)="toggleOpen()"
+          routerLinkActive="bg-blue-50 text-blue-600"
+          class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+        >
+          New Post
+        </a>
+        <button
+          (click)="logout()"
+          class="block w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+        >
+          Logout
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="!user">
+        <a
+          [routerLink]="['/login']"
+          (click)="toggleOpen()"
+          class="block px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+        >
+          Login
+        </a>
+      </ng-container>
+    </div>
+  </aside>
+</div>
