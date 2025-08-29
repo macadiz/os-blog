@@ -7,6 +7,7 @@ import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
+import { resolveBaseUrl } from "../utils/url-resolver.util";
 
 // DTOs matching OpenAPI specification
 export interface LoginDto {
@@ -281,9 +282,11 @@ export interface ErrorResponse {
   providedIn: "root",
 })
 export class ApiService {
-  public readonly baseUrl = environment.apiUrl;
+  public baseUrl = "";
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.baseUrl = resolveBaseUrl();
+  }
 
   // Health check endpoint
   getHealth(): Observable<string> {
@@ -318,6 +321,7 @@ export class ApiService {
   }
 
   getBlogSettings(): Observable<BlogSettings> {
+    console.log("aadasdasdasdas");
     return this.http.get<BlogSettings>(`${this.baseUrl}/setup/blog-settings`);
   }
 

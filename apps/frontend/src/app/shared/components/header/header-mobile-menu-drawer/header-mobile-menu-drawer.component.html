@@ -19,9 +19,9 @@
     <div class="flex gap-2">
       <div>
         <img
-          *ngIf="logoUrl; else fallbackIcon"
-          [src]="logoUrl"
-          [alt]="blogTitle + ' logo'"
+          *ngIf="blogSettings?.logoUrl; else fallbackIcon"
+          [src]="getLogoSrc(blogSettings?.logoUrl)"
+          [alt]="blogSettings?.blogTitle + ' logo'"
           class="h-8 w-auto mr-2"
           loading="lazy"
         />
@@ -32,7 +32,7 @@
         </ng-template>
       </div>
       <span class="text-xl font-bold text-gray-900">
-        {{ blogTitle || "OS Blog" }}
+        {{ blogSettings?.blogTitle || "OS Blog" }}
       </span>
     </div>
     <hr class="my-4 ml-[-16px] w-[calc(100%+32px)]" />
@@ -79,22 +79,6 @@
           class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
         >
           New Post
-        </a>
-        <button
-          (click)="logout()"
-          class="block w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-        >
-          Logout
-        </button>
-      </ng-container>
-
-      <ng-container *ngIf="!user">
-        <a
-          [routerLink]="['/login']"
-          (click)="toggleOpen()"
-          class="block px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-        >
-          Login
         </a>
       </ng-container>
     </div>

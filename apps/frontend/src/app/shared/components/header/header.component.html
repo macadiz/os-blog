@@ -1,17 +1,13 @@
 <header class="bg-white shadow-sm border-b border-gray-200">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-3 md:flex md:justify-between items-center h-16">
-      <ng-container *ngIf="blogSettings$ | async as settings">
-        <ng-container *ngIf="currentUser$ | async as user">
-          <app-mobile-menu-drawer
-            class="block md:hidden"
-            [blogTitle]="settings.blogTitle"
-            [logoUrl]="getLogoSrc(settings.logoUrl)"
-            [user]="user"
-            (logoutAction)="logout()"
-          ></app-mobile-menu-drawer>
-        </ng-container>
-      </ng-container>
+      <app-header-mobile-menu-drawer
+        class="block md:hidden"
+        [blogSettings]="blogSettings$ | async"
+        [user]="currentUser$ | async"
+        (logoutAction)="logout()"
+      ></app-header-mobile-menu-drawer>
+
       <!-- Logo/Brand -->
       <div class="flex items-center justify-center md:justify-start">
         <a [routerLink]="['/blog']" class="flex items-center">

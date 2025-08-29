@@ -14,6 +14,7 @@ import {
   UploadProgressEvent,
 } from "../../../core/services/file-upload.service";
 import { environment } from "../../../../environments/environment";
+import { resolveBaseUrl } from "../../../core/utils/url-resolver.util";
 // Define the types locally instead of importing
 export enum FileCategory {
   SETTINGS = "settings",
@@ -255,17 +256,15 @@ export class FileUploadComponent implements OnDestroy {
   }
 
   getImageUrl(url: string | null | undefined): string | undefined {
-    const isDev = !environment.production;
-
     const fileUrl = url;
 
     if (fileUrl) {
       var r = new RegExp("^(?:[a-z+]+:)?//", "i");
       const isURL = r.test(fileUrl);
 
-      return isURL
-        ? fileUrl
-        : `${isDev ? environment.apiUrl : window.location.origin}${fileUrl}`;
+      const apiUrl = resolveBaseUrl();
+
+      return isURL ? fileUrl : `${apiUrl}${fileUrl}`;
     }
   }
 }

@@ -1,4 +1,5 @@
 import { environment } from "../../../environments/environment";
+import { resolveBaseUrl } from "./url-resolver.util";
 
 /**
  * Utility functions for handling image URLs in different environments
@@ -36,7 +37,7 @@ export class ImageUrlUtil {
       }
     } else {
       // Development: use BASE_URL env var or fallback to http://localhost:3001
-      const baseUrl = environment.apiUrl || "http://localhost:3001";
+      const baseUrl = resolveBaseUrl();
       const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
       return `${baseUrl}${cleanPath}`;
     }

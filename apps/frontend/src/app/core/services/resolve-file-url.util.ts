@@ -1,5 +1,6 @@
 // Utility to resolve file/image URLs (relative or absolute) for the frontend
 import { environment } from "../../../environments/environment";
+import { resolveBaseUrl } from "../utils/url-resolver.util";
 
 /**
  * Resolves a file or image URL to an absolute URL if needed.
@@ -11,7 +12,7 @@ export function resolveFileUrl(url?: string | null): string | undefined {
   if (!url) return undefined;
   if (/^https?:\/\//.test(url)) return url;
   if (url.startsWith("/")) {
-    let baseUrl = environment.apiUrl;
+    let baseUrl = resolveBaseUrl();
 
     // If baseUrl is relative (like "/api"), prepend current origin
     if (baseUrl.startsWith("/")) {

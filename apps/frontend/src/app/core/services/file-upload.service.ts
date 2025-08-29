@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
+import { resolveBaseUrl } from "../utils/url-resolver.util";
 // Define the types locally instead of importing
 export enum FileCategory {
   SETTINGS = "settings",
@@ -40,7 +41,7 @@ export interface UploadProgressEvent {
   providedIn: "root",
 })
 export class FileUploadService {
-  private readonly baseUrl = environment.apiUrl;
+  private readonly baseUrl = resolveBaseUrl();
 
   constructor(private http: HttpClient) {}
 
