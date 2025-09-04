@@ -60,8 +60,6 @@ npm run dev
 
 - Frontend: http://localhost:4200
 - Backend/API: http://localhost:3000
-- API Docs: http://localhost:3000/api
-
 ---
 
 ## Running with Docker
@@ -81,7 +79,7 @@ docker run -d \
   -v openblog-database-data:/var/lib/postgresql/data \
   -v openblog-static-files:/app/static \
   --restart unless-stopped \
-  macadiz/os-blog:latest
+  mjacadiz/os-blog:latest
 ```
 
 - Access the blog at: http://localhost:8081
