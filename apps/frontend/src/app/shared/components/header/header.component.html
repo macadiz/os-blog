@@ -1,8 +1,15 @@
 <header class="bg-white shadow-sm border-b border-gray-200">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center h-16">
+    <div class="grid grid-cols-3 md:flex md:justify-between items-center h-16">
+      <app-header-mobile-menu-drawer
+        class="block md:hidden"
+        [blogSettings]="blogSettings$ | async"
+        [user]="currentUser$ | async"
+        (logoutAction)="logout()"
+      ></app-header-mobile-menu-drawer>
+
       <!-- Logo/Brand -->
-      <div class="flex items-center">
+      <div class="flex items-center justify-center md:justify-start">
         <a [routerLink]="['/blog']" class="flex items-center">
           <!-- Dynamic Logo or Fallback Icon -->
           <ng-container *ngIf="blogSettings$ | async as settings">
@@ -21,7 +28,7 @@
             </ng-template>
           </ng-container>
 
-          <span class="text-xl font-bold text-gray-900">
+          <span class="text-xl font-bold text-gray-900 hidden md:block">
             {{ (blogSettings$ | async)?.blogTitle || "OS Blog" }}
           </span>
         </a>
@@ -80,7 +87,7 @@
       </nav>
 
       <!-- User Menu -->
-      <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-4 justify-end">
         <ng-container *ngIf="currentUser$ | async as user; else loginLink">
           <!-- User Dropdown -->
           <div class="relative" [class.show]="showUserMenu">
@@ -91,7 +98,7 @@
               <span class="material-symbols-outlined text-gray-600"
                 >person</span
               >
-              <span class="ml-2 text-gray-700 font-medium">
+              <span class="ml-2 hidden md:block text-gray-700 font-medium">
                 {{
                   user.firstName && user.lastName
                     ? user.firstName + " " + user.lastName
@@ -149,83 +156,6 @@
             Login
           </a>
         </ng-template>
-
-        <!-- Mobile menu button -->
-        <button
-          (click)="toggleMobileMenu()"
-          class="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-        >
-          <span class="material-symbols-outlined">menu</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div
-      *ngIf="showMobileMenu"
-      class="md:hidden border-t border-gray-200 pt-4 pb-3"
-    >
-      <div class="space-y-1">
-        <a
-          [routerLink]="['/blog']"
-          (click)="closeMobileMenu()"
-          routerLinkActive="bg-blue-50 text-blue-600"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
-        >
-          Blog
-        </a>
-
-        <ng-container *ngIf="currentUser$ | async as user">
-          <a
-            [routerLink]="['/admin']"
-            (click)="closeMobileMenu()"
-            routerLinkActive="bg-blue-50 text-blue-600"
-            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
-          >
-            {{ user.role === "ADMIN" ? "Admin Dashboard" : "Author Dashboard" }}
-          </a>
-          <a
-            [routerLink]="['/admin/profile']"
-            (click)="closeMobileMenu()"
-            routerLinkActive="bg-blue-50 text-blue-600"
-            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
-          >
-            My Profile
-          </a>
-          <a
-            [routerLink]="['/admin/posts']"
-            (click)="closeMobileMenu()"
-            routerLinkActive="bg-blue-50 text-blue-600"
-            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
-          >
-            My Posts
-          </a>
-          <a
-            [routerLink]="['/admin/posts/new']"
-            (click)="closeMobileMenu()"
-            routerLinkActive="bg-blue-50 text-blue-600"
-            class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
-          >
-            New Post
-          </a>
-          <button
-            (click)="logout()"
-            class="block w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-          >
-            Logout
-          </button>
-        </ng-container>
-
-        <ng-container *ngIf="!(currentUser$ | async)">
-          <a
-            [routerLink]="['/login']"
-            (click)="closeMobileMenu()"
-            class="block px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-          >
-            Login
-          </a>
-        </ng-container>
       </div>
     </div>
   </div>

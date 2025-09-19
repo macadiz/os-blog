@@ -5,6 +5,7 @@ import { Router } from "@angular/router";
 import { catchError, tap, map } from "rxjs/operators";
 import { environment } from "../../../environments/environment";
 import { STORAGE_KEYS } from "../../shared/constants";
+import { resolveBaseUrl } from "../utils/url-resolver.util";
 
 export interface User {
   id: string;
@@ -32,7 +33,7 @@ export interface LoginResponse {
   providedIn: "root",
 })
 export class AuthService {
-  private baseUrl = environment.apiUrl;
+  private baseUrl = resolveBaseUrl();
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   private isInitialized = false;

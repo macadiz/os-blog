@@ -16,19 +16,22 @@ import {
   DropdownMenuItem,
 } from "../dropdown-menu-item/dropdown-menu-item.component";
 import { resolveFileUrl } from "../../../core/services/resolve-file-url.util";
-import { environment } from "../../../../environments/environment";
+import { HeaderMobileMenuDrawerComponent } from "./header-mobile-menu-drawer/header-mobile-menu-drawer.component";
+import { resolveBaseUrl } from "../../../core/utils/url-resolver.util";
 
 @Component({
   selector: "app-header",
   standalone: true,
-  imports: [CommonModule, RouterModule, DropdownMenuItemComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    DropdownMenuItemComponent,
+    HeaderMobileMenuDrawerComponent,
+  ],
   templateUrl: "./header.component.html",
   styleUrls: ["./header.component.css"],
 })
 export class HeaderComponent implements OnInit {
-  getLogoSrc(logoUrl: string | undefined | null): string | undefined {
-    return resolveFileUrl(logoUrl);
-  }
   blogSettings$: Observable<BlogSettings | null>;
   currentUser$: Observable<AuthUser | null>;
   showUserMenu = false;
@@ -118,10 +121,12 @@ export class HeaderComponent implements OnInit {
   }
 
   getRssFeedUrl(): string {
-    if (environment.production) {
-      return `${window.location.origin}${environment.apiUrl}/feed.xml`;
-    } else {
-      return `${environment.apiUrl}/feed.xml`;
-    }
+    const apiUrl = resolveBaseUrl();
+
+    return `${apiUrl}/feed.xml`;
+  }
+
+  getLogoSrc(logoUrl: string | undefined | null): string | undefined {
+    return resolveFileUrl(logoUrl);
   }
 }

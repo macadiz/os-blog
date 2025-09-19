@@ -2,6 +2,7 @@ import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { environment } from "../../../environments/environment";
+import { resolveBaseUrl } from "../utils/url-resolver.util";
 
 export interface Tag {
   id: string;
@@ -26,7 +27,7 @@ export interface UpdateTagDto {
 })
 export class TagsService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/tags`;
+  private readonly apiUrl = `${resolveBaseUrl()}/tags`;
 
   getAllTags(): Observable<Tag[]> {
     return this.http.get<Tag[]>(this.apiUrl);

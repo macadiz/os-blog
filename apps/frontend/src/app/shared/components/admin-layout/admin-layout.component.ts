@@ -80,11 +80,17 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Add admin layout class to body for proper scrolling
+    document
+      .getElementsByTagName("html")[0]
+      .classList.add("admin-layout-active");
     document.body.classList.add("admin-layout-active");
   }
 
   ngOnDestroy() {
     // Remove admin layout class when component is destroyed
+    document
+      .getElementsByTagName("html")[0]
+      .classList.remove("admin-layout-active");
     document.body.classList.remove("admin-layout-active");
   }
 

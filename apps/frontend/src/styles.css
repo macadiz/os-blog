@@ -126,6 +126,6 @@
 }
 
 /* Admin Layout Scrolling Fix */
-body.admin-layout-active {
+.admin-layout-active {
   overflow: hidden;
 }
