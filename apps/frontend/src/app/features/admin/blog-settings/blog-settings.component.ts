@@ -15,6 +15,7 @@ import {
 } from "../../../core/services/api.service";
 import { TitleService } from "../../../core/services/title.service";
 import { FileUploadService } from "../../../core/services/file-upload.service";
+import { ThemeService, ThemeConfig } from "../../../core/services/theme.service";
 import {
   FileUploadComponent,
   FileUploadConfig,
@@ -46,6 +47,7 @@ export class BlogSettingsComponent implements OnInit {
   message = "";
   error = "";
   currentSettings?: BlogSettings;
+  availableThemes: ThemeConfig[] = [];
   private logoExplicitlyRemoved = false;
   private faviconExplicitlyRemoved = false;
   private originalLogoUrl?: string;
@@ -74,6 +76,7 @@ export class BlogSettingsComponent implements OnInit {
     private apiService: ApiService,
     private titleService: TitleService,
     private fileUploadService: FileUploadService,
+    private themeService: ThemeService,
     private viewportScroller: ViewportScroller,
     private router: Router
   ) {
@@ -87,6 +90,7 @@ export class BlogSettingsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.availableThemes = this.themeService.getAllThemes();
     this.loadSettings();
   }
 
@@ -229,6 +233,11 @@ export class BlogSettingsComponent implements OnInit {
           // Refresh the title service to update titles across the app
           this.titleService.refreshBlogSettings();
 
+          // Update theme if it changed
+          if (settingsDto.theme && settingsDto.theme !== this.themeService.getCurrentTheme()) {
+            this.themeService.setTheme(settingsDto.theme as any, false);
+          }
+
           // Scroll to top to show success message (target the main element)
           setTimeout(() => {
             this.scrollToTop();
@@ -333,5 +342,20 @@ export class BlogSettingsComponent implements OnInit {
       }
     }
     return "";
+  }
+
+  // Handle theme preview
+  onThemeChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const selectedTheme = target.value;
+
+    if (this.themeService.isValidTheme(selectedTheme)) {
+      this.themeService.setTheme(selectedTheme as any, false);
+    }
+  }
+
+  // Get current theme for UI feedback
+  getCurrentTheme(): string {
+    return this.themeService.getCurrentTheme();
   }
 }

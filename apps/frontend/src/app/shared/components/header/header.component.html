@@ -1,4 +1,4 @@
-<header class="bg-white shadow-sm border-b border-gray-200">
+<header class="themed-surface shadow-sm themed-border border-b">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-3 md:flex md:justify-between items-center h-16">
       <app-header-mobile-menu-drawer
@@ -22,13 +22,13 @@
             />
             <ng-template #fallbackIcon>
               <span
-                class="material-symbols-outlined text-blue-600 text-3xl mr-2"
+                class="material-symbols-outlined themed-accent text-3xl mr-2"
                 >article</span
               >
             </ng-template>
           </ng-container>
 
-          <span class="text-xl font-bold text-gray-900 hidden md:block">
+          <span class="text-xl font-bold themed-text hidden md:block">
             {{ (blogSettings$ | async)?.blogTitle || "OS Blog" }}
           </span>
         </a>
@@ -38,9 +38,9 @@
       <nav class="hidden md:flex items-center space-x-8">
         <a
           [routerLink]="['/blog']"
-          routerLinkActive="text-blue-600 border-blue-600"
+          routerLinkActive="themed-accent border-theme-accent"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
+          class="themed-text-secondary hover:text-theme-accent px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
         >
           Blog
         </a>
@@ -48,7 +48,7 @@
           [href]="getRssFeedUrl()"
           target="_blank"
           rel="noopener"
-          class="text-gray-600 hover:text-orange-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors flex items-center"
+          class="themed-text-secondary hover:text-orange-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors flex items-center"
         >
           <span class="material-symbols-outlined text-orange-500 mr-1"
             >rss_feed</span
@@ -60,26 +60,26 @@
         <ng-container *ngIf="currentUser$ | async as user">
           <a
             [routerLink]="['/admin']"
-            routerLinkActive="text-blue-600 border-blue-600"
-            class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
+            routerLinkActive="themed-accent border-theme-accent"
+            class="themed-text-secondary hover:text-theme-accent px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
           >
             {{ user.role === "ADMIN" ? "Admin Dashboard" : "Author Dashboard" }}
           </a>
 
           <a
             [routerLink]="['/admin/posts']"
-            routerLinkActive="text-blue-600 border-blue-600"
+            routerLinkActive="themed-accent border-theme-accent"
             [routerLinkActiveOptions]="{ exact: true }"
-            class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
+            class="themed-text-secondary hover:text-theme-accent px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
           >
             My Posts
           </a>
 
           <a
             [routerLink]="['/admin/posts/new']"
-            routerLinkActive="text-blue-600 border-blue-600"
+            routerLinkActive="themed-accent border-theme-accent"
             [routerLinkActiveOptions]="{ exact: true }"
-            class="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
+            class="themed-text-secondary hover:text-theme-accent px-3 py-2 text-sm font-medium border-b-2 border-transparent transition-colors"
           >
             New Post
           </a>
@@ -93,19 +93,19 @@
           <div class="relative" [class.show]="showUserMenu">
             <button
               (click)="toggleUserMenu()"
-              class="flex items-center text-sm rounded-full bg-gray-100 hover:bg-gray-200 transition-colors p-2"
+              class="flex items-center text-sm rounded-full themed-surface hover:bg-theme-border transition-colors p-2"
             >
-              <span class="material-symbols-outlined text-gray-600"
+              <span class="material-symbols-outlined themed-text-secondary"
                 >person</span
               >
-              <span class="ml-2 hidden md:block text-gray-700 font-medium">
+              <span class="ml-2 hidden md:block themed-text font-medium">
                 {{
                   user.firstName && user.lastName
                     ? user.firstName + " " + user.lastName
                     : user.username
                 }}
               </span>
-              <span class="material-symbols-outlined ml-2 text-gray-400"
+              <span class="material-symbols-outlined ml-2 themed-text-secondary"
                 >expand_more</span
               >
             </button>
@@ -113,11 +113,11 @@
             <!-- Dropdown Menu -->
             <div
               *ngIf="showUserMenu"
-              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50"
+              class="absolute right-0 mt-2 w-48 themed-surface rounded-md shadow-theme themed-border border z-50"
             >
               <div class="py-1">
                 <div
-                  class="px-4 py-2 text-sm text-gray-500 border-b border-gray-100"
+                  class="px-4 py-2 text-sm themed-text-secondary themed-border border-b"
                 >
                   {{ user.role === "ADMIN" ? "Administrator" : "Author" }}
                 </div>
@@ -126,7 +126,7 @@
                 <ng-container *ngFor="let menuItem of dropdownMenuItems">
                   <div
                     *ngIf="menuItem.label === 'Logout'"
-                    class="border-t border-gray-100 mt-1 pt-1"
+                    class="themed-border border-t mt-1 pt-1"
                   >
                     <app-dropdown-menu-item
                       [item]="menuItem"
@@ -150,7 +150,7 @@
         <ng-template #loginLink>
           <a
             [routerLink]="['/login']"
-            class="inline-flex items-center px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors"
+            class="inline-flex items-center px-4 py-2 border border-theme-accent themed-accent rounded-md hover:bg-theme-accent hover:text-white transition-colors"
           >
             <span class="material-symbols-outlined mr-2 text-lg">login</span>
             Login

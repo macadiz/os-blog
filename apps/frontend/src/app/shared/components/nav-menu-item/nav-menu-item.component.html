@@ -1,8 +1,8 @@
 <a
   [routerLink]="item.routerLink"
-  routerLinkActive="bg-blue-100 text-blue-700 border-blue-300"
+  routerLinkActive="bg-theme-accent/10 themed-accent border-theme-accent"
   [routerLinkActiveOptions]="{ exact: item.exact ?? true }"
-  class="flex items-center justify-center md:justify-normal w-8 h-8 md:w-auto md:h-auto md:px-3 md:py-2 md:gap-3 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors md:border-l-4 border-transparent"
+  class="flex items-center justify-center md:justify-normal w-8 h-8 md:w-auto md:h-auto md:px-3 md:py-2 md:gap-3 text-sm font-medium themed-text rounded-md hover:bg-theme-border transition-colors md:border-l-4 border-transparent"
 >
   <span class="material-symbols-outlined text-lg">
     {{ item.icon }}

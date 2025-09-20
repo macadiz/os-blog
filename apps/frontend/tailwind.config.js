@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{html,ts}"],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -17,6 +18,14 @@ module.exports = {
           900: "#1e3a8a",
         },
         backdrop: "rgba(0, 0, 0, 0.3)",
+        // Theme-specific colors
+        'theme-bg': 'var(--theme-bg)',
+        'theme-surface': 'var(--theme-surface)',
+        'theme-text': 'var(--theme-text)',
+        'theme-text-secondary': 'var(--theme-text-secondary)',
+        'theme-border': 'var(--theme-border)',
+        'theme-accent': 'var(--theme-accent)',
+        'theme-accent-hover': 'var(--theme-accent-hover)',
       },
       fontFamily: {
         sans: [
@@ -32,6 +41,10 @@ module.exports = {
           "Noto Sans",
           "sans-serif",
         ],
+      },
+      boxShadow: {
+        'theme': 'var(--theme-card-shadow)',
+        'theme-hover': 'var(--theme-card-shadow-hover)',
       },
     },
   },

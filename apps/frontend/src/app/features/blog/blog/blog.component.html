@@ -2,17 +2,17 @@
 <app-blog-unavailable *ngIf="isBlogUnavailable"></app-blog-unavailable>
 
 <!-- Show normal blog content if settings loaded successfully -->
-<div *ngIf="!isBlogUnavailable" class="min-h-screen bg-gray-50">
+<div *ngIf="!isBlogUnavailable" class="min-h-screen themed-bg">
   <!-- Mobile Hero Section (visible only on mobile) -->
-  <section class="lg:hidden bg-white border-b border-gray-200">
+  <section class="lg:hidden themed-surface themed-border border-b">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
       <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
+        <h1 class="text-3xl font-bold themed-text mb-4 tracking-tight">
           {{ (blogSettings$ | async)?.blogTitle || "OS Blog" }}
         </h1>
         <p
           *ngIf="(blogSettings$ | async)?.blogDescription"
-          class="text-lg text-gray-600 leading-relaxed"
+          class="text-lg themed-text-secondary leading-relaxed"
         >
           {{ (blogSettings$ | async)?.blogDescription ?? "" }}
         </p>
@@ -28,24 +28,24 @@
         <div class="sticky top-8 space-y-6">
           <!-- Desktop Blog Header (visible only on desktop) -->
           <div
-            class="hidden lg:block bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            class="hidden lg:block themed-surface rounded-xl shadow-theme themed-border border p-6"
           >
-            <h1 class="text-2xl font-bold text-gray-900 mb-3 tracking-tight">
+            <h1 class="text-2xl font-bold themed-text mb-3 tracking-tight">
               {{ (blogSettings$ | async)?.blogTitle || "OS Blog" }}
             </h1>
             <p
               *ngIf="(blogSettings$ | async)?.blogDescription"
-              class="text-sm text-gray-600 leading-relaxed"
+              class="text-sm themed-text-secondary leading-relaxed"
             >
               {{ (blogSettings$ | async)?.blogDescription ?? "" }}
             </p>
           </div>
           <!-- Search Card -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div class="themed-surface rounded-xl shadow-theme themed-border border p-6">
             <h3
-              class="text-lg font-semibold text-gray-900 mb-4 flex items-center"
+              class="text-lg font-semibold themed-text mb-4 flex items-center"
             >
-              <span class="material-symbols-outlined mr-2 text-blue-600"
+              <span class="material-symbols-outlined mr-2 themed-accent"
                 >search</span
               >
               Search Posts
@@ -56,10 +56,10 @@
                 [(ngModel)]="searchQuery"
                 (input)="onSearchChange()"
                 placeholder="Search articles..."
-                class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-gray-50 focus:bg-white"
+                class="w-full px-4 py-3 pl-12 themed-border rounded-lg focus:ring-2 focus:ring-theme-accent focus:border-transparent outline-none transition-all themed-bg focus:themed-surface"
               />
               <span
-                class="absolute left-4 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 text-lg"
+                class="absolute left-4 top-1/2 transform -translate-y-1/2 material-symbols-outlined themed-text-secondary text-lg"
               >
                 search
               </span>
@@ -68,13 +68,13 @@
 
           <!-- Categories Card -->
           <div
-            class="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            class="themed-surface rounded-xl shadow-theme themed-border border p-6"
             *ngIf="categories.length > 0"
           >
             <h3
-              class="text-lg font-semibold text-gray-900 mb-4 flex items-center"
+              class="text-lg font-semibold themed-text mb-4 flex items-center"
             >
-              <span class="material-symbols-outlined mr-2 text-green-600"
+              <span class="material-symbols-outlined mr-2 themed-accent"
                 >folder</span
               >
               Categories
@@ -84,12 +84,12 @@
                 (click)="selectedCategorySlug = ''; onCategoryChange()"
                 [class]="
                   selectedCategorySlug === ''
-                    ? 'w-full text-left px-4 py-3 rounded-lg bg-green-50 text-green-800 border border-green-200 font-medium transition-all'
-                    : 'w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 border border-transparent transition-all'
+                    ? 'w-full text-left px-4 py-3 rounded-lg bg-theme-accent/10 themed-accent themed-border border font-medium transition-all'
+                    : 'w-full text-left px-4 py-3 rounded-lg themed-text hover:bg-theme-border themed-border border-transparent transition-all'
                 "
               >
                 All Categories
-                <span class="float-right text-sm text-gray-500">{{
+                <span class="float-right text-sm themed-text-secondary">{{
                   posts.length
                 }}</span>
               </button>
@@ -100,12 +100,12 @@
                 "
                 [class]="
                   selectedCategorySlug === category.slug
-                    ? 'w-full text-left px-4 py-3 rounded-lg bg-green-50 text-green-800 border border-green-200 font-medium transition-all'
-                    : 'w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 border border-transparent transition-all'
+                    ? 'w-full text-left px-4 py-3 rounded-lg bg-theme-accent/10 themed-accent themed-border border font-medium transition-all'
+                    : 'w-full text-left px-4 py-3 rounded-lg themed-text hover:bg-theme-border themed-border border-transparent transition-all'
                 "
               >
                 {{ category.name }}
-                <span class="float-right text-sm text-gray-500">
+                <span class="float-right text-sm themed-text-secondary">
                   {{ getPostsCountByCategory(category.slug) }}
                 </span>
               </button>
@@ -114,21 +114,21 @@
 
           <!-- Tags Card -->
           <div
-            class="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            class="themed-surface rounded-xl shadow-theme themed-border border p-6"
             *ngIf="tags.length > 0"
           >
             <h3
-              class="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between"
+              class="text-lg font-semibold themed-text mb-4 flex items-center justify-between"
             >
               <span class="flex items-center">
-                <span class="material-symbols-outlined mr-2 text-blue-600"
+                <span class="material-symbols-outlined mr-2 themed-accent"
                   >tag</span
                 >
                 Tags
               </span>
               <span
                 *ngIf="selectedTagSlugs.length > 0"
-                class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium"
+                class="text-sm bg-theme-accent/10 themed-accent px-2 py-1 rounded-full font-medium"
               >
                 {{ selectedTagSlugs.length }} selected
               </span>
@@ -140,8 +140,8 @@
                 [class]="
                   'inline-flex items-center px-3 py-2 rounded-full text-sm font-medium transition-all ' +
                   (isTagSelected(tag.slug)
-                    ? 'bg-blue-100 text-blue-800 border border-blue-300 shadow-sm'
-                    : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200')
+                    ? 'bg-theme-accent/10 themed-accent themed-border border shadow-sm'
+                    : 'bg-theme-border themed-text-secondary themed-border border hover:bg-theme-surface')
                 "
                 [title]="tag.postCount + ' posts'"
               >
@@ -155,11 +155,11 @@
 
           <!-- Active Filters -->
           <div
-            class="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            class="themed-surface rounded-xl shadow-theme themed-border border p-6"
             *ngIf="hasActiveFilters"
           >
             <h3
-              class="text-lg font-semibold text-gray-900 mb-4 flex items-center"
+              class="text-lg font-semibold themed-text mb-4 flex items-center"
             >
               <span class="material-symbols-outlined mr-2 text-purple-600"
                 >tune</span
@@ -225,10 +225,10 @@
         <!-- Results Header -->
         <div class="flex items-center justify-between mb-6">
           <div>
-            <h2 class="text-xl font-semibold text-gray-900">
+            <h2 class="text-xl font-semibold themed-text">
               {{ hasActiveFilters ? "Search Results" : "Latest Posts" }}
             </h2>
-            <p class="text-gray-600 text-sm mt-1">
+            <p class="themed-text-secondary text-sm mt-1">
               <span *ngIf="hasActiveFilters">
                 {{ filteredPostsCount }} posts found
                 <span *ngIf="currentPostsCount < filteredPostsCount">
@@ -252,9 +252,9 @@
         <!-- Loading State -->
         <div *ngIf="isLoading" class="text-center py-16">
           <div
-            class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"
+            class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-theme-accent mb-4"
           ></div>
-          <div class="text-gray-600 text-lg">Loading articles...</div>
+          <div class="themed-text-secondary text-lg">Loading articles...</div>
         </div>
 
         <!-- Empty States -->
@@ -264,19 +264,19 @@
         >
           <div class="max-w-md mx-auto">
             <span
-              class="material-symbols-outlined text-6xl text-gray-300 mb-6 block"
+              class="material-symbols-outlined text-6xl themed-text-secondary mb-6 block"
               >search_off</span
             >
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            <h3 class="text-xl font-semibold themed-text mb-2">
               No articles found
             </h3>
-            <p class="text-gray-600 mb-6">
+            <p class="themed-text-secondary mb-6">
               Try adjusting your search criteria or clear the filters to see all
               posts.
             </p>
             <button
               (click)="clearFilters()"
-              class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              class="inline-flex items-center px-6 py-3 themed-accent-bg text-white rounded-lg hover:bg-theme-accent-hover transition-colors font-medium"
             >
               <span class="material-symbols-outlined mr-2">clear</span>
               Clear All Filters
@@ -290,13 +290,13 @@
         >
           <div class="max-w-md mx-auto">
             <span
-              class="material-symbols-outlined text-6xl text-gray-300 mb-6 block"
+              class="material-symbols-outlined text-6xl themed-text-secondary mb-6 block"
               >article</span
             >
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            <h3 class="text-xl font-semibold themed-text mb-2">
               No articles yet
             </h3>
-            <p class="text-gray-600">Check back later for new content!</p>
+            <p class="themed-text-secondary">Check back later for new content!</p>
           </div>
         </div>
 
@@ -304,7 +304,7 @@
         <div *ngIf="posts.length > 0 && !isLoading" class="space-y-8">
           <article
             *ngFor="let post of posts; trackBy: trackByPostId"
-            class="post-card bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group"
+            class="post-card themed-surface rounded-2xl shadow-theme themed-border border overflow-hidden hover:shadow-theme-hover transition-all duration-300 group themed-hover-lift"
           >
             <div class="post-card-layout lg:flex">
               <!-- Featured Image -->
@@ -324,7 +324,7 @@
                   <ng-template #placeholder>
                     <div class="image-placeholder">
                       <span
-                        class="material-symbols-outlined text-5xl text-gray-400"
+                        class="material-symbols-outlined text-5xl themed-text-secondary"
                         >image</span
                       >
                     </div>
@@ -341,7 +341,7 @@
                     <h2 class="mb-3">
                       <a
                         [routerLink]="['/blog', post.slug]"
-                        class="text-2xl lg:text-3xl font-bold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 group-hover:text-blue-600"
+                        class="text-2xl lg:text-3xl font-bold themed-text hover:text-theme-accent transition-colors line-clamp-2 group-hover:text-theme-accent"
                         >{{ post.title }}</a
                       >
                     </h2>
@@ -361,7 +361,7 @@
 
                       <!-- Author and Date -->
                       <div
-                        class="flex items-center text-sm text-gray-500 space-x-4"
+                        class="flex items-center text-sm themed-text-secondary space-x-4"
                       >
                         <span class="flex items-center">
                           <span class="material-symbols-outlined mr-1 text-base"
@@ -389,7 +389,7 @@
 
                     <!-- Excerpt -->
                     <div
-                      class="text-gray-600 leading-relaxed mb-4"
+                      class="themed-text-secondary leading-relaxed mb-4"
                       *ngIf="post.excerpt"
                     >
                       <p class="line-clamp-3 text-lg">{{ post.excerpt }}</p>
@@ -420,7 +420,7 @@
                   <!-- Read More -->
                   <a
                     [routerLink]="['/blog', post.slug]"
-                    class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors group-hover:translate-x-1 transform duration-200"
+                    class="inline-flex items-center themed-accent hover:text-theme-accent-hover font-semibold transition-colors group-hover:translate-x-1 transform duration-200"
                   >
                     Read Article
                     <span class="material-symbols-outlined ml-2 text-lg"
@@ -441,7 +441,7 @@
           <button
             (click)="loadMorePosts()"
             [disabled]="isLoadingMore"
-            class="inline-flex items-center px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200"
+            class="inline-flex items-center px-8 py-4 themed-accent-bg text-white rounded-xl hover:bg-theme-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200"
           >
             <span *ngIf="!isLoadingMore" class="material-symbols-outlined mr-2"
               >expand_more</span
@@ -461,7 +461,7 @@
           "
           class="text-center mt-12 py-8"
         >
-          <p class="text-gray-500 text-lg">
+          <p class="themed-text-secondary text-lg">
             🎉 You've reached the end! You've seen all
             {{ pagination?.total || posts.length }} articles.
           </p>

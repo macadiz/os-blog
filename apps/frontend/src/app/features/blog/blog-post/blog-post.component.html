@@ -1,25 +1,25 @@
-<div class="max-w-4xl mx-auto p-8">
+<div class="max-w-4xl mx-auto p-8 themed-bg min-h-screen">
   <!-- Loading state -->
   <div *ngIf="isLoading" class="text-center py-12">
     <div
-      class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"
+      class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-theme-accent mb-4"
     ></div>
-    <div class="text-gray-600">Loading post...</div>
+    <div class="themed-text-secondary">Loading post...</div>
   </div>
 
   <!-- Error state -->
   <div *ngIf="errorMessage" class="text-center py-12">
     <div class="mb-4">
       <span
-        class="material-symbols-outlined w-16 h-16 mx-auto text-gray-400 mb-4 text-6xl block"
+        class="material-symbols-outlined w-16 h-16 mx-auto themed-text-secondary mb-4 text-6xl block"
         >error</span
       >
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Post Not Found</h2>
-      <p class="text-gray-600 mb-6">{{ errorMessage }}</p>
+      <h2 class="text-2xl font-bold themed-text mb-2">Post Not Found</h2>
+      <p class="themed-text-secondary mb-6">{{ errorMessage }}</p>
     </div>
     <button
       (click)="goBack()"
-      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+      class="inline-flex items-center px-4 py-2 themed-accent-bg text-white rounded hover:bg-theme-accent-hover transition-colors"
     >
       <span class="material-symbols-outlined mr-2 text-lg">arrow_back</span>
       Back to Blog
@@ -29,7 +29,7 @@
   <!-- Post content -->
   <article
     *ngIf="post && !isLoading"
-    class="bg-white rounded-lg shadow-md overflow-hidden"
+    class="themed-surface rounded-xl shadow-theme themed-border border overflow-hidden"
   >
     <!-- Featured Image -->
     <div *ngIf="post.featuredImage" class="w-full">
@@ -43,15 +43,15 @@
 
     <div class="p-8">
       <!-- Breadcrumb -->
-      <nav class="flex mb-6 text-sm text-gray-500">
+      <nav class="flex mb-6 text-sm themed-text-secondary">
         <a
           [routerLink]="['/blog']"
-          class="hover:text-blue-600 transition-colors"
+          class="hover:text-theme-accent transition-colors"
         >
           Blog
         </a>
         <span class="mx-2">/</span>
-        <span class="text-gray-900 truncate max-w-xs md:max-w-md">{{
+        <span class="themed-text truncate max-w-xs md:max-w-md">{{
           post.title
         }}</span>
       </nav>
@@ -60,7 +60,7 @@
       <div class="mb-6">
         <button
           (click)="goBack()"
-          class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+          class="inline-flex items-center themed-accent hover:text-theme-accent-hover transition-colors"
         >
           <span class="material-symbols-outlined mr-2 text-lg">arrow_back</span>
           Back to Blog
@@ -68,13 +68,13 @@
       </div>
 
       <!-- Title -->
-      <h1 class="text-4xl font-bold text-gray-900 mb-6">
+      <h1 class="text-4xl font-bold themed-text mb-6">
         {{ post.title }}
       </h1>
 
       <!-- Meta information -->
       <div
-        class="flex flex-wrap gap-4 mb-6 text-sm text-gray-600 border-b border-gray-200 pb-6"
+        class="flex flex-wrap gap-4 mb-6 text-sm themed-text-secondary themed-border border-b pb-6"
       >
         <span class="flex items-center">
           <span class="material-symbols-outlined mr-1 text-lg">person</span>
@@ -98,11 +98,11 @@
         <!-- Category -->
         <div *ngIf="post.category" class="flex items-center">
           <span
-            class="text-sm text-gray-500 mr-3 uppercase font-medium tracking-wider min-w-0"
+            class="text-sm themed-text-secondary mr-3 uppercase font-medium tracking-wider min-w-0"
             >Category:</span
           >
           <span
-            class="inline-flex items-center px-4 py-2 rounded-lg text-sm bg-green-100 text-green-800 border border-green-200 font-medium"
+            class="inline-flex items-center px-4 py-2 rounded-lg text-sm bg-theme-accent/10 themed-accent themed-border border font-medium"
           >
             <span class="material-symbols-outlined mr-2 text-base">folder</span>
             {{ post.category.name }}
@@ -112,13 +112,13 @@
         <!-- Tags -->
         <div *ngIf="post.tags.length > 0" class="flex items-start">
           <span
-            class="text-sm text-gray-500 mr-3 uppercase font-medium tracking-wider min-w-0 mt-1"
+            class="text-sm themed-text-secondary mr-3 uppercase font-medium tracking-wider min-w-0 mt-1"
             >Tags:</span
           >
           <div class="flex flex-wrap gap-2 flex-1">
             <span
               *ngFor="let tag of post.tags"
-              class="inline-flex items-center px-3 py-1 rounded-lg text-sm bg-blue-100 text-blue-800 border border-blue-200"
+              class="inline-flex items-center px-3 py-1 rounded-lg text-sm bg-theme-accent/10 themed-accent themed-border border"
             >
               <span class="material-symbols-outlined mr-1 text-sm">tag</span>
               {{ tag.name }}
