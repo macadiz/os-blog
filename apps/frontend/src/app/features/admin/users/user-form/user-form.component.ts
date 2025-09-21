@@ -13,11 +13,12 @@ import {
   UpdateUserDto,
   User,
 } from "../../../../core/services/api.service";
+import { CardComponent, InputComponent, ButtonComponent } from "../../../../shared/ui";
 
 @Component({
   selector: "app-user-form",
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, CardComponent, InputComponent, ButtonComponent],
   templateUrl: "./user-form.component.html",
   styleUrls: ["./user-form.component.css"],
 })

@@ -8,11 +8,12 @@ import {
   StatCardComponent,
   StatCard,
 } from "../../../shared/components/stat-card/stat-card.component";
+import { CardComponent } from "../../../shared/ui/card.component";
 
 @Component({
   selector: "app-admin-dashboard",
   standalone: true,
-  imports: [CommonModule, RouterModule, StatCardComponent],
+  imports: [CommonModule, RouterModule, StatCardComponent, CardComponent],
   templateUrl: "./admin-dashboard.component.html",
   styleUrls: ["./admin-dashboard.component.css"],
 })

@@ -101,12 +101,10 @@
             class="text-sm themed-text-secondary mr-3 uppercase font-medium tracking-wider min-w-0"
             >Category:</span
           >
-          <span
-            class="inline-flex items-center px-4 py-2 rounded-lg text-sm bg-theme-accent/10 themed-accent themed-border border font-medium"
-          >
-            <span class="material-symbols-outlined mr-2 text-base">folder</span>
-            {{ post.category.name }}
-          </span>
+          <app-category-display
+            [category]="post.category"
+            size="md"
+          ></app-category-display>
         </div>
 
         <!-- Tags -->
@@ -116,13 +114,11 @@
             >Tags:</span
           >
           <div class="flex flex-wrap gap-2 flex-1">
-            <span
+            <app-tag-display
               *ngFor="let tag of post.tags"
-              class="inline-flex items-center px-3 py-1 rounded-lg text-sm bg-theme-accent/10 themed-accent themed-border border"
-            >
-              <span class="material-symbols-outlined mr-1 text-sm">tag</span>
-              {{ tag.name }}
-            </span>
+              [tag]="tag"
+              size="sm"
+            ></app-tag-display>
           </div>
         </div>
       </div>

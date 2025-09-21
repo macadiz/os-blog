@@ -9,11 +9,12 @@ import {
 import { Router } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
 import { ApiService } from "../../../core/services/api.service";
+import { CardComponent, InputComponent, ButtonComponent } from "../../../shared/ui";
 
 @Component({
   selector: "app-change-password",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, CardComponent, InputComponent, ButtonComponent],
   templateUrl: "./change-password.component.html",
   styleUrls: ["./change-password.component.css"],
 })

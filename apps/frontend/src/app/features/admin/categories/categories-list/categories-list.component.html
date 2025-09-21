@@ -1,55 +1,62 @@
 <div class="max-w-7xl mx-auto p-6">
-  <div class="bg-white rounded-lg shadow-md">
+  <ui-card variant="tight" size="lg">
     <!-- Header -->
-    <div class="border-b border-gray-200 px-6 py-4">
-      <div class="flex justify-between items-center">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
-          <p class="text-gray-600">Manage your blog categories</p>
+    <div class="themed-border border-b px-6 py-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="flex flex-col md:flex-row items-center gap-4">
+          <h1 class="text-2xl font-bold themed-text">Categories</h1>
+          <div class="flex items-center gap-2" *ngIf="categories$ | async as categories">
+            <span class="text-sm themed-text-secondary">Showing:</span>
+            <span class="text-sm font-medium themed-accent">{{ categories.length }}</span>
+            <span class="text-sm themed-text-secondary">categories</span>
+          </div>
         </div>
-        <app-create-button
-          [routerLink]="['/admin/categories/new']"
-          text="New Category"
-        />
+        <div class="flex items-center gap-3">
+          <app-create-button
+            [routerLink]="['/admin/categories/new']"
+            text="New Category"
+          />
+        </div>
       </div>
     </div>
 
     <!-- Categories List -->
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+      <table class="min-w-full themed-border border-separate border-spacing-0">
+        <thead class="themed-surface">
           <tr>
             <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
             >
               Name
             </th>
             <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
             >
               Description
             </th>
             <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
             >
               Color
             </th>
             <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
             >
               Created
             </th>
             <th
-              class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              class="px-6 py-3 text-right text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
             >
               Actions
             </th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="themed-surface">
           <tr
-            *ngFor="let category of categories$ | async"
-            class="hover:bg-gray-50"
+            *ngFor="let category of categories$ | async; let isOdd = odd"
+            class="themed-border border-b transition-colors duration-200"
+            [class.themed-surface-alt]="isOdd"
           >
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
@@ -59,17 +66,17 @@
                   [style.background-color]="category.color"
                 ></div>
                 <div>
-                  <div class="text-sm font-medium text-gray-900">
+                  <div class="text-sm font-medium themed-text">
                     {{ category.name }}
                   </div>
-                  <div class="text-sm text-gray-500">
+                  <div class="text-sm themed-text-secondary">
                     {{ category.slug }}
                   </div>
                 </div>
               </div>
             </td>
             <td class="px-6 py-4">
-              <div class="text-sm text-gray-900 max-w-xs truncate">
+              <div class="text-sm themed-text max-w-xs truncate">
                 {{ category.description || "-" }}
               </div>
             </td>
@@ -81,9 +88,9 @@
               >
                 {{ category.color }}
               </span>
-              <span *ngIf="!category.color" class="text-gray-400">-</span>
+              <span *ngIf="!category.color" class="themed-text-tertiary">-</span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="px-6 py-4 whitespace-nowrap text-sm themed-text-secondary">
               {{ category.createdAt | date: "short" }}
             </td>
             <td
@@ -108,14 +115,14 @@
             </td>
           </tr>
           <tr *ngIf="(categories$ | async)?.length === 0">
-            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+            <td colspan="5" class="px-6 py-12 text-center themed-text-secondary">
               <div class="flex flex-col items-center">
                 <span
-                  class="material-symbols-outlined text-4xl mb-4 text-gray-300"
+                  class="material-symbols-outlined text-4xl mb-4 themed-text-tertiary"
                   >category</span
                 >
-                <p class="text-lg font-medium">No categories yet</p>
-                <p class="text-sm">
+                <h3 class="text-lg font-medium themed-text mb-2">No categories yet</h3>
+                <p class="text-sm themed-text-secondary">
                   Create your first category to organize your posts
                 </p>
               </div>
@@ -124,5 +131,5 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </ui-card>
 </div>

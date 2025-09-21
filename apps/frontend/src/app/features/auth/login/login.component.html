@@ -1,51 +1,54 @@
-<div class="min-h-screen flex justify-center items-center bg-gray-100">
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h1 class="text-center mb-8 text-gray-800">Login to OS Blog</h1>
+<div class="min-h-screen flex justify-center items-center themed-bg">
+  <ui-card variant="elevated" size="lg" class="w-full max-w-md">
+    <h1 class="text-center mb-8 text-2xl font-bold themed-text">Login to OS Blog</h1>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="username" class="form-label">Username or Email</label>
-        <input
-          type="text"
+        <label for="username" class="block text-sm font-medium themed-text mb-2">Username or Email</label>
+        <ui-input
           id="username"
           formControlName="username"
-          class="form-input"
-          [class]="
+          placeholder="Enter your username or email"
+          type="text"
+          [state]="
             loginForm.get('username')?.invalid &&
             loginForm.get('username')?.touched
-              ? 'form-input border-red-500'
-              : 'form-input'
+              ? 'error'
+              : 'default'
           "
-        />
+        ></ui-input>
       </div>
 
       <div class="form-group">
-        <label for="password" class="form-label">Password</label>
-        <input
-          type="password"
+        <label for="password" class="block text-sm font-medium themed-text mb-2">Password</label>
+        <ui-input
           id="password"
           formControlName="password"
-          class="form-input"
-          [class]="
+          placeholder="Enter your password"
+          type="password"
+          [state]="
             loginForm.get('password')?.invalid &&
             loginForm.get('password')?.touched
-              ? 'form-input border-red-500'
-              : 'form-input'
+              ? 'error'
+              : 'default'
           "
-        />
+        ></ui-input>
       </div>
 
-      <button
+      <ui-button
         type="submit"
         [disabled]="loginForm.invalid || isLoading"
-        class="w-full py-3 bg-blue-600 text-white border-none rounded text-base cursor-pointer mt-4 disabled:bg-gray-600 disabled:cursor-not-allowed hover:bg-blue-700"
+        variant="primary"
+        size="lg"
+        [loading]="isLoading"
+        class="w-full mt-4"
       >
         {{ isLoading ? "Signing in..." : "Sign In" }}
-      </button>
+      </ui-button>
 
       <div *ngIf="errorMessage" class="alert alert-danger mt-4">
         {{ errorMessage }}
       </div>
     </form>
-  </div>
+  </ui-card>
 </div>

@@ -1,13 +1,12 @@
 <div class="max-w-4xl mx-auto p-6">
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h1 class="text-2xl font-bold text-gray-900">Blog Settings</h1>
-      <p class="text-gray-600 mt-1">
+  <ui-card variant="default" size="lg" [header]="true">
+    <div slot="header">
+      <h1 class="text-2xl font-bold themed-text">Blog Settings</h1>
+      <p class="themed-text-secondary mt-1">
         Manage your blog's general settings and appearance
       </p>
     </div>
 
-    <div class="p-6">
       <!-- Loading state -->
       <div *ngIf="loading" class="text-center py-8">
         <div class="inline-flex items-center">
@@ -50,53 +49,29 @@
         class="space-y-6"
       >
         <!-- Blog Title -->
-        <div>
-          <label
-            for="blogTitle"
-            class="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Blog Title *
-          </label>
-          <input
-            type="text"
-            id="blogTitle"
-            formControlName="blogTitle"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-300]="hasError('blogTitle')"
-            placeholder="Enter your blog title"
-          />
-          <p *ngIf="hasError('blogTitle')" class="mt-1 text-sm text-red-600">
-            {{ getErrorMessage("blogTitle") }}
-          </p>
-        </div>
+        <ui-input
+          label="Blog Title"
+          type="text"
+          placeholder="Enter your blog title"
+          [required]="true"
+          [state]="hasError('blogTitle') ? 'error' : 'default'"
+          [errorMessage]="hasError('blogTitle') ? getErrorMessage('blogTitle') : ''"
+          formControlName="blogTitle"
+        ></ui-input>
 
         <!-- Blog Description -->
-        <div>
-          <label
-            for="blogDescription"
-            class="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Blog Description
-          </label>
-          <textarea
-            id="blogDescription"
-            formControlName="blogDescription"
-            rows="4"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            [class.border-red-300]="hasError('blogDescription')"
-            placeholder="Describe your blog..."
-          ></textarea>
-          <p
-            *ngIf="hasError('blogDescription')"
-            class="mt-1 text-sm text-red-600"
-          >
-            {{ getErrorMessage("blogDescription") }}
-          </p>
-        </div>
+        <ui-textarea
+          label="Blog Description"
+          placeholder="Describe your blog..."
+          [rows]="4"
+          [state]="hasError('blogDescription') ? 'error' : 'default'"
+          [errorMessage]="hasError('blogDescription') ? getErrorMessage('blogDescription') : ''"
+          formControlName="blogDescription"
+        ></ui-textarea>
 
         <!-- Logo Upload -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
+          <label class="block text-sm font-medium themed-text-label mb-2">
             Blog Logo
           </label>
           <app-file-upload
@@ -108,14 +83,14 @@
             (uploadError)="onUploadError($event)"
           >
           </app-file-upload>
-          <p class="mt-1 text-xs text-gray-500">
+          <p class="mt-1 text-xs themed-text-secondary">
             Recommended: 200x60px or similar ratio, max 2MB
           </p>
         </div>
 
         <!-- Favicon Upload -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
+          <label class="block text-sm font-medium themed-text-label mb-2">
             Favicon
           </label>
           <app-file-upload
@@ -127,57 +102,37 @@
             (uploadError)="onUploadError($event)"
           >
           </app-file-upload>
-          <p class="mt-1 text-xs text-gray-500">
+          <p class="mt-1 text-xs themed-text-secondary">
             Recommended: 32x32px or 16x16px, max 1MB
           </p>
         </div>
 
         <!-- Theme -->
-        <div>
-          <label
-            for="theme"
-            class="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Look & Feel
-          </label>
-          <select
-            id="theme"
+        <div class="space-y-2">
+          <ui-select
+            label="Look & Feel"
             formControlName="theme"
-            (change)="onThemeChange($event)"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option
-              *ngFor="let theme of availableThemes"
-              [value]="theme.name"
-              [selected]="theme.name === getCurrentTheme()"
-            >
-              {{ theme.displayName }} - {{ theme.description }}
-            </option>
-          </select>
-          <p class="mt-1 text-xs text-gray-500">
+            [options]="themeOptions"
+            (selectionChange)="onThemeChange($event)"
+          ></ui-select>
+          <p class="text-sm themed-text-secondary">
             Preview changes instantly by selecting a theme. Changes will be saved when you submit the form.
           </p>
         </div>
 
         <!-- Submit Button -->
-        <div class="flex justify-end pt-4 border-t border-gray-200">
-          <button
+        <div class="flex justify-end pt-4 themed-border border-t">
+          <ui-button
             type="submit"
+            variant="primary"
+            size="md"
             [disabled]="settingsForm.invalid || saving"
-            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            [loading]="saving"
+            [prefixIcon]="!saving ? 'save' : ''"
           >
-            <span
-              *ngIf="saving"
-              class="material-symbols-outlined animate-spin mr-2"
-              >refresh</span
-            >
-            <span class="material-symbols-outlined mr-2" *ngIf="!saving"
-              >save</span
-            >
             {{ saving ? "Saving..." : "Save Settings" }}
-          </button>
+          </ui-button>
         </div>
       </form>
-    </div>
-  </div>
+  </ui-card>
 </div>

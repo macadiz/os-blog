@@ -95,7 +95,7 @@
   }
 
   .card-header {
-    @apply px-5 py-3 mb-0 bg-gray-50 border-b border-gray-200;
+    @apply px-5 py-3 mb-0 themed-surface-alt themed-border border-b;
   }
 
   /* Alert Components */
@@ -202,6 +202,14 @@ body {
 
   .themed-text-secondary {
     @apply text-theme-text-secondary;
+  }
+
+  .themed-text-label {
+    @apply text-theme-text font-medium;
+  }
+
+  .themed-text-tertiary {
+    @apply text-theme-text-secondary opacity-60;
   }
 
   .themed-border {
@@ -587,4 +595,13 @@ body {
 
 .theme-dark .prose a:hover {
   color: var(--theme-accent-hover);
+}
+
+/* Themed surface alternating row color */
+.themed-surface-alt {
+  background-color: rgba(var(--theme-accent-rgb), 0.02);
+}
+
+.theme-dark .themed-surface-alt {
+  background-color: rgba(255, 255, 255, 0.02);
 }

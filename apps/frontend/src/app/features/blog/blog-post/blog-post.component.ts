@@ -9,6 +9,8 @@ import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { ApiService, BlogPost } from "../../../core/services/api.service";
 import { TitleService } from "../../../core/services/title.service";
 import { ImageUrlUtil } from "../../../core/utils/image-url.util";
+import { TagDisplayComponent } from "../../../shared/components/tag-display/tag-display.component";
+import { CategoryDisplayComponent } from "../../../shared/components/category-display/category-display.component";
 import { marked } from "marked";
 
 // Import Prism for syntax highlighting
@@ -17,7 +19,7 @@ declare var Prism: any;
 @Component({
   selector: "app-blog-post",
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TagDisplayComponent, CategoryDisplayComponent],
   templateUrl: "./blog-post.component.html",
   styleUrls: ["./blog-post.component.css"],
   encapsulation: ViewEncapsulation.None, // Disable view encapsulation

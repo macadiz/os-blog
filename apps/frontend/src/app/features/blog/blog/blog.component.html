@@ -24,12 +24,10 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="lg:grid lg:grid-cols-4 lg:gap-8">
       <!-- Sidebar with Filters -->
-      <aside class="lg:col-span-1 mb-8 lg:mb-0">
-        <div class="sticky top-8 space-y-6">
+      <aside class="hidden lg:block lg:col-span-1 mb-8 lg:mb-0">
+        <div class="sticky top-8 space-y-6 flex flex-col">
           <!-- Desktop Blog Header (visible only on desktop) -->
-          <div
-            class="hidden lg:block themed-surface rounded-xl shadow-theme themed-border border p-6"
-          >
+          <ui-card variant="default" size="md" class="hidden lg:block">
             <h1 class="text-2xl font-bold themed-text mb-3 tracking-tight">
               {{ (blogSettings$ | async)?.blogTitle || "OS Blog" }}
             </h1>
@@ -39,9 +37,9 @@
             >
               {{ (blogSettings$ | async)?.blogDescription ?? "" }}
             </p>
-          </div>
+          </ui-card>
           <!-- Search Card -->
-          <div class="themed-surface rounded-xl shadow-theme themed-border border p-6">
+          <ui-card variant="default" size="md">
             <h3
               class="text-lg font-semibold themed-text mb-4 flex items-center"
             >
@@ -51,26 +49,18 @@
               Search Posts
             </h3>
             <div class="relative">
-              <input
-                type="text"
+              <ui-input
                 [(ngModel)]="searchQuery"
                 (input)="onSearchChange()"
                 placeholder="Search articles..."
-                class="w-full px-4 py-3 pl-12 themed-border rounded-lg focus:ring-2 focus:ring-theme-accent focus:border-transparent outline-none transition-all themed-bg focus:themed-surface"
-              />
-              <span
-                class="absolute left-4 top-1/2 transform -translate-y-1/2 material-symbols-outlined themed-text-secondary text-lg"
-              >
-                search
-              </span>
+                type="search"
+                icon="search"
+              ></ui-input>
             </div>
-          </div>
+          </ui-card>
 
           <!-- Categories Card -->
-          <div
-            class="themed-surface rounded-xl shadow-theme themed-border border p-6"
-            *ngIf="categories.length > 0"
-          >
+          <ui-card variant="default" size="md" *ngIf="categories.length > 0">
             <h3
               class="text-lg font-semibold themed-text mb-4 flex items-center"
             >
@@ -110,13 +100,10 @@
                 </span>
               </button>
             </div>
-          </div>
+          </ui-card>
 
           <!-- Tags Card -->
-          <div
-            class="themed-surface rounded-xl shadow-theme themed-border border p-6"
-            *ngIf="tags.length > 0"
-          >
+          <ui-card variant="default" size="md" *ngIf="tags.length > 0">
             <h3
               class="text-lg font-semibold themed-text mb-4 flex items-center justify-between"
             >
@@ -151,13 +138,10 @@
                 >
               </button>
             </div>
-          </div>
+          </ui-card>
 
           <!-- Active Filters -->
-          <div
-            class="themed-surface rounded-xl shadow-theme themed-border border p-6"
-            *ngIf="hasActiveFilters"
-          >
+          <ui-card variant="default" size="md" *ngIf="hasActiveFilters">
             <h3
               class="text-lg font-semibold themed-text mb-4 flex items-center"
             >
@@ -210,18 +194,136 @@
                 </button>
               </div>
             </div>
-            <button
+            <ui-button
               (click)="clearFilters()"
-              class="w-full mt-4 px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
+              variant="danger"
+              size="sm"
+              class="w-full mt-4"
             >
               Clear All Filters
-            </button>
-          </div>
+            </ui-button>
+          </ui-card>
         </div>
       </aside>
 
       <!-- Main Content -->
       <section class="lg:col-span-3">
+        <!-- Mobile Filter Button -->
+        <div class="lg:hidden mb-6">
+          <ui-button
+            (click)="toggleFilters()"
+            variant="outline"
+            size="md"
+            class="w-full"
+            [prefixIcon]="'tune'"
+          >
+            {{ showFilters ? 'Hide Filters' : 'Show Filters' }}
+            <span *ngIf="hasActiveFilters" class="ml-2 bg-theme-accent/10 themed-accent px-2 py-1 rounded-full text-xs font-medium">
+              {{ (searchQuery.trim() ? 1 : 0) + (selectedCategorySlug ? 1 : 0) + selectedTagSlugs.length }}
+            </span>
+          </ui-button>
+        </div>
+
+        <!-- Mobile Filters Drawer -->
+        <div
+          *ngIf="showFilters"
+          class="lg:hidden mb-6 space-y-4 themed-surface rounded-lg themed-border border p-4"
+        >
+          <!-- Search -->
+          <div>
+            <h4 class="text-sm font-medium themed-text mb-2 flex items-center">
+              <span class="material-symbols-outlined mr-2 themed-accent text-sm">search</span>
+              Search
+            </h4>
+            <ui-input
+              [(ngModel)]="searchQuery"
+              (input)="onSearchChange()"
+              placeholder="Search articles..."
+              type="search"
+              icon="search"
+            ></ui-input>
+          </div>
+
+          <!-- Categories -->
+          <div *ngIf="categories.length > 0">
+            <h4 class="text-sm font-medium themed-text mb-2 flex items-center">
+              <span class="material-symbols-outlined mr-2 themed-accent text-sm">folder</span>
+              Categories
+            </h4>
+            <div class="space-y-1">
+              <button
+                (click)="selectedCategorySlug = ''; onCategoryChange()"
+                [class]="
+                  selectedCategorySlug === ''
+                    ? 'w-full text-left px-3 py-2 rounded-lg bg-theme-accent/10 themed-accent themed-border border text-sm font-medium transition-all'
+                    : 'w-full text-left px-3 py-2 rounded-lg themed-text hover:bg-theme-border themed-border border-transparent text-sm transition-all'
+                "
+              >
+                All Categories
+                <span class="float-right text-xs themed-text-secondary">{{ posts.length }}</span>
+              </button>
+              <button
+                *ngFor="let category of categories"
+                (click)="selectedCategorySlug = category.slug; onCategoryChange()"
+                [class]="
+                  selectedCategorySlug === category.slug
+                    ? 'w-full text-left px-3 py-2 rounded-lg bg-theme-accent/10 themed-accent themed-border border text-sm font-medium transition-all'
+                    : 'w-full text-left px-3 py-2 rounded-lg themed-text hover:bg-theme-border themed-border border-transparent text-sm transition-all'
+                "
+              >
+                {{ category.name }}
+                <span class="float-right text-xs themed-text-secondary">
+                  {{ getPostsCountByCategory(category.slug) }}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div *ngIf="tags.length > 0">
+            <h4 class="text-sm font-medium themed-text mb-2 flex items-center justify-between">
+              <span class="flex items-center">
+                <span class="material-symbols-outlined mr-2 themed-accent text-sm">tag</span>
+                Tags
+              </span>
+              <span
+                *ngIf="selectedTagSlugs.length > 0"
+                class="text-xs bg-theme-accent/10 themed-accent px-2 py-1 rounded-full font-medium"
+              >
+                {{ selectedTagSlugs.length }} selected
+              </span>
+            </h4>
+            <div class="flex flex-wrap gap-2">
+              <button
+                *ngFor="let tag of tags"
+                (click)="onTagToggle(tag.slug)"
+                [class]="
+                  'inline-flex items-center px-3 py-2 rounded-full text-sm font-medium transition-all ' +
+                  (isTagSelected(tag.slug)
+                    ? 'bg-theme-accent/10 themed-accent themed-border border shadow-sm'
+                    : 'bg-theme-border themed-text-secondary themed-border border hover:bg-theme-surface')
+                "
+                [title]="tag.postCount + ' posts'"
+              >
+                #{{ tag.name }}
+                <span class="ml-2 text-xs opacity-75">({{ tag.postCount }})</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Clear Filters -->
+          <div *ngIf="hasActiveFilters">
+            <ui-button
+              (click)="clearFilters(); showFilters = false"
+              variant="danger"
+              size="sm"
+              class="w-full"
+            >
+              Clear All Filters
+            </ui-button>
+          </div>
+        </div>
+
         <!-- Results Header -->
         <div class="flex items-center justify-between mb-6">
           <div>
@@ -274,13 +376,10 @@
               Try adjusting your search criteria or clear the filters to see all
               posts.
             </p>
-            <button
-              (click)="clearFilters()"
-              class="inline-flex items-center px-6 py-3 themed-accent-bg text-white rounded-lg hover:bg-theme-accent-hover transition-colors font-medium"
-            >
+            <ui-button (click)="clearFilters()" variant="primary" size="md">
               <span class="material-symbols-outlined mr-2">clear</span>
               Clear All Filters
-            </button>
+            </ui-button>
           </div>
         </div>
 
@@ -296,7 +395,9 @@
             <h3 class="text-xl font-semibold themed-text mb-2">
               No articles yet
             </h3>
-            <p class="themed-text-secondary">Check back later for new content!</p>
+            <p class="themed-text-secondary">
+              Check back later for new content!
+            </p>
           </div>
         </div>
 
@@ -349,14 +450,10 @@
                     <div class="flex items-center gap-4 mb-3">
                       <!-- Category -->
                       <div *ngIf="post.category" class="flex items-center">
-                        <span
-                          class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800 border border-green-200 font-medium"
-                        >
-                          <span class="material-symbols-outlined mr-1 text-sm"
-                            >folder</span
-                          >
-                          {{ post.category.name }}
-                        </span>
+                        <app-category-display
+                          [category]="post.category"
+                          size="sm"
+                        ></app-category-display>
                       </div>
 
                       <!-- Author and Date -->
@@ -403,15 +500,16 @@
                 >
                   <!-- Tags -->
                   <div class="flex flex-wrap gap-2">
-                    <span
+                    <app-tag-display
                       *ngFor="let tag of post.tags | slice: 0 : 3"
-                      class="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-50 text-blue-700 border border-blue-200"
-                    >
-                      #{{ tag.name }}
-                    </span>
+                      [tag]="tag"
+                      size="sm"
+                      [showHash]="true"
+                      [showIcon]="false"
+                    ></app-tag-display>
                     <span
                       *ngIf="post.tags.length > 3"
-                      class="inline-flex items-center px-2 py-1 rounded-md text-xs bg-gray-100 text-gray-600"
+                      class="inline-flex items-center px-2 py-1 rounded-lg text-xs themed-surface-alt themed-text-secondary themed-border border"
                     >
                       +{{ post.tags.length - 3 }} more
                     </span>
@@ -438,20 +536,19 @@
           *ngIf="hasMorePosts && !isLoading"
           class="flex justify-center mt-12"
         >
-          <button
+          <ui-button
             (click)="loadMorePosts()"
             [disabled]="isLoadingMore"
-            class="inline-flex items-center px-8 py-4 themed-accent-bg text-white rounded-xl hover:bg-theme-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200"
+            variant="primary"
+            size="lg"
+            [loading]="isLoadingMore"
+            class="shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200"
           >
             <span *ngIf="!isLoadingMore" class="material-symbols-outlined mr-2"
               >expand_more</span
             >
-            <div
-              *ngIf="isLoadingMore"
-              class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"
-            ></div>
             {{ isLoadingMore ? "Loading..." : "Load More Posts" }}
-          </button>
+          </ui-button>
         </div>
 
         <!-- End of Results Message -->

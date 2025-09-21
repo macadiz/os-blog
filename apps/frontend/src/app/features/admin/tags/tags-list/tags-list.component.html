@@ -1,15 +1,19 @@
 <div class="max-w-7xl mx-auto p-6">
-  <div class="bg-white rounded-lg shadow-md">
+  <ui-card variant="tight" size="lg">
     <!-- Header -->
-    <div class="border-b border-gray-200 px-6 py-4">
-      <div class="flex justify-between items-center">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">Tags</h1>
-          <p class="text-gray-600">
-            Manage your blog tags. Tags with 0 posts can be safely deleted.
-          </p>
+    <div class="themed-border border-b px-6 py-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="flex flex-col md:flex-row items-center gap-4">
+          <h1 class="text-2xl font-bold themed-text">Tags</h1>
+          <div class="flex items-center gap-2">
+            <span class="text-sm themed-text-secondary">Showing:</span>
+            <span class="text-sm font-medium themed-accent">{{ tags().length }}</span>
+            <span class="text-sm themed-text-secondary">tags</span>
+          </div>
         </div>
-        <app-create-button [routerLink]="['/admin/tags/new']" text="New Tag" />
+        <div class="flex items-center gap-3">
+          <app-create-button [routerLink]="['/admin/tags/new']" text="New Tag" />
+        </div>
       </div>
     </div>
 
@@ -34,46 +38,46 @@
     <!-- Tags List -->
     @if (!isLoading() && !error()) {
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table class="min-w-full themed-border border-separate border-spacing-0">
+          <thead class="themed-surface">
             <tr>
               <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
               >
                 Name
               </th>
               <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
               >
                 Posts
               </th>
               <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
               >
                 Created
               </th>
               <th
-                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-right text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
               >
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            @for (tag of tags(); track tag.id) {
-              <tr class="hover:bg-gray-50">
+          <tbody class="themed-surface">
+            @for (tag of tags(); track tag.id; let isOdd = $odd) {
+              <tr class="themed-border border-b transition-colors duration-200" [class.themed-surface-alt]="isOdd">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div>
-                    <div class="text-sm font-medium text-gray-900">
+                    <div class="text-sm font-medium themed-text">
                       {{ tag.name }}
                     </div>
-                    <div class="text-sm text-gray-500">
+                    <div class="text-sm themed-text-secondary">
                       {{ tag.slug }}
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">
+                  <div class="text-sm themed-text">
                     @if (tag._count) {
                       {{ tag._count.postTags }}
                       {{ tag._count.postTags === 1 ? "post" : "posts" }}
@@ -82,7 +86,7 @@
                     }
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td class="px-6 py-4 whitespace-nowrap text-sm themed-text-secondary">
                   {{ formatDate(tag.createdAt) }}
                 </td>
                 <td
@@ -111,16 +115,16 @@
             }
             @if (tags().length === 0) {
               <tr>
-                <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                <td colspan="4" class="px-6 py-12 text-center themed-text-secondary">
                   <div class="flex flex-col items-center">
                     <span
-                      class="material-symbols-outlined text-4xl mb-4 text-gray-300"
+                      class="material-symbols-outlined text-4xl mb-4 themed-text-tertiary"
                       >sell</span
                     >
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">
+                    <h3 class="text-lg font-medium themed-text mb-2">
                       No tags yet
                     </h3>
-                    <p class="text-sm mb-4">
+                    <p class="text-sm mb-4 themed-text-secondary">
                       Create your first tag to organize your posts
                     </p>
                     <app-create-button
@@ -135,5 +139,5 @@
         </table>
       </div>
     }
-  </div>
+  </ui-card>
 </div>

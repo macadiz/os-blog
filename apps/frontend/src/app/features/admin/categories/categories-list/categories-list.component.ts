@@ -4,11 +4,12 @@ import { RouterModule } from "@angular/router";
 import { ApiService, Category } from "../../../../core/services/api.service";
 import { Observable } from "rxjs";
 import { CreateButtonComponent } from "../../../../shared/components/create-button/create-button.component";
+import { CardComponent } from "../../../../shared/ui";
 
 @Component({
   selector: "app-categories-list",
   standalone: true,
-  imports: [CommonModule, RouterModule, CreateButtonComponent],
+  imports: [CommonModule, RouterModule, CreateButtonComponent, CardComponent],
   templateUrl: "./categories-list.component.html",
   styleUrls: ["./categories-list.component.css"],
 })

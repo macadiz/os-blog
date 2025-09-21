@@ -2,7 +2,7 @@
   <!-- Current File Display -->
   <div *ngIf="currentFileUrl && !previewUrl" class="current-file mb-4">
     <div
-      class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
+      class="flex items-center justify-between p-3 themed-surface-alt rounded-lg themed-border"
     >
       <div class="flex flex-col items-center space-x-3 text-center">
         <img
@@ -13,10 +13,10 @@
         />
         <div>
           <div class="flex-1">
-            <p class="text-sm font-medium text-gray-900 text-center">
+            <p class="text-sm font-medium themed-text text-center">
               Current file
             </p>
-            <p class="text-xs text-gray-500 text-center">
+            <p class="text-xs themed-text-secondary text-center">
               Click remove to delete
             </p>
           </div>
@@ -57,7 +57,7 @@
     />
 
     <!-- Upload Content -->
-    <div class="upload-content p-6 text-center">
+    <div class="upload-content p-6 text-center border-2 border-dashed themed-border rounded-lg transition-all duration-200 hover:border-blue-500 hover:themed-surface-alt">
       <!-- Preview -->
       <div
         *ngIf="previewUrl && config.showPreview"
@@ -74,7 +74,7 @@
       <!-- Upload Icon -->
       <div *ngIf="!previewUrl" class="upload-icon mb-4">
         <span
-          class="material-symbols-outlined mx-auto text-gray-400 text-5xl block"
+          class="material-symbols-outlined mx-auto themed-text-secondary text-5xl block"
         >
           upload
         </span>
@@ -82,17 +82,17 @@
 
       <!-- Upload Text -->
       <div class="upload-text">
-        <p class="text-sm text-gray-600 mb-1">
+        <p class="text-sm themed-text-secondary mb-1">
           <span *ngIf="!isUploading">
             {{
               config.placeholder || "Click to select a file or drag and drop"
             }}
           </span>
-          <span *ngIf="isUploading" class="text-blue-600">
+          <span *ngIf="isUploading" class="themed-accent">
             Uploading your file...
           </span>
         </p>
-        <p class="text-xs text-gray-500">
+        <p class="text-xs themed-text-secondary">
           {{ config.accept || "Images only" }} up to
           {{ formatFileSize(config.maxSize || 5242880) }}
         </p>
@@ -100,13 +100,13 @@
 
       <!-- Progress Bar -->
       <div *ngIf="isUploading" class="progress-container mt-4">
-        <div class="progress-bar bg-gray-200 rounded-full h-2">
+        <div class="progress-bar themed-surface-alt rounded-full h-2">
           <div
-            class="progress-fill bg-blue-600 h-2 rounded-full transition-all duration-300"
+            class="progress-fill themed-accent h-2 rounded-full transition-all duration-300"
             [style.width.%]="uploadProgress"
           ></div>
         </div>
-        <p class="text-xs text-gray-500 mt-1">
+        <p class="text-xs themed-text-secondary mt-1">
           Uploading... {{ uploadProgress }}%
         </p>
       </div>
@@ -120,7 +120,7 @@
 
   <!-- File Info -->
   <div *ngIf="selectedFile" class="file-info mt-2">
-    <p class="text-xs text-gray-500">
+    <p class="text-xs themed-text-secondary">
       {{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})
     </p>
   </div>

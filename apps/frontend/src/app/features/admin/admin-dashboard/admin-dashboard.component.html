@@ -1,6 +1,6 @@
 <div class="space-y-6">
   <!-- Welcome Section -->
-  <div class="themed-surface shadow-theme rounded-lg p-6">
+  <ui-card variant="default" size="md">
     <div class="flex items-center">
       <div class="flex-shrink-0">
         <div
@@ -29,7 +29,7 @@
         </dl>
       </div>
     </div>
-  </div>
+  </ui-card>
 
   <!-- Quick Stats -->
   <!-- Loading State -->
@@ -64,14 +64,16 @@
   </div>
 
   <!-- Quick Actions -->
-  <div class="themed-surface shadow-theme rounded-lg">
-    <div class="px-4 py-5 sm:p-6">
-      <h3 class="text-lg leading-6 font-medium themed-text">Quick Actions</h3>
+  <div class="mt-8">
+    <ui-card variant="default" size="md">
+      <div slot="header">
+        <h3 class="text-lg leading-6 font-medium themed-text">Quick Actions</h3>
+      </div>
       <div class="mt-5">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <a
             [routerLink]="['/admin/posts/new']"
-            class="relative block w-full border-2 themed-border border-dashed rounded-lg p-12 text-center hover:border-theme-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-theme-accent transition-colors"
+            class="relative block w-full border-2 themed-border border-dashed rounded-lg p-12 text-center hover:border-theme-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-200 transition-colors"
           >
             <span
               class="material-symbols-outlined mx-auto h-12 w-12 themed-text-secondary text-5xl"
@@ -84,7 +86,7 @@
 
           <a
             [routerLink]="['/blog']"
-            class="relative block w-full border-2 themed-border border-dashed rounded-lg p-12 text-center hover:border-theme-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-theme-accent transition-colors"
+            class="relative block w-full border-2 themed-border border-dashed rounded-lg p-12 text-center hover:border-theme-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-200 transition-colors"
           >
             <span
               class="material-symbols-outlined mx-auto h-12 w-12 themed-text-secondary text-5xl"
@@ -96,6 +98,6 @@
           </a>
         </div>
       </div>
-    </div>
+    </ui-card>
   </div>
 </div>
