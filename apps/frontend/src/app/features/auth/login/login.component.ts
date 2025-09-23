@@ -9,11 +9,12 @@ import {
 import { Router } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
 import { Subscription } from "rxjs";
+import { CardComponent, InputComponent, ButtonComponent } from "../../../shared/ui";
 
 @Component({
   selector: "app-login",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, CardComponent, InputComponent, ButtonComponent],
   templateUrl: "./login.component.html",
   styles: [],
 })

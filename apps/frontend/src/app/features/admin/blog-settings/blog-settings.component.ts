@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   ReactiveFormsModule,
+  FormsModule,
   FormBuilder,
   FormGroup,
   Validators,
@@ -15,6 +16,7 @@ import {
 } from "../../../core/services/api.service";
 import { TitleService } from "../../../core/services/title.service";
 import { FileUploadService } from "../../../core/services/file-upload.service";
+import { ThemeService, ThemeConfig } from "../../../core/services/theme.service";
 import {
   FileUploadComponent,
   FileUploadConfig,
@@ -24,11 +26,12 @@ import {
   FileUploadResponse,
 } from "../../../shared/components/file-upload/file-upload.component";
 import { resolveFileUrl } from "../../../core/services/resolve-file-url.util";
+import { CardComponent, InputComponent, TextareaComponent, ButtonComponent, SelectComponent } from "../../../shared/ui";
 
 @Component({
   selector: "app-blog-settings",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FileUploadComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, FileUploadComponent, CardComponent, InputComponent, TextareaComponent, ButtonComponent, SelectComponent],
   templateUrl: "./blog-settings.component.html",
   styleUrls: ["./blog-settings.component.css"],
 })
@@ -46,6 +49,8 @@ export class BlogSettingsComponent implements OnInit {
   message = "";
   error = "";
   currentSettings?: BlogSettings;
+  availableThemes: ThemeConfig[] = [];
+  themeOptions: { value: string; label: string }[] = [];
   private logoExplicitlyRemoved = false;
   private faviconExplicitlyRemoved = false;
   private originalLogoUrl?: string;
@@ -74,6 +79,7 @@ export class BlogSettingsComponent implements OnInit {
     private apiService: ApiService,
     private titleService: TitleService,
     private fileUploadService: FileUploadService,
+    private themeService: ThemeService,
     private viewportScroller: ViewportScroller,
     private router: Router
   ) {
@@ -87,6 +93,13 @@ export class BlogSettingsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.availableThemes = this.themeService.getAllThemes();
+    this.themeOptions = this.availableThemes.map(theme => ({
+      value: theme.name,
+      label: `${theme.displayName} - ${theme.description}`
+    }));
+
+
     this.loadSettings();
   }
 
@@ -106,8 +119,9 @@ export class BlogSettingsComponent implements OnInit {
           blogDescription: settings.blogDescription || "",
           logoUrl: settings.logoUrl || "",
           faviconUrl: (settings as any).faviconUrl || "",
-          theme: (settings as any).theme || "default",
+          theme: (settings as any).theme || this.themeService.getCurrentTheme() || "default",
         });
+
         this.loading = false;
       },
       error: () => {
@@ -229,6 +243,11 @@ export class BlogSettingsComponent implements OnInit {
           // Refresh the title service to update titles across the app
           this.titleService.refreshBlogSettings();
 
+          // Update theme if it changed
+          if (settingsDto.theme && settingsDto.theme !== this.themeService.getCurrentTheme()) {
+            this.themeService.setTheme(settingsDto.theme as any, false);
+          }
+
           // Scroll to top to show success message (target the main element)
           setTimeout(() => {
             this.scrollToTop();
@@ -333,5 +352,22 @@ export class BlogSettingsComponent implements OnInit {
       }
     }
     return "";
+  }
+
+
+  // Handle theme preview
+  onThemeChange(selectedTheme: string): void {
+    if (this.themeService.isValidTheme(selectedTheme)) {
+      this.themeService.setTheme(selectedTheme as any, false);
+    }
+  }
+
+  // Get current theme for UI feedback
+  getCurrentTheme(): string {
+    return this.themeService.getCurrentTheme();
+  }
+
+  getFormThemeValue(): string {
+    return this.settingsForm.get('theme')?.value || 'default';
   }
 }

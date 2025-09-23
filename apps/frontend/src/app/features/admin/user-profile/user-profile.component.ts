@@ -15,6 +15,7 @@ import {
 import { AuthService } from "../../../core/services/auth.service";
 import { FileUploadService } from "../../../core/services/file-upload.service";
 import { ProfilePictureUploadComponent } from "../../../shared/components/profile-picture-upload/profile-picture-upload.component";
+import { CardComponent, InputComponent } from "../../../shared/ui";
 import {
   FileCategory,
   FileUploadResponse,
@@ -24,7 +25,7 @@ import { ImageUrlUtil } from "../../../core/utils/image-url.util";
 @Component({
   selector: "app-user-profile",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ProfilePictureUploadComponent],
+  imports: [CommonModule, ReactiveFormsModule, ProfilePictureUploadComponent, CardComponent, InputComponent],
   templateUrl: "./user-profile.component.html",
   styleUrls: ["./user-profile.component.css"],
 })

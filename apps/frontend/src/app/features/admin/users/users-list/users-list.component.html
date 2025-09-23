@@ -1,24 +1,35 @@
 <div class="max-w-7xl mx-auto p-6">
-  <div class="bg-white rounded-lg shadow-md">
+  <ui-card variant="tight" size="lg">
     <!-- Header -->
-    <div class="border-b border-gray-200 px-6 py-4">
-      <div class="flex justify-between items-center">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">Users</h1>
-          <p class="text-gray-600">Manage user accounts and permissions</p>
+    <div class="themed-border border-b px-6 py-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="flex flex-col md:flex-row items-center gap-4">
+          <h1 class="text-2xl font-bold themed-text">Users</h1>
+          <div class="flex items-center gap-2" *ngIf="users$ | async as users">
+            <span class="text-sm themed-text-secondary">Showing:</span>
+            <span class="text-sm font-medium themed-accent">{{
+              users.length
+            }}</span>
+            <span class="text-sm themed-text-secondary">users</span>
+          </div>
         </div>
-        <app-create-button [routerLink]="['/admin/users/new']" text="New User">
-        </app-create-button>
+        <div class="flex items-center gap-3">
+          <app-create-button
+            [routerLink]="['/admin/users/new']"
+            text="New User"
+          >
+          </app-create-button>
+        </div>
       </div>
     </div>
 
     <!-- Filters -->
-    <div class="border-b border-gray-200 px-6 py-4 bg-gray-50">
+    <div class="themed-border border-b px-6 py-4 themed-surface-alt">
       <div class="flex items-center justify-between">
-        <h3 class="text-sm font-medium text-gray-900">Filters</h3>
+        <h3 class="text-sm font-medium themed-text">Filters</h3>
         <button
           (click)="clearFilters()"
-          class="text-sm text-gray-500 hover:text-gray-700"
+          class="text-sm themed-text-secondary hover:themed-text transition-colors"
         >
           Clear all
         </button>
@@ -26,92 +37,84 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
         <!-- Search -->
         <div>
-          <input
-            type="text"
+          <ui-input
+            type="search"
+            label="Username"
             [(ngModel)]="searchTerm"
-            (input)="applyFilters()"
+            (ngModelChange)="applyFilters()"
             placeholder="Search users..."
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
+          ></ui-input>
         </div>
 
         <!-- Role Filter -->
-        <div>
-          <select
-            [(ngModel)]="selectedRole"
-            (change)="applyFilters()"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">All Roles</option>
-            <option value="ADMIN">Admin</option>
-            <option value="AUTHOR">Author</option>
-          </select>
-        </div>
+        <ui-select
+          label="Role"
+          [(ngModel)]="selectedRole"
+          (ngModelChange)="applyFilters()"
+          [options]="roleOptions"
+        ></ui-select>
 
         <!-- Status Filter -->
-        <div>
-          <select
-            [(ngModel)]="selectedStatus"
-            (change)="applyFilters()"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+        <ui-select
+          label="Status"
+          [(ngModel)]="selectedStatus"
+          (ngModelChange)="applyFilters()"
+          [options]="statusOptions"
+        ></ui-select>
 
         <!-- Sort Order -->
-        <div>
-          <select
-            [(ngModel)]="sortOrder"
-            (change)="applyFilters()"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="desc">Newest First</option>
-            <option value="asc">Oldest First</option>
-          </select>
-        </div>
+        <ui-select
+          label="Sort"
+          [(ngModel)]="sortOrder"
+          (ngModelChange)="applyFilters()"
+          [options]="sortOptions"
+        ></ui-select>
       </div>
     </div>
 
     <!-- Users Table -->
     <div *ngIf="users$ | async as users; else loading">
       <div *ngIf="users.length > 0; else noUsers" class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table
+          class="min-w-full themed-border border-separate border-spacing-0"
+        >
+          <thead class="themed-surface">
             <tr>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
               >
                 User
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
               >
                 Role & Status
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
               >
                 Last Login
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium themed-text-secondary uppercase tracking-wider themed-border border-b"
               >
                 Created
               </th>
-              <th scope="col" class="relative px-6 py-3">
+              <th scope="col" class="relative px-6 py-3 themed-border border-b">
                 <span class="sr-only">Actions</span>
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let user of users" class="hover:bg-gray-50">
+          <tbody class="themed-surface">
+            <tr
+              *ngFor="let user of users; odd as isOdd"
+              class="themed-border border-b transition-colors duration-200"
+              [class.themed-surface-alt]="isOdd"
+            >
               <!-- User Info -->
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
@@ -127,15 +130,15 @@
                     </div>
                   </div>
                   <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">
+                    <div class="text-sm font-medium themed-text">
                       {{
                         user.firstName && user.lastName
                           ? user.firstName + " " + user.lastName
                           : user.username
                       }}
                     </div>
-                    <div class="text-sm text-gray-500">{{ user.email }}</div>
-                    <div class="text-xs text-gray-400">
+                    <div class="text-sm themed-text-secondary">{{ user.email }}</div>
+                    <div class="text-xs themed-text-secondary">
                       {{ "@" + user.username }}
                     </div>
                   </div>
@@ -162,21 +165,21 @@
               </td>
 
               <!-- Last Login -->
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-6 py-4 whitespace-nowrap text-sm themed-text-secondary">
                 <div *ngIf="user.lastLoginAt; else neverLoggedIn">
                   {{ user.lastLoginAt | date: "short" }}
                 </div>
                 <ng-template #neverLoggedIn>
-                  <span class="text-gray-400 italic">Never</span>
+                  <span class="themed-text-secondary italic">Never</span>
                 </ng-template>
               </td>
 
               <!-- Created -->
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-500">
+                <div class="text-sm themed-text-secondary">
                   {{ user.createdAt | date: "short" }}
                 </div>
-                <div class="text-xs text-gray-400 space-y-1 mt-1">
+                <div class="text-xs themed-text-secondary space-y-1 mt-1">
                   <div *ngIf="user.passwordResetAt">
                     Reset: {{ user.passwordResetAt | date: "short" }}
                   </div>
@@ -194,7 +197,7 @@
                   <!-- Edit Button -->
                   <button
                     [routerLink]="['/admin/users', user.id, 'edit']"
-                    class="inline-flex items-center p-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    class="inline-flex items-center p-2 themed-border shadow-sm text-sm leading-4 font-medium rounded-md themed-text themed-surface hover:themed-surface-alt focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     title="Edit user"
                   >
                     <span class="material-symbols-outlined text-base"
@@ -258,15 +261,15 @@
       <!-- No users found -->
       <ng-template #noUsers>
         <div class="px-6 py-12 text-center">
-          <div class="text-gray-500">
+          <div class="themed-text-secondary">
             <span
-              class="material-symbols-outlined mx-auto block text-6xl text-gray-400"
+              class="material-symbols-outlined mx-auto block text-6xl themed-text-tertiary"
               >group</span
             >
-            <h3 class="mt-2 text-sm font-medium text-gray-900">
+            <h3 class="mt-2 text-sm font-medium themed-text">
               No users found
             </h3>
-            <p class="mt-1 text-sm text-gray-500">
+            <p class="mt-1 text-sm themed-text-secondary">
               Get started by creating a new user.
             </p>
           </div>
@@ -277,9 +280,9 @@
     <!-- Loading state -->
     <ng-template #loading>
       <div class="px-6 py-12 text-center">
-        <div class="text-gray-500">
+        <div class="themed-text-secondary">
           <div
-            class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-indigo-600 rounded-full"
+            class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent themed-accent rounded-full"
             role="status"
           >
             <span class="sr-only">Loading...</span>
@@ -288,6 +291,5 @@
         </div>
       </div>
     </ng-template>
-  </div>
-  <!-- End Single Card Container -->
+  </ui-card>
 </div>

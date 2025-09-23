@@ -1,9 +1,9 @@
-<div class="max-w-4xl mx-auto p-6 space-y-8">
+<div class="max-w-4xl mx-auto flex flex-col gap-8">
   <!-- Profile Header -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h1 class="text-2xl font-bold text-gray-900">My Profile</h1>
-      <p class="text-gray-600 mt-1">
+  <ui-card variant="tight" size="md" [header]="true">
+    <div slot="header">
+      <h1 class="text-2xl font-bold themed-text">My Profile</h1>
+      <p class="themed-text-secondary mt-1">
         Manage your personal information and account settings
       </p>
     </div>
@@ -35,7 +35,7 @@
           ></app-profile-picture-upload>
 
           <div>
-            <h3 class="text-lg font-medium text-gray-900">
+            <h3 class="text-lg font-medium themed-text">
               {{
                 currentUser?.firstName && currentUser?.lastName
                   ? (currentUser?.firstName || "") +
@@ -44,8 +44,8 @@
                   : currentUser?.username || ""
               }}
             </h3>
-            <p class="text-gray-500">{{ currentUser?.email || "" }}</p>
-            <p class="text-sm text-gray-400 capitalize">
+            <p class="themed-text-secondary">{{ currentUser?.email || "" }}</p>
+            <p class="text-sm themed-text-secondary capitalize">
               {{ currentUser?.role?.toLowerCase() || "" }}
             </p>
           </div>
@@ -85,104 +85,66 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- First Name -->
-            <div>
-              <label
-                for="firstName"
-                class="block text-sm font-medium text-gray-700 mb-2"
-              >
-                First Name
-              </label>
-              <input
-                type="text"
-                id="firstName"
-                formControlName="firstName"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                [class.border-red-300]="hasError('profile', 'firstName')"
-                placeholder="Enter your first name"
-              />
-              <p
-                *ngIf="hasError('profile', 'firstName')"
-                class="mt-1 text-sm text-red-600"
-              >
-                {{ getErrorMessage("profile", "firstName") }}
-              </p>
-            </div>
+            <ui-input
+              label="First Name"
+              type="text"
+              placeholder="Enter your first name"
+              [state]="hasError('profile', 'firstName') ? 'error' : 'default'"
+              [errorMessage]="
+                hasError('profile', 'firstName')
+                  ? getErrorMessage('profile', 'firstName')
+                  : ''
+              "
+              formControlName="firstName"
+            ></ui-input>
 
             <!-- Last Name -->
-            <div>
-              <label
-                for="lastName"
-                class="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Last Name
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                formControlName="lastName"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                [class.border-red-300]="hasError('profile', 'lastName')"
-                placeholder="Enter your last name"
-              />
-              <p
-                *ngIf="hasError('profile', 'lastName')"
-                class="mt-1 text-sm text-red-600"
-              >
-                {{ getErrorMessage("profile", "lastName") }}
-              </p>
-            </div>
+            <ui-input
+              label="Last Name"
+              type="text"
+              placeholder="Enter your last name"
+              [state]="hasError('profile', 'lastName') ? 'error' : 'default'"
+              [errorMessage]="
+                hasError('profile', 'lastName')
+                  ? getErrorMessage('profile', 'lastName')
+                  : ''
+              "
+              formControlName="lastName"
+            ></ui-input>
 
             <!-- Email -->
-            <div>
-              <label
-                for="email"
-                class="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Email *
-              </label>
-              <input
-                type="email"
-                id="email"
-                formControlName="email"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                [class.border-red-300]="hasError('profile', 'email')"
-                placeholder="Enter your email"
-              />
-              <p
-                *ngIf="hasError('profile', 'email')"
-                class="mt-1 text-sm text-red-600"
-              >
-                {{ getErrorMessage("profile", "email") }}
-              </p>
-            </div>
+            <ui-input
+              label="Email"
+              type="email"
+              placeholder="Enter your email"
+              [required]="true"
+              [state]="hasError('profile', 'email') ? 'error' : 'default'"
+              [errorMessage]="
+                hasError('profile', 'email')
+                  ? getErrorMessage('profile', 'email')
+                  : ''
+              "
+              formControlName="email"
+            ></ui-input>
 
             <!-- Username -->
-            <div>
-              <label
-                for="username"
-                class="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Username *
-              </label>
-              <input
-                type="text"
-                id="username"
-                formControlName="username"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                [class.border-red-300]="hasError('profile', 'username')"
-                placeholder="Enter your username"
-              />
-              <p
-                *ngIf="hasError('profile', 'username')"
-                class="mt-1 text-sm text-red-600"
-              >
-                {{ getErrorMessage("profile", "username") }}
-              </p>
-            </div>
+            <ui-input
+              label="Username"
+              type="text"
+              placeholder="Enter your username"
+              [required]="true"
+              [state]="hasError('profile', 'username') ? 'error' : 'default'"
+              [errorMessage]="
+                hasError('profile', 'username')
+                  ? getErrorMessage('profile', 'username')
+                  : ''
+              "
+              formControlName="username"
+            ></ui-input>
           </div>
 
           <!-- Submit Button -->
-          <div class="flex justify-end pt-4 border-t border-gray-200">
+          <div class="flex justify-end pt-4 border-t themed-border">
             <button
               type="submit"
               [disabled]="profileForm.invalid || saving"
@@ -202,13 +164,13 @@
         </form>
       </div>
     </div>
-  </div>
+  </ui-card>
 
   <!-- Password Change Section -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h2 class="text-xl font-semibold text-gray-900">Change Password</h2>
-      <p class="text-gray-600 mt-1">Update your account password</p>
+  <ui-card variant="tight" size="md" [header]="true">
+    <div slot="header">
+      <h2 class="text-xl font-semibold themed-text">Change Password</h2>
+      <p class="themed-text-secondary mt-1">Update your account password</p>
     </div>
 
     <div class="p-6">
@@ -245,83 +207,58 @@
 
         <div class="space-y-6">
           <!-- Current Password -->
-          <div>
-            <label
-              for="currentPassword"
-              class="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Current Password *
-            </label>
-            <input
-              type="password"
-              id="currentPassword"
-              formControlName="currentPassword"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              [class.border-red-300]="hasError('password', 'currentPassword')"
-              placeholder="Enter your current password"
-            />
-            <p
-              *ngIf="hasError('password', 'currentPassword')"
-              class="mt-1 text-sm text-red-600"
-            >
-              {{ getErrorMessage("password", "currentPassword") }}
-            </p>
-          </div>
+          <ui-input
+            label="Current Password"
+            type="password"
+            placeholder="Enter your current password"
+            [required]="true"
+            [state]="
+              hasError('password', 'currentPassword') ? 'error' : 'default'
+            "
+            [errorMessage]="
+              hasError('password', 'currentPassword')
+                ? getErrorMessage('password', 'currentPassword')
+                : ''
+            "
+            formControlName="currentPassword"
+          ></ui-input>
 
           <!-- New Password -->
-          <div>
-            <label
-              for="newPassword"
-              class="block text-sm font-medium text-gray-700 mb-2"
-            >
-              New Password *
-            </label>
-            <input
-              type="password"
-              id="newPassword"
-              formControlName="newPassword"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              [class.border-red-300]="hasError('password', 'newPassword')"
-              placeholder="Enter your new password"
-            />
-            <p
-              *ngIf="hasError('password', 'newPassword')"
-              class="mt-1 text-sm text-red-600"
-            >
-              {{ getErrorMessage("password", "newPassword") }}
-            </p>
-            <p class="mt-1 text-sm text-gray-500">
-              Password must be at least 8 characters long
-            </p>
-          </div>
+          <ui-input
+            label="New Password"
+            type="password"
+            placeholder="Enter your new password"
+            [required]="true"
+            [state]="hasError('password', 'newPassword') ? 'error' : 'default'"
+            [errorMessage]="
+              hasError('password', 'newPassword')
+                ? getErrorMessage('password', 'newPassword')
+                : ''
+            "
+            helpText="Password must be at least 8 characters long"
+            formControlName="newPassword"
+          ></ui-input>
 
           <!-- Confirm Password -->
-          <div>
-            <label
-              for="confirmPassword"
-              class="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Confirm New Password *
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              formControlName="confirmPassword"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              [class.border-red-300]="hasError('password', 'confirmPassword')"
-              placeholder="Confirm your new password"
-            />
-            <p
-              *ngIf="hasError('password', 'confirmPassword')"
-              class="mt-1 text-sm text-red-600"
-            >
-              {{ getErrorMessage("password", "confirmPassword") }}
-            </p>
-          </div>
+          <ui-input
+            label="Confirm New Password"
+            type="password"
+            placeholder="Confirm your new password"
+            [required]="true"
+            [state]="
+              hasError('password', 'confirmPassword') ? 'error' : 'default'
+            "
+            [errorMessage]="
+              hasError('password', 'confirmPassword')
+                ? getErrorMessage('password', 'confirmPassword')
+                : ''
+            "
+            formControlName="confirmPassword"
+          ></ui-input>
         </div>
 
         <!-- Submit Button -->
-        <div class="flex justify-end pt-4 border-t border-gray-200">
+        <div class="flex justify-end pt-4 border-t themed-border">
           <button
             type="submit"
             [disabled]="passwordForm.invalid || changingPassword"
@@ -342,5 +279,5 @@
         </div>
       </form>
     </div>
-  </div>
+  </ui-card>
 </div>

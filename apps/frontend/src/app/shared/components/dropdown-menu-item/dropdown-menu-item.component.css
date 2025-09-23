@@ -1,1 +1,10 @@
 /* Dropdown Menu Item Component Styles */
+
+/* Dark theme support for danger items */
+:host-context(.theme-dark) .text-red-600 {
+  color: #fca5a5 !important;
+}
+
+:host-context(.theme-dark) .hover\:bg-red-50:hover {
+  background-color: rgba(185, 28, 28, 0.2) !important;
+}

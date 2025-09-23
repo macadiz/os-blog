@@ -21,11 +21,14 @@ import {
   BlogSettings,
 } from "../../../core/services/title.service";
 import { BlogUnavailableComponent } from "../../../shared/components/blog-unavailable/blog-unavailable.component";
+import { TagDisplayComponent } from "../../../shared/components/tag-display/tag-display.component";
+import { CategoryDisplayComponent } from "../../../shared/components/category-display/category-display.component";
+import { CardComponent, InputComponent, ButtonComponent } from "../../../shared/ui";
 
 @Component({
   selector: "app-blog",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, BlogUnavailableComponent],
+  imports: [CommonModule, RouterModule, FormsModule, BlogUnavailableComponent, TagDisplayComponent, CategoryDisplayComponent, CardComponent, InputComponent, ButtonComponent],
   templateUrl: "./blog.component.html",
   styleUrls: ["./blog.component.css"],
 })

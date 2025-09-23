@@ -1,24 +1,24 @@
 <div class="space-y-6">
   <!-- Welcome Section -->
-  <div class="bg-white shadow rounded-lg p-6">
+  <ui-card variant="default" size="md">
     <div class="flex items-center">
       <div class="flex-shrink-0">
         <div
-          class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white"
+          class="flex items-center justify-center h-12 w-12 rounded-md themed-accent-bg text-white"
         >
           <span class="material-symbols-outlined text-2xl">dashboard</span>
         </div>
       </div>
       <div class="ml-5 w-0 flex-1">
         <dl>
-          <dt class="text-sm font-medium text-gray-500 truncate">
+          <dt class="text-sm font-medium themed-text-secondary truncate">
             Welcome back,
             {{
               (currentUser$ | async)?.firstName ||
                 (currentUser$ | async)?.username
             }}!
           </dt>
-          <dd class="text-lg font-medium text-gray-900">
+          <dd class="text-lg font-medium themed-text">
             {{
               (currentUser$ | async)?.role === "ADMIN"
                 ? "Administrator"
@@ -29,18 +29,18 @@
         </dl>
       </div>
     </div>
-  </div>
+  </ui-card>
 
   <!-- Quick Stats -->
   <!-- Loading State -->
   <div *ngIf="isLoading" class="text-center py-8">
-    <p class="text-gray-600">Loading dashboard...</p>
+    <p class="themed-text-secondary">Loading dashboard...</p>
   </div>
 
   <!-- Error State -->
   <div
     *ngIf="errorMessage"
-    class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md mb-6"
+    class="alert alert-danger px-4 py-3 rounded-md mb-6"
   >
     {{ errorMessage }}
   </div>
@@ -64,38 +64,40 @@
   </div>
 
   <!-- Quick Actions -->
-  <div class="bg-white shadow rounded-lg">
-    <div class="px-4 py-5 sm:p-6">
-      <h3 class="text-lg leading-6 font-medium text-gray-900">Quick Actions</h3>
+  <div class="mt-8">
+    <ui-card variant="default" size="md">
+      <div slot="header">
+        <h3 class="text-lg leading-6 font-medium themed-text">Quick Actions</h3>
+      </div>
       <div class="mt-5">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <a
             [routerLink]="['/admin/posts/new']"
-            class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            class="relative block w-full border-2 themed-border border-dashed rounded-lg p-12 text-center hover:border-theme-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-200 transition-colors"
           >
             <span
-              class="material-symbols-outlined mx-auto h-12 w-12 text-gray-400 text-5xl"
+              class="material-symbols-outlined mx-auto h-12 w-12 themed-text-secondary text-5xl"
               >add_circle</span
             >
-            <span class="mt-2 block text-sm font-medium text-gray-900">
+            <span class="mt-2 block text-sm font-medium themed-text">
               Create New Post
             </span>
           </a>
 
           <a
             [routerLink]="['/blog']"
-            class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            class="relative block w-full border-2 themed-border border-dashed rounded-lg p-12 text-center hover:border-theme-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-200 transition-colors"
           >
             <span
-              class="material-symbols-outlined mx-auto h-12 w-12 text-gray-400 text-5xl"
+              class="material-symbols-outlined mx-auto h-12 w-12 themed-text-secondary text-5xl"
               >public</span
             >
-            <span class="mt-2 block text-sm font-medium text-gray-900">
+            <span class="mt-2 block text-sm font-medium themed-text">
               View Public Blog
             </span>
           </a>
         </div>
       </div>
-    </div>
+    </ui-card>
   </div>
 </div>

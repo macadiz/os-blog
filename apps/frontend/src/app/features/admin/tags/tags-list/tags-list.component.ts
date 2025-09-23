@@ -3,11 +3,12 @@ import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { TagsService, type Tag } from "../../../../core/services/tags.service";
 import { CreateButtonComponent } from "../../../../shared/components/create-button/create-button.component";
+import { CardComponent } from "../../../../shared/ui";
 
 @Component({
   selector: "app-tags-list",
   standalone: true,
-  imports: [CommonModule, RouterModule, CreateButtonComponent],
+  imports: [CommonModule, RouterModule, CreateButtonComponent, CardComponent],
   templateUrl: "./tags-list.component.html",
 })
 export class TagsListComponent implements OnInit {

@@ -4,11 +4,12 @@ import { Router, RouterModule } from "@angular/router";
 import { ApiService, BlogPost } from "../../../../core/services/api.service";
 import { AuthService, User } from "../../../../core/services/auth.service";
 import { CreateButtonComponent } from "../../../../shared/components/create-button/create-button.component";
+import { CardComponent } from "../../../../shared/ui";
 
 @Component({
   selector: "app-posts-list",
   standalone: true,
-  imports: [CommonModule, RouterModule, CreateButtonComponent],
+  imports: [CommonModule, RouterModule, CreateButtonComponent, CardComponent],
   templateUrl: "./posts-list.component.html",
   styleUrls: ["./posts-list.component.css"],
 })

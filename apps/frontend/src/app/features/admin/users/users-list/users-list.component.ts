@@ -10,11 +10,12 @@ import {
 import { Observable, BehaviorSubject, combineLatest, of } from "rxjs";
 import { switchMap, startWith, catchError } from "rxjs/operators";
 import { CreateButtonComponent } from "../../../../shared/components/create-button/create-button.component";
+import { CardComponent, InputComponent, SelectComponent } from "../../../../shared/ui";
 
 @Component({
   selector: "app-users-list",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, CreateButtonComponent],
+  imports: [CommonModule, RouterModule, FormsModule, CreateButtonComponent, CardComponent, InputComponent, SelectComponent],
   templateUrl: "./users-list.component.html",
   styleUrls: ["./users-list.component.css"],
 })
@@ -27,6 +28,24 @@ export class UsersListComponent implements OnInit {
   selectedStatus: string = "";
   sortBy = "createdAt";
   sortOrder: "asc" | "desc" = "desc";
+
+  // Select options
+  roleOptions = [
+    { value: "", label: "All Roles" },
+    { value: "ADMIN", label: "Admin" },
+    { value: "AUTHOR", label: "Author" }
+  ];
+
+  statusOptions = [
+    { value: "", label: "All Status" },
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" }
+  ];
+
+  sortOptions = [
+    { value: "desc", label: "Newest First" },
+    { value: "asc", label: "Oldest First" }
+  ];
 
   private filterSubject = new BehaviorSubject<UserQueryDto>({});
 

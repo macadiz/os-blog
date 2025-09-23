@@ -1,11 +1,11 @@
 <div class="max-w-4xl mx-auto">
-  <div class="bg-white rounded-lg shadow-md">
+  <ui-card variant="tight" size="lg">
     <!-- Header -->
     <div
-      class="border-b border-gray-200 px-6 py-4 sticky top-[-24px] bg-white z-10 shadow-md"
+      class="themed-border border-b px-6 py-4 sticky top-[-24px] themed-surface z-10 shadow-md"
     >
       <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900 flex-grow">
+        <h1 class="text-2xl font-bold themed-text flex-grow">
           {{ isEditing ? "Edit Post" : "Create New Post" }}
         </h1>
         <div class="flex gap-4">
@@ -30,14 +30,15 @@
               {{ postForm.get("published")?.value ? "Published" : "Draft" }}
             </div>
           </div>
-          <button
+          <ui-button
             type="button"
-            (click)="onCancel()"
-            class="inline-flex items-center px-4 py-2 text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+            variant="secondary"
+            size="md"
+            [prefixIcon]="'close'"
+            (buttonClick)="onCancel()"
           >
-            <span class="material-symbols-outlined mr-2 text-lg">close</span>
             Cancel
-          </button>
+          </ui-button>
         </div>
       </div>
     </div>
@@ -57,87 +58,64 @@
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-6">
           <!-- Title -->
-          <div class="form-group">
-            <label for="title" class="form-label">Title *</label>
-            <input
-              type="text"
-              id="title"
-              formControlName="title"
-              class="form-input"
-              [class.border-red-500]="isFieldInvalid('title')"
-              placeholder="Enter post title..."
-            />
-            <div
-              *ngIf="isFieldInvalid('title')"
-              class="text-red-500 text-sm mt-1"
-            >
-              {{ getFieldError("title") }}
-            </div>
-          </div>
+          <ui-input
+            label="Title"
+            type="text"
+            placeholder="Enter post title..."
+            [required]="true"
+            [state]="isFieldInvalid('title') ? 'error' : 'default'"
+            [errorMessage]="
+              isFieldInvalid('title') ? getFieldError('title') : ''
+            "
+            formControlName="title"
+          ></ui-input>
 
           <!-- Content -->
-          <div class="form-group">
-            <label for="content" class="form-label">Content *</label>
-            <textarea
-              id="content"
-              formControlName="content"
-              rows="20"
-              class="form-input min-h-96"
-              [class.border-red-500]="isFieldInvalid('content')"
-              placeholder="Write your post content here..."
-            ></textarea>
-            <div
-              *ngIf="isFieldInvalid('content')"
-              class="text-red-500 text-sm mt-1"
-            >
-              {{ getFieldError("content") }}
-            </div>
-            <p class="text-sm text-gray-500 mt-1">
-              Supports HTML and Markdown formatting
-            </p>
-          </div>
+          <ui-textarea
+            label="Content"
+            placeholder="Write your post content here..."
+            [rows]="20"
+            [required]="true"
+            [state]="isFieldInvalid('content') ? 'error' : 'default'"
+            [errorMessage]="
+              isFieldInvalid('content') ? getFieldError('content') : ''
+            "
+            helpText="Supports HTML and Markdown formatting"
+            formControlName="content"
+          ></ui-textarea>
 
           <!-- Excerpt -->
-          <div class="form-group">
-            <label for="excerpt" class="form-label">Excerpt</label>
-            <textarea
-              id="excerpt"
-              formControlName="excerpt"
-              rows="3"
-              class="form-input"
-              [class.border-red-500]="isFieldInvalid('excerpt')"
-              placeholder="Brief summary of the post (optional)..."
-            ></textarea>
-            <div
-              *ngIf="isFieldInvalid('excerpt')"
-              class="text-red-500 text-sm mt-1"
-            >
-              {{ getFieldError("excerpt") }}
-            </div>
-          </div>
+          <ui-textarea
+            label="Excerpt"
+            placeholder="Brief summary of the post (optional)..."
+            [rows]="3"
+            [state]="isFieldInvalid('excerpt') ? 'error' : 'default'"
+            [errorMessage]="
+              isFieldInvalid('excerpt') ? getFieldError('excerpt') : ''
+            "
+            formControlName="excerpt"
+          ></ui-textarea>
         </div>
 
         <!-- Sidebar -->
-        <div class="space-y-6">
+        <div class="flex flex-col gap-4">
           <!-- Publish Settings -->
-          <div class="bg-gray-50 p-4 rounded-lg" *ngIf="isEditing">
+          <ui-card variant="compact" size="sm" *ngIf="isEditing">
             <!-- Publish Date (only show if published) -->
-            <div *ngIf="postForm.get('published')?.value" class="form-group">
-              <label for="publishedAt" class="form-label">Publish Date</label>
-              <input
+            <div *ngIf="postForm.get('published')?.value">
+              <ui-input
+                label="Publish Date"
                 type="datetime-local"
-                id="publishedAt"
+                helpText="Leave empty to use current date/time"
                 formControlName="publishedAt"
-                class="form-input"
-              />
-              <p class="text-sm text-gray-500 mt-1">
-                Leave empty to use current date/time
-              </p>
+              ></ui-input>
             </div>
-          </div>
+          </ui-card>
           <!-- Featured Image -->
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <h3 class="text-lg font-medium mb-3">Featured Image</h3>
+          <ui-card variant="compact" size="sm" [header]="true">
+            <h3 slot="header" class="text-lg font-medium themed-text">
+              Featured Image
+            </h3>
             <app-file-upload
               [config]="featuredImageUploadConfig"
               [currentFileUrl]="postForm.get('featuredImage')?.value"
@@ -145,13 +123,18 @@
               (fileRemoved)="onFeaturedImageRemoved()"
               (uploadError)="onUploadError($event)"
             ></app-file-upload>
-          </div>
+          </ui-card>
 
           <!-- Category -->
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <h3 class="text-lg font-medium mb-3">Category</h3>
-            <div class="form-group">
-              <select formControlName="categoryId" class="form-input">
+          <ui-card variant="compact" size="sm" [header]="true">
+            <h3 slot="header" class="text-lg font-medium themed-text">
+              Category
+            </h3>
+            <div class="space-y-2">
+              <select
+                formControlName="categoryId"
+                class="form-input block w-full transition-all duration-200 ease-in-out focus:outline-none themed-border border focus:ring-2 focus:ring-blue-200 focus:border-theme-accent px-3 py-2 text-base"
+              >
                 <option value="">Select a category</option>
                 <option
                   *ngFor="let category of categories"
@@ -161,11 +144,11 @@
                 </option>
               </select>
             </div>
-          </div>
+          </ui-card>
 
           <!-- Tags -->
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <h3 class="text-lg font-medium mb-3">Tags</h3>
+          <ui-card variant="compact" size="sm" [header]="true">
+            <h3 slot="header" class="text-lg font-medium themed-text">Tags</h3>
             <div class="space-y-2">
               <div *ngFor="let tag of tags" class="flex items-center">
                 <input
@@ -173,24 +156,31 @@
                   [id]="'tag-' + tag.id"
                   [checked]="isTagSelected(tag.id)"
                   (change)="onTagToggle(tag.id)"
-                  class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 themed-border rounded"
                 />
-                <label [for]="'tag-' + tag.id" class="text-sm text-gray-700">
+                <label [for]="'tag-' + tag.id" class="text-sm themed-text">
                   {{ tag.name }}
                 </label>
               </div>
-              <div *ngIf="tags.length === 0" class="text-sm text-gray-500">
+              <div
+                *ngIf="tags.length === 0"
+                class="text-sm themed-text-secondary"
+              >
                 No tags available
               </div>
             </div>
-          </div>
+          </ui-card>
 
           <!-- SEO Settings -->
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <h3 class="text-lg font-medium mb-3">SEO Settings</h3>
+          <ui-card variant="compact" size="sm" [header]="true">
+            <h3 slot="header" class="text-lg font-medium themed-text">
+              SEO Settings
+            </h3>
 
             <div class="form-group mb-3">
-              <label for="metaTitle" class="form-label">Meta Title</label>
+              <label for="metaTitle" class="form-label themed-text"
+                >Meta Title</label
+              >
               <input
                 type="text"
                 id="metaTitle"
@@ -208,7 +198,7 @@
             </div>
 
             <div class="form-group">
-              <label for="metaDescription" class="form-label"
+              <label for="metaDescription" class="form-label themed-text"
                 >Meta Description</label
               >
               <textarea
@@ -226,12 +216,12 @@
                 {{ getFieldError("metaDescription") }}
               </div>
             </div>
-          </div>
+          </ui-card>
         </div>
       </div>
 
       <!-- Form Actions -->
-      <div class="mt-8 pt-6 border-t border-gray-200">
+      <div class="mt-8 pt-6 themed-border border-t">
         <div class="flex gap-3 justify-end">
           <!-- Save as Draft -->
           <button
@@ -283,5 +273,5 @@
         </div>
       </div>
     </form>
-  </div>
+  </ui-card>
 </div>

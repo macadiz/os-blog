@@ -61,7 +61,7 @@ export class DropdownMenuItemComponent {
       return `${baseClasses} text-red-600 hover:bg-red-50`;
     }
 
-    return `${baseClasses} text-gray-700 hover:bg-gray-100`;
+    return `${baseClasses} themed-text hover:bg-theme-border`;
   }
 
   getButtonClasses(): string {
@@ -72,6 +72,6 @@ export class DropdownMenuItemComponent {
       return `${baseClasses} text-red-600 hover:bg-red-50`;
     }
 
-    return `${baseClasses} text-gray-700 hover:bg-gray-100`;
+    return `${baseClasses} themed-text hover:bg-theme-border`;
   }
 }

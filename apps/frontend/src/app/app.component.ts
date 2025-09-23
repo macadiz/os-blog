@@ -5,6 +5,7 @@ import { HeaderComponent } from "./shared/components/header/header.component";
 import { ApiService } from "./core/services/api.service";
 import { AuthService } from "./core/services/auth.service";
 import { TitleService } from "./core/services/title.service";
+import { ThemeService } from "./core/services/theme.service";
 import { filter } from "rxjs/operators";
 
 @Component({
@@ -21,6 +22,7 @@ export class AppComponent implements OnInit {
     private apiService: ApiService,
     private authService: AuthService,
     private titleService: TitleService,
+    private themeService: ThemeService,
     private router: Router
   ) {}
 

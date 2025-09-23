@@ -1,4 +1,7 @@
-<button (click)="toggleOpen()">
+<button
+  (click)="toggleOpen()"
+  class="p-2 rounded-md themed-text hover:bg-theme-border focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
+>
   <span class="material-symbols-outlined">menu</span>
 </button>
 
@@ -13,7 +16,7 @@
   ></div>
   <aside
     [ngClass]="{
-      'absolute top-0 left-0 bg-white z-20 w-3/4 h-full p-4': true,
+      'absolute top-0 left-0 themed-surface z-20 w-3/4 h-full p-4 themed-border border-r': true,
     }"
   >
     <div class="flex gap-2">
@@ -26,23 +29,23 @@
           loading="lazy"
         />
         <ng-template #fallbackIcon>
-          <span class="material-symbols-outlined text-blue-600 text-3xl mr-2"
+          <span class="material-symbols-outlined themed-accent text-3xl mr-2"
             >article</span
           >
         </ng-template>
       </div>
-      <span class="text-xl font-bold text-gray-900">
+      <span class="text-xl font-bold themed-text">
         {{ blogSettings?.blogTitle || "OS Blog" }}
       </span>
     </div>
-    <hr class="my-4 ml-[-16px] w-[calc(100%+32px)]" />
+    <hr class="my-4 ml-[-16px] w-[calc(100%+32px)] themed-border" />
     <div class="space-y-1">
       <a
         [routerLink]="['/blog']"
         (click)="toggleOpen()"
-        routerLinkActive="bg-blue-50 text-blue-600"
+        routerLinkActive="bg-theme-accent/10 themed-accent"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+        class="block px-3 py-2 themed-text-secondary hover:themed-text hover:bg-theme-border rounded-md transition-colors"
       >
         Blog
       </a>
@@ -51,32 +54,32 @@
         <a
           [routerLink]="['/admin']"
           (click)="toggleOpen()"
-          routerLinkActive="bg-blue-50 text-blue-600"
-          class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+          routerLinkActive="bg-theme-accent/10 themed-accent"
+          class="block px-3 py-2 themed-text-secondary hover:themed-text hover:bg-theme-border rounded-md transition-colors"
         >
           {{ user.role === "ADMIN" ? "Admin Dashboard" : "Author Dashboard" }}
         </a>
         <a
           [routerLink]="['/admin/profile']"
           (click)="toggleOpen()"
-          routerLinkActive="bg-blue-50 text-blue-600"
-          class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+          routerLinkActive="bg-theme-accent/10 themed-accent"
+          class="block px-3 py-2 themed-text-secondary hover:themed-text hover:bg-theme-border rounded-md transition-colors"
         >
           My Profile
         </a>
         <a
           [routerLink]="['/admin/posts']"
           (click)="toggleOpen()"
-          routerLinkActive="bg-blue-50 text-blue-600"
-          class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+          routerLinkActive="bg-theme-accent/10 themed-accent"
+          class="block px-3 py-2 themed-text-secondary hover:themed-text hover:bg-theme-border rounded-md transition-colors"
         >
           My Posts
         </a>
         <a
           [routerLink]="['/admin/posts/new']"
           (click)="toggleOpen()"
-          routerLinkActive="bg-blue-50 text-blue-600"
-          class="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+          routerLinkActive="bg-theme-accent/10 themed-accent"
+          class="block px-3 py-2 themed-text-secondary hover:themed-text hover:bg-theme-border rounded-md transition-colors"
         >
           New Post
         </a>

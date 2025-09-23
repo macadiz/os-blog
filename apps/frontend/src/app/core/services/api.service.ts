@@ -321,7 +321,6 @@ export class ApiService {
   }
 
   getBlogSettings(): Observable<BlogSettings> {
-    console.log("aadasdasdasdas");
     return this.http.get<BlogSettings>(`${this.baseUrl}/setup/blog-settings`);
   }
 

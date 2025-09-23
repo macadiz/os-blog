@@ -24,11 +24,12 @@ import {
   FileCategory,
   FileUploadResponse,
 } from "../../../../shared/components/file-upload/file-upload.component";
+import { CardComponent, InputComponent, TextareaComponent, ButtonComponent } from "../../../../shared/ui";
 
 @Component({
   selector: "app-post-editor",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FileUploadComponent],
+  imports: [CommonModule, ReactiveFormsModule, FileUploadComponent, CardComponent, InputComponent, TextareaComponent, ButtonComponent],
   templateUrl: "./post-editor.component.html",
   styles: [],
 })

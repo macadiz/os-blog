@@ -1,12 +1,14 @@
 <div class="container mx-auto px-4 py-8 max-w-2xl">
   <div class="flex items-center mb-6">
-    <button
-      (click)="onCancel()"
-      class="mr-4 p-2 text-gray-600 hover:text-gray-900"
+    <ui-button
+      (buttonClick)="onCancel()"
+      variant="secondary"
+      size="md"
+      [prefixIcon]="'arrow_back'"
+      class="mr-4"
     >
-      <span class="material-symbols-outlined text-2xl">arrow_back</span>
-    </button>
-    <h1 class="text-3xl font-bold text-gray-900">
+    </ui-button>
+    <h1 class="text-3xl font-bold themed-text">
       {{ isEditMode ? "Edit User" : "Create New User" }}
     </h1>
   </div>
@@ -20,121 +22,70 @@
     </div>
   </div>
 
-  <form
-    *ngIf="!isLoading"
-    [formGroup]="userForm"
-    (ngSubmit)="onSubmit()"
-    class="bg-white shadow rounded-lg p-6"
-  >
+  <ui-card variant="default" size="lg" *ngIf="!isLoading">
+    <form
+      [formGroup]="userForm"
+      (ngSubmit)="onSubmit()"
+    >
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Email -->
       <div class="md:col-span-2">
-        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-          Email Address *
-        </label>
-        <input
+        <ui-input
+          label="Email Address"
           type="email"
-          id="email"
-          formControlName="email"
-          [class]="
-            isFieldInvalid('email')
-              ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-              : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
-          "
-          class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1"
           placeholder="Enter email address"
-        />
-        <p *ngIf="isFieldInvalid('email')" class="mt-1 text-sm text-red-600">
-          {{ getFieldError("email") }}
-        </p>
+          [required]="true"
+          [state]="isFieldInvalid('email') ? 'error' : 'default'"
+          [errorMessage]="isFieldInvalid('email') ? getFieldError('email') : ''"
+          formControlName="email"
+        ></ui-input>
       </div>
 
       <!-- Username -->
       <div class="md:col-span-2">
-        <label
-          for="username"
-          class="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Username *
-        </label>
-        <input
+        <ui-input
+          label="Username"
           type="text"
-          id="username"
-          formControlName="username"
-          [class]="
-            isFieldInvalid('username')
-              ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-              : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
-          "
-          class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1"
           placeholder="Enter username"
-        />
-        <p *ngIf="isFieldInvalid('username')" class="mt-1 text-sm text-red-600">
-          {{ getFieldError("username") }}
-        </p>
+          [required]="true"
+          [state]="isFieldInvalid('username') ? 'error' : 'default'"
+          [errorMessage]="isFieldInvalid('username') ? getFieldError('username') : ''"
+          formControlName="username"
+        ></ui-input>
       </div>
 
       <!-- First Name -->
       <div>
-        <label
-          for="firstName"
-          class="block text-sm font-medium text-gray-700 mb-1"
-        >
-          First Name
-        </label>
-        <input
+        <ui-input
+          label="First Name"
           type="text"
-          id="firstName"
-          formControlName="firstName"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:border-indigo-500 focus:ring-indigo-500"
           placeholder="Enter first name"
-        />
+          formControlName="firstName"
+        ></ui-input>
       </div>
 
       <!-- Last Name -->
       <div>
-        <label
-          for="lastName"
-          class="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Last Name
-        </label>
-        <input
+        <ui-input
+          label="Last Name"
           type="text"
-          id="lastName"
-          formControlName="lastName"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:border-indigo-500 focus:ring-indigo-500"
           placeholder="Enter last name"
-        />
+          formControlName="lastName"
+        ></ui-input>
       </div>
 
       <!-- Password -->
       <div class="md:col-span-2" *ngIf="!isEditMode">
-        <label
-          for="password"
-          class="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Password *
-        </label>
-        <input
+        <ui-input
+          label="Password"
           type="password"
-          id="password"
-          formControlName="password"
-          [class]="
-            isFieldInvalid('password')
-              ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-              : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
-          "
-          class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1"
           placeholder="Enter password (minimum 8 characters)"
-        />
-        <p *ngIf="isFieldInvalid('password')" class="mt-1 text-sm text-red-600">
-          {{ getFieldError("password") }}
-        </p>
-        <p class="mt-1 text-sm text-gray-500">
-          The user will be required to change this password on their first
-          login.
-        </p>
+          [required]="true"
+          [state]="isFieldInvalid('password') ? 'error' : 'default'"
+          [errorMessage]="isFieldInvalid('password') ? getFieldError('password') : ''"
+          helpText="The user will be required to change this password on their first login."
+          formControlName="password"
+        ></ui-input>
       </div>
 
       <!-- Password info for edit mode -->
@@ -195,33 +146,29 @@
 
     <!-- Form Actions -->
     <div class="mt-8 flex justify-end space-x-3">
-      <button
+      <ui-button
         type="button"
-        (click)="onCancel()"
-        class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        (buttonClick)="onCancel()"
+        variant="secondary"
+        size="md"
       >
         Cancel
-      </button>
-      <button
+      </ui-button>
+      <ui-button
         type="submit"
         [disabled]="userForm.invalid || isSubmitting"
-        [class]="
-          userForm.invalid || isSubmitting
-            ? 'bg-gray-300 cursor-not-allowed'
-            : 'bg-indigo-600 hover:bg-indigo-700'
-        "
-        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        variant="primary"
+        size="md"
+        [loading]="isSubmitting"
       >
-        <span *ngIf="isSubmitting" class="flex items-center">
-          <div
-            class="animate-spin -ml-1 mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"
-          ></div>
+        <span *ngIf="isSubmitting">
           {{ isEditMode ? "Updating..." : "Creating..." }}
         </span>
         <span *ngIf="!isSubmitting">
           {{ isEditMode ? "Update User" : "Create User" }}
         </span>
-      </button>
+      </ui-button>
     </div>
-  </form>
+    </form>
+  </ui-card>
 </div>
