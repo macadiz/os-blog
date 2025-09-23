@@ -10,6 +10,16 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
     />
+
+    <!-- Theme initialization script - apply default theme immediately -->
+    <script>
+      (function() {
+        // Apply default theme immediately to prevent flash
+        // Angular APP_INITIALIZER will fetch admin theme from API and update if needed
+        document.documentElement.classList.add('theme-default');
+        document.documentElement.setAttribute('data-theme', 'default');
+      })();
+    </script>
   </head>
   <body>
     <app-root></app-root>

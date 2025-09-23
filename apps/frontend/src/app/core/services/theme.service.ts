@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { ApiService } from './api.service';
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, firstValueFrom } from "rxjs";
+import { ApiService } from "./api.service";
 
-export type Theme = 'default' | 'dark';
+export type Theme = "default" | "dark";
 
 export interface ThemeConfig {
   name: string;
@@ -12,10 +12,10 @@ export interface ThemeConfig {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class ThemeService {
-  private currentThemeSubject = new BehaviorSubject<Theme>('default');
+  private currentThemeSubject = new BehaviorSubject<Theme>("default");
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
 
   currentTheme$ = this.currentThemeSubject.asObservable();
@@ -23,47 +23,62 @@ export class ThemeService {
 
   private readonly themes: Record<Theme, ThemeConfig> = {
     default: {
-      name: 'default',
-      displayName: 'Default',
-      description: 'Clean and modern design with blue accents',
-      cssClass: 'theme-default'
+      name: "default",
+      displayName: "Default",
+      description: "Clean and modern design with blue accents",
+      cssClass: "theme-default",
     },
     dark: {
-      name: 'dark',
-      displayName: 'Dark',
-      description: 'Dark mode for comfortable reading',
-      cssClass: 'theme-dark'
-    }
+      name: "dark",
+      displayName: "Dark",
+      description: "Dark mode for comfortable reading",
+      cssClass: "theme-dark",
+    },
   };
 
-  constructor(private apiService: ApiService) {
-    this.initializeTheme();
+  constructor(private apiService: ApiService) {}
+
+  async waitForInitialization(): Promise<void> {
+    return this.initializeTheme();
   }
 
-  private initializeTheme(): void {
+  private async initializeTheme(): Promise<void> {
     this.isLoadingSubject.next(true);
 
-    this.apiService.getBlogSettings().subscribe({
-      next: (settings) => {
-        const theme = settings.theme as Theme;
-        if (this.isValidTheme(theme)) {
-          this.setTheme(theme, false);
-        } else {
-          this.setTheme('default', false);
-        }
-        this.isLoadingSubject.next(false);
-      },
-      error: () => {
-        this.setTheme('default', false);
-        this.isLoadingSubject.next(false);
+    // HTML script applies default theme immediately
+    // Set service state to match
+    this.currentThemeSubject.next("default");
+
+    try {
+      // Fetch the admin-configured theme from the API
+      const settings = await firstValueFrom(this.apiService.getBlogSettings());
+      const theme = settings.theme as Theme;
+
+      if (this.isValidTheme(theme)) {
+        // Apply the admin-configured theme
+        this.setTheme(theme, false);
+      } else {
+        // API doesn't have a valid theme, keep default
+        // Admin needs to set a theme in blog settings
+        console.warn(
+          "No valid theme found in blog settings, using default theme"
+        );
       }
-    });
+    } catch (error) {
+      // API failed, keep default theme
+      console.warn(
+        "Failed to load theme from API, using default theme:",
+        error
+      );
+    } finally {
+      this.isLoadingSubject.next(false);
+    }
   }
 
   setTheme(theme: Theme, updateSettings: boolean = true): void {
     if (!this.isValidTheme(theme)) {
       console.warn(`Invalid theme: ${theme}. Using default theme.`);
-      theme = 'default';
+      theme = "default";
     }
 
     const previousTheme = this.currentThemeSubject.value;
@@ -103,7 +118,7 @@ export class ThemeService {
       documentElement.classList.add(this.themes[newTheme].cssClass);
     }
 
-    documentElement.setAttribute('data-theme', newTheme);
+    documentElement.setAttribute("data-theme", newTheme);
   }
 
   private updateBlogSettings(theme: Theme): void {
@@ -111,7 +126,7 @@ export class ThemeService {
       next: (currentSettings) => {
         const updatedSettings = {
           ...currentSettings,
-          theme: theme
+          theme: theme,
         };
 
         this.apiService.updateBlogSettings(updatedSettings).subscribe({
@@ -119,13 +134,16 @@ export class ThemeService {
             console.log(`Theme updated to: ${theme}`);
           },
           error: (error) => {
-            console.error('Failed to update theme in settings:', error);
-          }
+            console.error("Failed to update theme in settings:", error);
+          },
         });
       },
       error: (error) => {
-        console.error('Failed to get current settings for theme update:', error);
-      }
+        console.error(
+          "Failed to get current settings for theme update:",
+          error
+        );
+      },
     });
   }
 
