@@ -9,6 +9,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` - Build both frontend and backend for production
 - `npm run dev:backend` - Start only the NestJS backend in development mode
 - `npm run dev:frontend` - Start only the Angular frontend in development mode
+- `npm run test` - Run tests for both frontend and backend concurrently
+- `npm run test:front` - Run only frontend Jest tests
+- `npm run test:back` - Run only backend Jest tests
 
 ### Backend Development (apps/backend)
 - `npm run start:dev` - Start backend with hot reload
@@ -26,7 +29,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Frontend Development (apps/frontend)
 - `npm run start` - Start Angular dev server (port 4200)
 - `npm run build` - Build Angular app for production
-- `npm run test` - Run Karma/Jasmine tests
+- `npm run test` - Run Jest unit tests
+- `npm run test:watch` - Run Jest tests in watch mode
+- `npm run test:coverage` - Run Jest tests with coverage report
 - `npm run watch` - Build with watch mode
 
 ### Docker Development
@@ -123,4 +128,4 @@ libs/shared-types/    # TypeScript types shared between frontend/backend
 ### Testing
 - Backend has Jest unit tests and e2e tests
 - Use Bruno collections in `/REST` folder for API testing
-- Frontend uses Karma/Jasmine for unit tests
+- Frontend uses Jest with Angular Testing Library for unit tests

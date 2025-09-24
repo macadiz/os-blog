@@ -18,7 +18,10 @@
     "prisma:studio": "npm run prisma:studio --workspace=apps/backend",
     "docker:build": "docker build -t os-blog:latest . --platform linux/amd64",
     "docker:build-arm": "docker build -t os-blog:latest-arm . --platform linux/arm64",
-    "docker:setup": "./setup.sh"
+    "docker:setup": "./setup.sh",
+    "test:front": "npm run test --workspace=apps/frontend",
+    "test:back": "npm run test --workspace=apps/backend",
+    "test": "concurrently \"npm run test:front\" \"npm run test:back\""
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
