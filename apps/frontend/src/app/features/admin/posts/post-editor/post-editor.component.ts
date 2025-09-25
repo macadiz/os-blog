@@ -24,12 +24,23 @@ import {
   FileCategory,
   FileUploadResponse,
 } from "../../../../shared/components/file-upload/file-upload.component";
-import { CardComponent, InputComponent, TextareaComponent, ButtonComponent } from "../../../../shared/ui";
+import {
+  CardComponent,
+  InputComponent,
+  ButtonComponent,
+} from "../../../../shared/ui";
 
 @Component({
   selector: "app-post-editor",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FileUploadComponent, CardComponent, InputComponent, TextareaComponent, ButtonComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FileUploadComponent,
+    CardComponent,
+    InputComponent,
+    ButtonComponent,
+  ],
   templateUrl: "./post-editor.component.html",
   styles: [],
 })
@@ -78,31 +89,42 @@ export class PostEditorComponent implements OnInit {
     private route: ActivatedRoute,
     private apiService: ApiService
   ) {
-    this.postForm = this.fb.group({
+    this.postForm = this.createForm();
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
       title: ["", [Validators.required, Validators.maxLength(200)]],
-      content: ["", Validators.required],
-      excerpt: ["", Validators.maxLength(500)],
+      content: ["", [Validators.required]],
+      excerpt: ["", [Validators.maxLength(500)]],
       featuredImage: [""],
       published: [false],
       publishedAt: [""],
-      metaTitle: ["", Validators.maxLength(60)],
-      metaDescription: ["", Validators.maxLength(160)],
+      metaTitle: ["", [Validators.maxLength(60)]],
+      metaDescription: ["", [Validators.maxLength(160)]],
       categoryId: [""],
     });
   }
 
-  ngOnInit() {
-    this.route.params.subscribe((params) => {
+  async ngOnInit() {
+    // Reset form to initial state
+    this.postForm = this.createForm();
+
+    // Subscribe to route params for editing mode
+    this.route.params.subscribe(async (params) => {
       this.postId = params["id"] || null;
       this.isEditing = !!this.postId;
 
       if (this.isEditing) {
-        this.loadPost();
+        await this.loadPost();
       }
     });
 
-    this.loadCategories();
-    this.loadTags();
+    // Load required data
+    await Promise.all([this.loadCategories(), this.loadTags()]);
+
+    // Ensure form is marked as initialized
+    this.postForm.updateValueAndValidity();
   }
 
   private async loadPost() {
@@ -171,6 +193,8 @@ export class PostEditorComponent implements OnInit {
   }
 
   async onSubmit() {
+    this.markFormGroupTouched();
+
     if (this.postForm.invalid) {
       return;
     }
