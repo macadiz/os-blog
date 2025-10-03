@@ -13,7 +13,7 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const API_BASE_URL = process.env.API_URL || 'http://localhost:3001';
 const DIST_DIR = process.env.DIST_DIR || './dist/frontend';
-const BASE_URL = process.env.BASE_URL || 'http://localhost:4200';
+const BASE_URL = process.env.BASE_URL || 'http://localhost';
 
 // Read the base index.html template
 function getIndexTemplate() {
