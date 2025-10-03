@@ -92,7 +92,12 @@ docker run -d \
 **Environment Variables:**
 - `POSTGRES_PASSWORD` (required) - Database password
 - `JWT_SECRET` (required) - JWT signing secret (min 32 characters)
-- `BASE_URL` (optional) - Your domain for meta tags (default: http://localhost)
+- `BASE_URL` (important for production) - Your domain for meta tags and image URLs (default: http://localhost)
+
+**⚠️ Important**: Set `BASE_URL` to your actual domain in production to ensure:
+- OpenGraph meta tags have correct URLs for social media sharing
+- Featured images display properly in social media previews
+- Example: `BASE_URL=https://yourdomain.com`
 
 #### **Option 3: Systemd Services**
 

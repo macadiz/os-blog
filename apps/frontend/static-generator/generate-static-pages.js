@@ -117,10 +117,11 @@ function generateMetaTags(post, blogSettings) {
     if (post.featuredImage.startsWith('http://') || post.featuredImage.startsWith('https://')) {
       imageUrl = post.featuredImage;
     } else {
-      // For relative URLs, use localhost:3001 directly since that's where the API serves files
+      // For relative URLs, use BASE_URL (respects environment)
+      const baseForFiles = BASE_URL.replace(/\/$/, ''); // Remove trailing slash
       imageUrl = post.featuredImage.startsWith('/')
-        ? `http://localhost:3001${post.featuredImage}`
-        : `http://localhost:3001/${post.featuredImage}`;
+        ? `${baseForFiles}${post.featuredImage}`
+        : `${baseForFiles}/${post.featuredImage}`;
     }
   }
 

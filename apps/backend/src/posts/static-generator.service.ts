@@ -31,7 +31,7 @@ export class StaticGeneratorService {
    * Trigger static page regeneration
    * Called when posts are created, updated, or published
    */
-  async triggerRegeneration(reason: string = 'Post updated'): Promise<void> {
+  triggerRegeneration(reason: string = 'Post updated') {
     try {
       this.logger.log(`🔄 Triggering static page regeneration: ${reason}`);
 
