@@ -3,7 +3,7 @@ name: Candidate deploy
 on:
   push:
     tags:
-      - "*-RC*" # Trigger only if matches version-RCnumber (ej: 0.0.1-RC1)
+      - "**-RC**" # Trigger only if matches version-RCnumber (ej: 0.0.1-RC1)
 
 jobs:
   docker:
