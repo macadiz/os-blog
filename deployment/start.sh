@@ -169,6 +169,21 @@ nginx
 # Wait a moment for nginx to start
 sleep 2
 
+# Install missing dependencies for static-generator
+echo "📦 Installing static-generator dependencies..."
+cd /app/frontend
+npm install dotenv express --production --no-save 2>/dev/null || echo "Dependencies already installed"
+
+# Generate initial static pages for existing posts
+echo "📄 Generating initial static pages..."
+export API_URL="http://localhost:3000"
+export BASE_URL=${BASE_URL:-"http://localhost"}
+export WEBHOOK_PORT=3002
+export DIST_DIR="./dist"
+
+# Wait for backend to be ready before generating static pages
+echo "⏳ Backend will start first, static pages will be generated after..."
+
 # Start the backend application
 echo "🚀 Starting backend application..."
 sleep 3
@@ -181,14 +196,36 @@ export BASE_URL=${BASE_URL:-"http://localhost:$PORT"}
 node dist/main.js &
 BACKEND_PID=$!
 
+# Wait for backend to be ready
+echo "⏳ Waiting for backend to be ready..."
+sleep 5
+until curl -f http://localhost:3000/health > /dev/null 2>&1; do
+    echo "   Backend not ready yet..."
+    sleep 2
+done
+echo "✅ Backend is ready!"
+
+# Generate initial static pages
+echo "📄 Generating initial static pages..."
+cd /app/frontend
+node static-generator/generate-static-pages.js || echo "⚠️  Static page generation failed (normal if no posts exist yet)"
+
+# Start webhook server for automatic regeneration
+echo "🔗 Starting static page webhook server..."
+cd /app/frontend
+node static-generator/auto-generate-webhook.js &
+WEBHOOK_PID=$!
+
 echo "✅ All services started!"
 echo "📍 Backend PID: $BACKEND_PID"
+echo "📍 Webhook PID: $WEBHOOK_PID"
 echo "🌐 Access your blog at: http://localhost"
 
 # Function to handle shutdown
 cleanup() {
     echo "🛑 Shutting down services..."
     kill $BACKEND_PID 2>/dev/null || true
+    kill $WEBHOOK_PID 2>/dev/null || true
     nginx -s quit 2>/dev/null || true
     su postgres -c "pg_ctl -D /var/lib/postgresql/data stop" 2>/dev/null || true
     exit 0

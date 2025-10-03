@@ -29,6 +29,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Frontend Development (apps/frontend)
 - `npm run start` - Start Angular dev server (port 4200)
 - `npm run build` - Build Angular app for production
+- `npm run build:static` - Build Angular app and generate static pages with meta tags
+- `npm run generate-static` - Generate static HTML pages for blog posts (run after build)
+- `npm run webhook:start` - Start webhook server for automatic static page regeneration
 - `npm run test` - Run Jest unit tests
 - `npm run test:watch` - Run Jest tests in watch mode
 - `npm run test:coverage` - Run Jest tests with coverage report

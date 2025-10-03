@@ -12,6 +12,9 @@ RUN sed -i 's#../../node_modules#./node_modules#g' ./angular.json
 
 RUN npm run build
 
+# Note: Static pages will be generated at runtime when backend starts
+# because we need database connection to fetch blog posts
+
 # Backend Build Stage
 FROM node:20-alpine AS backend-builder
 WORKDIR /app/backend
@@ -51,6 +54,10 @@ WORKDIR /app
 
 # Copy built frontend
 COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
+
+# Copy static-generator files and dependencies
+COPY --from=frontend-builder /app/frontend/static-generator /app/frontend/static-generator
+COPY --from=frontend-builder /app/frontend/node_modules /app/frontend/node_modules
 
 # Copy built backend
 COPY --from=backend-builder /app/backend/dist /app/backend/dist
