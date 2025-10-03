@@ -18,12 +18,14 @@ import { PostsQueryDto } from './dto/posts-query.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RequireActiveUser } from '../auth/decorators/require-active-user.decorator';
 import { RssService } from '../rss/rss.service';
+import { StaticGeneratorService } from './static-generator.service';
 
 @Controller()
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
     private readonly rssService: RssService,
+    private readonly staticGeneratorService: StaticGeneratorService,
   ) {}
 
   // RSS Feed endpoint
@@ -54,8 +56,15 @@ export class PostsController {
   // Admin endpoints (protected)
   @RequireActiveUser()
   @Post('admin/posts')
-  create(@Body() createPostDto: CreatePostDto, @CurrentUser() user: any) {
-    return this.postsService.create(createPostDto, user.id);
+  async create(@Body() createPostDto: CreatePostDto, @CurrentUser() user: any) {
+    const result = await this.postsService.create(createPostDto, user.id);
+
+    // Trigger static page regeneration if post is published
+    if (createPostDto.published) {
+      this.staticGeneratorService.triggerRegeneration('New post published');
+    }
+
+    return result;
   }
 
   @RequireActiveUser()
@@ -96,7 +105,17 @@ export class PostsController {
       throw new NotFoundException('Post not found');
     }
 
-    return this.postsService.update(id, updatePostDto);
+    const result = await this.postsService.update(id, updatePostDto);
+
+    // Trigger static page regeneration if post is published (newly published or already published)
+    const wasPublished = post.published;
+    const isPublished = updatePostDto.published !== undefined ? updatePostDto.published : wasPublished;
+
+    if (isPublished || wasPublished) {
+      this.staticGeneratorService.triggerRegeneration('Post updated');
+    }
+
+    return result;
   }
 
   @RequireActiveUser()
@@ -109,6 +128,13 @@ export class PostsController {
       throw new NotFoundException('Post not found');
     }
 
-    return this.postsService.remove(id);
+    const result = await this.postsService.remove(id);
+
+    // Trigger static page regeneration if a published post was deleted
+    if (post.published) {
+      this.staticGeneratorService.triggerRegeneration('Post deleted');
+    }
+
+    return result;
   }
 }

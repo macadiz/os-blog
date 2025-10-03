@@ -115,7 +115,7 @@ if [[ $START_NOW =~ ^[Yy]$ ]]; then
                 -p $PORT:80 \
                 -p $POSTGRES_PORT:5432 \
                 -v os-blog-database-data:/var/lib/postgresql/data \
-                -v os-blog-static-files:/app/static \
+                -v os-blog-static-files:/var/www/static \
                 $DOCKER_ENV_VARS \
                 --restart unless-stopped \
                 os-blog:latest
@@ -124,7 +124,7 @@ if [[ $START_NOW =~ ^[Yy]$ ]]; then
                 --name os-blog \
                 -p $PORT:80 \
                 -v os-blog-database-data:/var/lib/postgresql/data \
-                -v os-blog-static-files:/app/static \
+                -v os-blog-static-files:/var/www/static \
                 $DOCKER_ENV_VARS \
                 --restart unless-stopped \
                 os-blog:latest
