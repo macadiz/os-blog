@@ -1,9 +1,9 @@
-name: Image deploy
+name: Candidate deploy
 
 on:
   push:
     tags:
-      - "v*-RC" # Trigger only if tag starts with v (e.g., v1.0.0)
+      - "*-RC" # Trigger only if tag starts with v (e.g., v1.0.0)
 
 jobs:
   docker:
