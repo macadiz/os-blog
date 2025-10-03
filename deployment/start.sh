@@ -169,11 +169,6 @@ nginx
 # Wait a moment for nginx to start
 sleep 2
 
-# Install missing dependencies for static-generator
-echo "📦 Installing static-generator dependencies..."
-cd /app/frontend
-npm install dotenv express --production --no-save 2>/dev/null || echo "Dependencies already installed"
-
 # Generate initial static pages for existing posts
 echo "📄 Generating initial static pages..."
 export API_URL="http://localhost:3000"

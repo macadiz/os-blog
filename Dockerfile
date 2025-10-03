@@ -79,7 +79,7 @@ RUN chmod +x /app/start.sh
 EXPOSE 80
 
 # Volumes for data persistence
-VOLUME /app/static
+VOLUME /var/www/static
 VOLUME /var/lib/postgresql/data
 
 # Run the startup script
