@@ -1,0 +1,30 @@
+meta {
+  name: Test Access Denied for Non-Admin Actions
+  type: http
+  seq: 14
+}
+
+patch {
+  url: {{baseUrl}}/comments/{{testCommentId}}/approve
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userToken}}
+}
+
+assert {
+  res.status: eq 403
+}
+
+tests {
+  test("Non-admin users cannot perform admin actions", function() {
+    const response = res.getBody();
+    
+    expect(response.statusCode).to.equal(403);
+    expect(response.message).to.include("Forbidden");
+    
+    console.log("Correctly blocked non-admin approval attempt");
+  });
+}

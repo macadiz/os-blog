@@ -1,0 +1,44 @@
+meta {
+  name: Create Comment - Rate Limiting
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/comments/{{testPostId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "content": "First comment to test rate limiting",
+    "authorEmail": "rate.test@example.com",
+    "authorName": "Rate Test User"
+  }
+}
+
+assert {
+  res.status: in [201, 400, 429]
+}
+
+tests {
+  test("Rate limiting works correctly", function() {
+    const status = res.getStatus();
+    const response = res.getBody();
+    
+    if (status === 201) {
+      // First comment should succeed
+      expect(response.id).to.be.a("string");
+      expect(response.message).to.include("approval");
+      console.log("First comment created successfully");
+    } else if (status === 400) {
+      // Rate limit exceeded
+      expect(response.message).to.include("Too many comments");
+      console.log("Rate limit message:", response.message);
+    } else if (status === 429) {
+      // Throttler rate limit
+      console.log("Throttler rate limit reached");
+    }
+  });
+}

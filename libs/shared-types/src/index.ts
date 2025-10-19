@@ -35,6 +35,7 @@ export interface Post {
   categoryId?: string;
   category?: Category;
   tags?: Tag[];
+  comments?: Comment[];
 }
 
 export interface Category {
@@ -68,8 +69,24 @@ export interface BlogSettings {
   emailSettings?: any;
   socialLinks?: any;
   seoSettings?: any;
+  allowComments?: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  authorEmail: string;
+  authorName: string;
+  authorIpAddress: string;
+  userAgent?: string;
+  isApproved: boolean;
+  isSpam: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  postId: string;
+  post?: Post;
 }
 
 // DTOs
@@ -90,6 +107,7 @@ export interface BlogSettingsDto {
   emailSettings?: any;
   socialLinks?: any;
   seoSettings?: any;
+  allowComments?: boolean;
 }
 
 export interface UpdateProfileDto {
@@ -118,6 +136,38 @@ export interface SetupStatusResponse {
 export interface CreateAdminResponse {
   message: string;
   admin: Omit<User, "password">;
+}
+
+// Comment DTOs
+export interface CreateCommentDto {
+  content: string;
+  authorEmail: string;
+  authorName: string;
+}
+
+export interface UpdateCommentDto {
+  content?: string;
+  isApproved?: boolean;
+  isSpam?: boolean;
+}
+
+export interface CommentQueryParams {
+  postId?: string;
+  isApproved?: boolean;
+  isSpam?: boolean;
+  page?: number;
+  limit?: number;
+  sortBy?: 'createdAt' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface CommentResponse {
+  id: string;
+  content: string;
+  authorName: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isApproved: boolean;
 }
 
 // File Upload Types

@@ -12,6 +12,7 @@ import { TagsModule } from './tags/tags.module';
 import { SetupModule } from './setup/setup.module';
 import { FilesModule } from './files/files.module';
 import { RssModule } from './rss/rss.module';
+import { CommentsModule } from './comments/comments.module';
 import { HttpsRedirectMiddleware } from './common/middleware/https-redirect.middleware';
 import { ProductionConfig } from './common/config/production.config';
 
@@ -46,6 +47,7 @@ import { ProductionConfig } from './common/config/production.config';
     SetupModule,
     FilesModule,
     RssModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

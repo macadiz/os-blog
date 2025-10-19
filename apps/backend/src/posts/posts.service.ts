@@ -8,7 +8,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsQueryDto } from './dto/posts-query.dto';
 import { PaginatedResponse } from '../common/dto/pagination.dto';
-import { ContentUtil } from '../common/utils/content.util';
+import { convertToHtml } from '../common/utils/content.util';
 
 @Injectable()
 export class PostsService {
@@ -56,7 +56,7 @@ export class PostsService {
 
     // Convert content to HTML
     const htmlContent = createPostDto.content
-      ? await ContentUtil.convertToHtml(createPostDto.content)
+      ? await convertToHtml(createPostDto.content)
       : null;
 
     // Validate category if provided
@@ -456,7 +456,7 @@ export class PostsService {
     let htmlContent = existingPost.htmlContent;
     if (updatePostDto.content !== undefined) {
       htmlContent = updatePostDto.content
-        ? await ContentUtil.convertToHtml(updatePostDto.content)
+        ? await convertToHtml(updatePostDto.content)
         : null;
     }
 

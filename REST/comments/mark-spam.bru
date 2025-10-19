@@ -1,0 +1,33 @@
+meta {
+  name: Mark Comment as Spam - Admin Only
+  type: http
+  seq: 10
+}
+
+patch {
+  url: {{baseUrl}}/comments/{{testCommentId}}/spam
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Admin can mark comments as spam", function() {
+    const response = res.getBody();
+    
+    expect(response.id).to.equal(bru.getEnvVar("testCommentId"));
+    expect(response.isSpam).to.be.true;
+    expect(response.isApproved).to.be.false;
+    expect(response.message).to.include("spam");
+    expect(response.updatedAt).to.be.a("string");
+    
+    console.log("Comment marked as spam successfully");
+  });
+}

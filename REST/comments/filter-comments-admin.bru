@@ -1,0 +1,42 @@
+meta {
+  name: Filter Comments - Admin Only
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{baseUrl}}/comments?isApproved=false&isSpam=false&sortBy=createdAt&sortOrder=desc&limit=5
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Admin can filter comments by approval and spam status", function() {
+    const response = res.getBody();
+    
+    expect(response.data).to.be.an("array");
+    expect(response.meta).to.be.an("object");
+    
+    // Check that all returned comments match the filter criteria
+    response.data.forEach(comment => {
+      expect(comment.isApproved).to.be.false;
+      expect(comment.isSpam).to.be.false;
+      expect(comment.id).to.be.a("string");
+      expect(comment.authorName).to.be.a("string");
+      expect(comment.content).to.be.a("string");
+    });
+    
+    // Verify limit is respected
+    expect(response.data.length).to.be.at.most(5);
+    
+    console.log(`Found ${response.data.length} pending comments out of ${response.meta.total} total`);
+  });
+}

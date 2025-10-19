@@ -1,0 +1,49 @@
+meta {
+  name: Get Comments by Post - Admin View
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/comments/post/{{testPostId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Admin can see all comments including unapproved", function() {
+    const comments = res.getBody();
+    
+    expect(comments).to.be.an("array");
+    
+    let hasUnapproved = false;
+    
+    comments.forEach(comment => {
+      expect(comment.id).to.be.a("string");
+      expect(comment.content).to.be.a("string");
+      expect(comment.authorName).to.be.a("string");
+      expect(comment.createdAt).to.be.a("string");
+      expect(comment.isApproved).to.be.a("boolean");
+      expect(comment.isSpam).to.be.a("boolean");
+      
+      if (!comment.isApproved) {
+        hasUnapproved = true;
+      }
+      
+      // Should still not expose sensitive data in post endpoint
+      expect(comment.authorEmail).to.be.undefined;
+      expect(comment.authorIpAddress).to.be.undefined;
+      expect(comment.userAgent).to.be.undefined;
+    });
+    
+    console.log(`Admin sees ${comments.length} comments (including unapproved: ${hasUnapproved})`);
+  });
+}

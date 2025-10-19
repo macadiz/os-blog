@@ -1,0 +1,30 @@
+meta {
+  name: Get All Comments - Non-Admin Forbidden
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/comments
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userToken}}
+}
+
+assert {
+  res.status: eq 403
+}
+
+tests {
+  test("Non-admin users cannot access all comments", function() {
+    const response = res.getBody();
+    
+    expect(response.statusCode).to.equal(403);
+    expect(response.message).to.include("Forbidden");
+    
+    console.log("Correctly blocked non-admin access");
+  });
+}

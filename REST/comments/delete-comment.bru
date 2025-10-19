@@ -1,0 +1,32 @@
+meta {
+  name: Delete Comment - Admin Only
+  type: http
+  seq: 13
+}
+
+delete {
+  url: {{baseUrl}}/comments/{{testCommentId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 204
+}
+
+tests {
+  test("Admin can delete comments", function() {
+    const status = res.getStatus();
+    expect(status).to.equal(204);
+    
+    // Response body should be empty for 204
+    const body = res.getBody();
+    expect(body).to.be.undefined.or.empty;
+    
+    console.log("Comment deleted successfully");
+  });
+}

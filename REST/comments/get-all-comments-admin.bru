@@ -1,0 +1,48 @@
+meta {
+  name: Get All Comments - Admin Only
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/comments?page=1&limit=10&sortBy=createdAt&sortOrder=desc
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Admin can access all comments with metadata", function() {
+    const response = res.getBody();
+    
+    expect(response.data).to.be.an("array");
+    expect(response.meta).to.be.an("object");
+    expect(response.meta.total).to.be.a("number");
+    expect(response.meta.page).to.equal(1);
+    expect(response.meta.limit).to.equal(10);
+    expect(response.meta.totalPages).to.be.a("number");
+    
+    response.data.forEach(comment => {
+      expect(comment.id).to.be.a("string");
+      expect(comment.content).to.be.a("string");
+      expect(comment.authorName).to.be.a("string");
+      expect(comment.authorEmail).to.be.a("string");
+      expect(comment.authorIpAddress).to.be.a("string");
+      expect(comment.isApproved).to.be.a("boolean");
+      expect(comment.isSpam).to.be.a("boolean");
+      expect(comment.createdAt).to.be.a("string");
+      expect(comment.post).to.be.an("object");
+      expect(comment.post.id).to.be.a("string");
+      expect(comment.post.title).to.be.a("string");
+    });
+    
+    console.log(`Found ${response.data.length} comments out of ${response.meta.total} total`);
+  });
+}

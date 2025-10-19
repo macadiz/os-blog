@@ -1,0 +1,32 @@
+meta {
+  name: Approve Comment - Admin Only
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{baseUrl}}/comments/{{testCommentId}}/approve
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Admin can approve comments", function() {
+    const response = res.getBody();
+    
+    expect(response.id).to.equal(bru.getEnvVar("testCommentId"));
+    expect(response.isApproved).to.be.true;
+    expect(response.message).to.include("approved");
+    expect(response.updatedAt).to.be.a("string");
+    
+    console.log("Comment approved successfully");
+  });
+}

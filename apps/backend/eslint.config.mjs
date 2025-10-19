@@ -45,6 +45,7 @@ export default tseslint.config(
         {
           singleQuote: true,
           trailingComma: 'all',
+          endOfLine: 'auto',
         },
       ],
     },

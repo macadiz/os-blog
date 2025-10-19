@@ -1,0 +1,40 @@
+meta {
+  name: Get Comments by Post - Public View
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/comments/post/{{testPostId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Public can only see approved comments", function() {
+    const comments = res.getBody();
+    
+    expect(comments).to.be.an("array");
+    
+    // All comments should be approved and not spam
+    comments.forEach(comment => {
+      expect(comment.isApproved).to.be.true;
+      expect(comment.isSpam).to.be.false;
+      expect(comment.id).to.be.a("string");
+      expect(comment.content).to.be.a("string");
+      expect(comment.authorName).to.be.a("string");
+      expect(comment.createdAt).to.be.a("string");
+      
+      // Should not expose sensitive data
+      expect(comment.authorEmail).to.be.undefined;
+      expect(comment.authorIpAddress).to.be.undefined;
+      expect(comment.userAgent).to.be.undefined;
+    });
+    
+    console.log(`Found ${comments.length} approved comments`);
+  });
+}

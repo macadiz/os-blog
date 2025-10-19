@@ -1,0 +1,40 @@
+meta {
+  name: Create Comment - Validation Errors
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/comments/{{testPostId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "content": "",
+    "authorEmail": "invalid-email",
+    "authorName": ""
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+tests {
+  test("Validation errors are returned", function() {
+    const response = res.getBody();
+    
+    expect(response.message).to.be.an("array");
+    expect(response.statusCode).to.equal(400);
+    
+    // Check for specific validation messages
+    const messages = Array.isArray(response.message) ? response.message : [response.message];
+    const messageString = messages.join(' ');
+    
+    expect(messageString).to.include("email");
+    
+    console.log("Validation errors:", messages);
+  });
+}

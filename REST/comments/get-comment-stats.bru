@@ -1,0 +1,35 @@
+meta {
+  name: Get Comment Statistics - Admin Only
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/comments/stats
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Admin can get comment statistics", function() {
+    const stats = res.getBody();
+    
+    expect(stats.total).to.be.a("number");
+    expect(stats.approved).to.be.a("number");
+    expect(stats.pending).to.be.a("number");
+    expect(stats.spam).to.be.a("number");
+    
+    // Verify totals add up
+    expect(stats.total).to.equal(stats.approved + stats.pending + stats.spam);
+    
+    console.log(`Comment stats - Total: ${stats.total}, Approved: ${stats.approved}, Pending: ${stats.pending}, Spam: ${stats.spam}`);
+  });
+}

@@ -1,0 +1,38 @@
+meta {
+  name: Test Content Length Validation
+  type: http
+  seq: 17
+}
+
+post {
+  url: {{baseUrl}}/comments/{{testPostId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "content": "a".repeat(2001),
+    "authorEmail": "test@example.com",
+    "authorName": "Test User With Very Long Content That Should Also Be Validated For Maximum Length Allowed"
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+tests {
+  test("Content length validation works", function() {
+    const response = res.getBody();
+    
+    expect(response.statusCode).to.equal(400);
+    
+    const messages = Array.isArray(response.message) ? response.message : [response.message];
+    const messageString = messages.join(' ');
+    
+    expect(messageString).to.include("2000");
+    
+    console.log("Content length validation working correctly");
+  });
+}

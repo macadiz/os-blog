@@ -1,0 +1,33 @@
+meta {
+  name: Setup Test Data for Comments
+  type: http
+  seq: 0
+}
+
+get {
+  url: {{baseUrl}}/admin/posts?limit=1&published=true
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Setup test post ID for comment tests", function() {
+    const posts = res.getBody();
+    
+    if (posts && posts.length > 0) {
+      const testPost = posts[0];
+      bru.setEnvVar("testPostId", testPost.id);
+      console.log(`Set testPostId to: ${testPost.id} (${testPost.title})`);
+    } else {
+      console.log("No published posts found. You may need to create a test post first.");
+    }
+  });
+}

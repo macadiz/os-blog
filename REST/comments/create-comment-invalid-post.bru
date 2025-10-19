@@ -1,0 +1,34 @@
+meta {
+  name: Create Comment - Invalid Post ID
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{baseUrl}}/comments/invalid-post-id
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "content": "This should fail due to invalid post ID",
+    "authorEmail": "test@example.com",
+    "authorName": "Test User"
+  }
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("Comment creation fails for non-existent post", function() {
+    const response = res.getBody();
+    
+    expect(response.statusCode).to.equal(404);
+    expect(response.message).to.include("not found");
+    
+    console.log("Correctly rejected comment for invalid post ID");
+  });
+}

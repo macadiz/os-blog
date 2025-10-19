@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run prisma:migrate:*)",
+      "Read(/H:\\h\\Proyectos\\os-blog\\apps/**)",
+      "Read(/H:\\h\\Proyectos\\os-blog\\apps/**)",
+      "Read(/H:\\h\\Proyectos\\os-blog\\apps/**)"
+    ],
+    "deny": [],
+    "ask": [],
+    "additionalDirectories": [
+      "H:\\h\\Proyectos\\os-blog\\apps\\backend\\src\\comments",
+      "H:\\h\\Proyectos\\os-blog\\apps\\backend\\src",
+      "H:\\h\\Proyectos\\os-blog\\REST"
+    ]
+  }
+}

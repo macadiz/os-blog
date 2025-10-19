@@ -1,0 +1,40 @@
+meta {
+  name: Get Single Comment - Admin Only
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/comments/{{testCommentId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Admin can get individual comment details", function() {
+    const comment = res.getBody();
+    
+    expect(comment.id).to.equal(bru.getEnvVar("testCommentId"));
+    expect(comment.content).to.be.a("string");
+    expect(comment.authorName).to.be.a("string");
+    expect(comment.authorEmail).to.be.a("string");
+    expect(comment.authorIpAddress).to.be.a("string");
+    expect(comment.isApproved).to.be.a("boolean");
+    expect(comment.isSpam).to.be.a("boolean");
+    expect(comment.createdAt).to.be.a("string");
+    expect(comment.updatedAt).to.be.a("string");
+    expect(comment.post).to.be.an("object");
+    expect(comment.post.id).to.be.a("string");
+    expect(comment.post.title).to.be.a("string");
+    
+    console.log(`Retrieved comment: ${comment.id}`);
+  });
+}
