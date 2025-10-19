@@ -20,6 +20,15 @@ Write-Host ""
 
 # Build Docker image
 docker build -t os-blog:latest .
+if ($LASTEXITCODE -ne 0) {
+    Write-Host ""
+    Write-Host "Docker build failed! Please check the build output above." -ForegroundColor Red
+    exit 1
+}
+
+Write-Host ""
+Write-Host "Docker image built successfully" -ForegroundColor Green
+Write-Host ""
 
 # Ask user for basic configuration
 Write-Host "Configuration" -ForegroundColor Cyan
@@ -169,7 +178,7 @@ if ($START_NOW -match "^[Yy]$") {
         "--name", "os-blog",
         "-p", "$PORT`:80",
         "-v", "os-blog-database-data:/var/lib/postgresql/data",
-        "-v", "os-blog-static-files:/app/static"
+        "-v", "os-blog-static-files:/var/www/static"
     )
     
     $dockerArgs += $DOCKER_ENV_VARS
