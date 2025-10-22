@@ -10,3 +10,4 @@ apps/backend/static/blog_images
 apps/backend/static/settings
 dist/
 apps/backend/static/settings
+fly.toml

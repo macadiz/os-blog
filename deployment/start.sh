@@ -200,10 +200,20 @@ until curl -f http://localhost:3000/health > /dev/null 2>&1; do
 done
 echo "✅ Backend is ready!"
 
-# Generate initial static pages
-echo "📄 Generating initial static pages..."
+# Generate initial static pages with OpenGraph meta tags
+echo "📄 Generating initial static pages with OpenGraph meta tags..."
+echo "   This creates /blog/[slug]/index.html for each published post"
+echo "   These pages have proper meta tags for social media sharing"
 cd /app/frontend
 node static-generator/generate-static-pages.js || echo "⚠️  Static page generation failed (normal if no posts exist yet)"
+
+# Verify static pages were created
+if [ -d "./dist/blog" ]; then
+    POST_COUNT=$(ls -1 ./dist/blog 2>/dev/null | wc -l)
+    echo "   ✅ Generated static pages for $POST_COUNT posts"
+else
+    echo "   ℹ️  No static pages generated (no posts exist yet)"
+fi
 
 # Start webhook server for automatic regeneration
 echo "🔗 Starting static page webhook server..."

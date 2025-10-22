@@ -113,9 +113,33 @@ async function fetchBlogSettings() {
 // Generate meta tags for a blog post
 function generateMetaTags(post, blogSettings) {
   const title = post.metaTitle || `${post.title} - ${blogSettings.blogTitle}`;
-  const description =
-    post.metaDescription || post.excerpt || blogSettings.blogDescription;
+
+  // Generate description with multiple fallbacks
+  let description = post.metaDescription || post.excerpt;
+
+  // If still no description, try to generate from content (strip markdown/html and truncate)
+  if (!description && post.content) {
+    // Remove markdown/html tags and get first 160 characters
+    const plainText = post.content
+      .replace(/[#*_~`]/g, '') // Remove markdown formatting
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/\n+/g, ' ') // Replace newlines with spaces
+      .trim();
+    description = plainText.substring(0, 160);
+    if (plainText.length > 160) {
+      description += '...';
+    }
+  }
+
+  // Final fallback to blog description or default
+  if (!description || description.trim() === '') {
+    description = (blogSettings.blogDescription && blogSettings.blogDescription.trim() !== '')
+      ? blogSettings.blogDescription
+      : `Read ${post.title} on ${blogSettings.blogTitle || 'this blog'}`;
+  }
+
   const url = `${BASE_URL}/blog/${post.slug}`;
+
   // Handle image URL - check if it's already absolute or needs base URL
   let imageUrl = "";
   if (post.featuredImage) {
@@ -126,12 +150,42 @@ function generateMetaTags(post, blogSettings) {
       imageUrl = post.featuredImage;
     } else {
       // For relative URLs, use BASE_URL (respects environment)
-      const baseForFiles = `${BASE_URL.replace(/\/$/, "")}/api`; // Remove trailing slash
+      const baseForFiles = `${BASE_URL.replace(/\/$/, "")}/api`;
       imageUrl = post.featuredImage.startsWith("/")
         ? `${baseForFiles}${post.featuredImage}`
         : `${baseForFiles}/${post.featuredImage}`;
     }
   }
+
+  const ogImageTags = imageUrl
+    ? `<meta property="og:image" content="${escapeHtml(imageUrl)}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />`
+    : "";
+
+  const twitterImageTag = imageUrl
+    ? `<meta name="twitter:image" content="${escapeHtml(imageUrl)}" />`
+    : "";
+
+  // Handle logo URL - same logic as featured image
+  let logoUrl = "";
+  if (blogSettings.logoUrl && blogSettings.logoUrl.trim() !== '') {
+    if (
+      blogSettings.logoUrl.startsWith("http://") ||
+      blogSettings.logoUrl.startsWith("https://")
+    ) {
+      logoUrl = blogSettings.logoUrl;
+    } else {
+      const baseForFiles = `${BASE_URL.replace(/\/$/, "")}/api`;
+      logoUrl = blogSettings.logoUrl.startsWith("/")
+        ? `${baseForFiles}${blogSettings.logoUrl}`
+        : `${baseForFiles}/${blogSettings.logoUrl}`;
+    }
+  }
+
+  const ogLogoTag = logoUrl
+    ? `<meta property="og:logo" content="${escapeHtml(logoUrl)}" />`
+    : "";
 
   return `
     <title>${escapeHtml(title)}</title>
@@ -143,15 +197,14 @@ function generateMetaTags(post, blogSettings) {
     <meta property="og:type" content="article" />
     <meta property="og:url" content="${escapeHtml(url)}" />
     <meta property="og:site_name" content="${escapeHtml(blogSettings.blogTitle)}" />
-    ${imageUrl ? `<meta property="og:image" content="${escapeHtml(imageUrl)}" />` : ""}
-    ${imageUrl ? `<meta property="og:image:width" content="1200" />` : ""}
-    ${imageUrl ? `<meta property="og:image:height" content="630" />` : ""}
+    ${ogImageTags}
+    ${ogLogoTag}
 
     <!-- Twitter Card tags -->
     <meta name="twitter:card" content="${imageUrl ? "summary_large_image" : "summary"}" />
     <meta name="twitter:title" content="${escapeHtml(title)}" />
     <meta name="twitter:description" content="${escapeHtml(description)}" />
-    ${imageUrl ? `<meta name="twitter:image" content="${escapeHtml(imageUrl)}" />` : ""}`;
+    ${twitterImageTag}`;
 }
 
 // Escape HTML entities
@@ -169,21 +222,12 @@ function escapeHtml(text) {
 function createStaticPage(post, blogSettings, template) {
   const metaTags = generateMetaTags(post, blogSettings);
 
-  // Replace the default meta tags with post-specific ones
-  let html = template.replace(
-    /<title>.*?<\/title>/,
-    metaTags.split("\n").find((line) => line.includes("<title>")) || ""
-  );
+  // Remove existing title and meta description from template to avoid duplicates
+  let html = template.replace(/<title>.*?<\/title>/, "");
+  html = html.replace(/<meta name="description"[^>]*>/, "");
 
-  // Replace or add meta description
-  html = html.replace(
-    /<meta name="description"[^>]*>/,
-    metaTags.split("\n").find((line) => line.includes('name="description"')) ||
-      ""
-  );
-
-  // Add OpenGraph and Twitter meta tags in the head section
-  html = html.replace("</head>", `\n    ${metaTags}\n  </head>`);
+  // Add all meta tags (including title and description) in the head section
+  html = html.replace("</head>", `${metaTags}\n  </head>`);
 
   // Create directory structure
   const blogDir = path.join(DIST_DIR, "blog");
