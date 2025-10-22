@@ -36,7 +36,7 @@ jobs:
         run: |
           npm version $VERSION --no-git-tag-version
           git add package.json package-lock.json
-          git commit -m "chore: bump version to $VERSION [skip ci]"
+          git commit -m "chore: bump version to $VERSION"
           git push origin HEAD:main
 
       - name: Log in to Docker Hub
