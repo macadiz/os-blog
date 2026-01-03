@@ -32,16 +32,22 @@ RUN npm run build
 # Final Stage
 FROM alpine:3.21
 
+# Default to local PostgreSQL (can be overridden at runtime)
+ENV POSTGRES_HOST="localhost"
+ENV POSTGRES_PORT=5432
+
 # Install system dependencies
+# Includes PostgreSQL for local database support
+# Includes postgresql-client for external database connections
 RUN apk add --no-cache \
     curl \
     wget \
     gnupg \
-    postgresql \
-    postgresql-client \
     nginx \
     sudo \
     nodejs \
+    postgresql \
+    postgresql-client \
     npm \
     openssl
 
@@ -75,6 +81,7 @@ COPY deployment/nginx.conf /etc/nginx/nginx.conf
 COPY deployment/start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
+RUN if [ "$EXPOSE_DB" == "true" ]; then echo "EXPOSE 5432" >> /etc/docker_exposed_ports; fi
 # Expose port
 EXPOSE 80
 
