@@ -1,5 +1,5 @@
 # OS Blog - Multi-Stage Build
-
+ARG EXPOSE_DB="false"
 # Frontend Build Stage
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
@@ -35,6 +35,7 @@ FROM alpine:3.21
 # Default to local PostgreSQL (can be overridden at runtime)
 ENV POSTGRES_HOST="localhost"
 ENV POSTGRES_PORT=5432
+ARG EXPOSE_DB
 
 # Install system dependencies
 # Includes PostgreSQL for local database support
