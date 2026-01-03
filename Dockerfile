@@ -81,7 +81,6 @@ COPY deployment/nginx.conf /etc/nginx/nginx.conf
 COPY deployment/start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
-RUN if [ "$EXPOSE_DB" == "true" ]; then echo "EXPOSE 5432" >> /etc/docker_exposed_ports; fi
 # Expose port
 EXPOSE 80
 
