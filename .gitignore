@@ -11,3 +11,4 @@ apps/backend/static/settings
 dist/
 apps/backend/static/settings
 fly.toml
+/backup.sql
